@@ -1,7 +1,6 @@
 import createPersistedState from 'vuex-persistedstate'
 import { remote } from 'electron'
 import Package from '~~/package.json'
-import fileUtil from '~/utils/file'
 
 export const state = () => ({
   title: Package.productName,
@@ -20,12 +19,12 @@ export const actions = {
   initialize({ dispatch }) {
     dispatch('local/explorer/initialize')
   },
-  open({ dispatch }, { filepath }) {
-    const file = fileUtil.getFile(filepath)
-    if (file.directory) {
-      dispatch('openDirectory', { dirpath: file.path })
-    }
-  },
+  // open({ dispatch }, { filepath }) {
+  //   const file = fileUtil.getFile(filepath)
+  //   if (file.directory) {
+  //     dispatch('openDirectory', { dirpath: file.path })
+  //   }
+  // },
   openDirectory({ dispatch }, { dirpath }) {
     dispatch('local/explorer/changeDirectory', { dirpath })
     this.$router.push('/explorer')
@@ -91,14 +90,6 @@ export const mutations = {
 
 export const plugins = [
   createPersistedState({
-    paths: [
-      'local.explorer.directory',
-      'local.explorer.queryHistories',
-      'local.explorer.display',
-      'bookmark',
-      'rating',
-      'views',
-      'settings'
-    ]
+    paths: ['tab']
   })
 ]

@@ -1,39 +1,28 @@
 <template>
   <v-app
-    :dark="darkTheme"
     @contextmenu.native="onContextMenu"
     @drop.native.prevent="onDrop"
     @dragover.native.prevent
   >
     <title-bar />
-    <activity-bar />
-    <v-content class="fill-height"><router-view /></v-content>
-    <notification-bar />
-    <viewer />
+    <v-content class="fill-height">
+      <router-view />
+    </v-content>
   </v-app>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import ActivityBar from '~/components/ActivityBar'
-import NotificationBar from '~/components/NotificationBar'
 import TitleBar from '~/components/TitleBar'
-import Viewer from '~/components/Viewer'
 
 export default {
   components: {
-    ActivityBar,
-    NotificationBar,
-    TitleBar,
-    Viewer
+    TitleBar
   },
   computed: {
-    ...mapState(['viewing']),
     ...mapState('settings', ['darkTheme'])
   },
-  created() {
-    this.initialize()
-  },
+  created() {},
   methods: {
     onContextMenu() {
       this.$contextMenu.show()
@@ -46,7 +35,11 @@ export default {
       const filepath = files[0].path
       this.open({ filepath })
     },
-    ...mapActions(['initialize', 'open'])
+    ...mapActions(['open'])
   }
 }
 </script>
+
+<style lang="scss">
+@import '~/assets/app.scss';
+</style>

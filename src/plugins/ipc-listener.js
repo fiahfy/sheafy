@@ -1,5 +1,4 @@
 import { ipcRenderer, remote } from 'electron'
-import selector from '~/consts/selector'
 
 export default ({ store }) => {
   ipcRenderer.on('enterFullScreen', () => {
@@ -29,8 +28,8 @@ export default ({ store }) => {
     store.dispatch('openDirectory', { dirpath })
   })
   ipcRenderer.on('search', () => {
-    store.dispatch('focus', { selector: selector.QUERY_INPUT })
-    store.dispatch('select', { selector: selector.QUERY_INPUT })
+    // store.dispatch('focus', { selector: selector.QUERY_INPUT })
+    // store.dispatch('select', { selector: selector.QUERY_INPUT })
   })
   ipcRenderer.on('showExplorer', () => {
     store.$router.push('/explorer')
@@ -44,8 +43,8 @@ export default ({ store }) => {
   ipcRenderer.on('openLocation', () => {
     store.$router.push('/explorer')
     setTimeout(() => {
-      store.dispatch('focus', { selector: selector.DIRECTORY_INPUT })
-      store.dispatch('select', { selector: selector.DIRECTORY_INPUT })
+      // store.dispatch('focus', { selector: selector.DIRECTORY_INPUT })
+      // store.dispatch('select', { selector: selector.DIRECTORY_INPUT })
     }, 100)
   })
   ipcRenderer.on('backDirectory', () => {

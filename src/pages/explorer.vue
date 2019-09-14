@@ -1,26 +1,39 @@
 <template>
   <v-container class="explorer" fill-height fluid pa-0>
-    OK
+    <explorer-tabbar />
+    <explorer-toolbar />
+    <explorer-webview
+      v-for="tab in tabs"
+      :key="tab.id"
+      :tab="tab"
+      class="fill-height spacer"
+      :class="getClasses(tab)"
+    />
   </v-container>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
+import ExplorerTabbar from '~/components/ExplorerTabbar'
 import ExplorerToolbar from '~/components/ExplorerToolbar'
-import ExplorerCard from '~/components/ExplorerCard'
-import ExplorerTable from '~/components/ExplorerTable'
-import ExplorerGridList from '~/components/ExplorerGridList'
+import ExplorerWebview from '~/components/ExplorerWebview'
 
 export default {
   components: {
+    ExplorerTabbar,
     ExplorerToolbar,
-    ExplorerCard
+    ExplorerWebview
   },
   computed: {
-    component() {
-      return this.display === 'list' ? ExplorerTable : ExplorerGridList
-    },
-    ...mapState('local/explorer', ['display'])
+    ...mapState('tab', ['tabs']),
+    ...mapGetters('tab', ['isActiveTab'])
+  },
+  methods: {
+    getClasses(tab) {
+      return {
+        'd-none': !this.isActiveTab(tab)
+      }
+    }
   }
 }
 </script>
