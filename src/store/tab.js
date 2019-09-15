@@ -33,33 +33,34 @@ export const mutations = {
         id,
         url: 'https://www.google.com',
         title: '',
-        favicon: ''
+        favicon: '',
+        loading: false,
+        canGoBack: false,
+        canGoForward: false
       }
     ]
   },
-  updateTabTitle(state, { id, title }) {
+  updateTab(state, { id, ...params }) {
     state.tabs = state.tabs.map((tab) => {
       if (tab.id !== id) {
         return tab
       }
       return {
         ...tab,
-        title
-      }
-    })
-  },
-  updateTabFavicon(state, { id, favicon }) {
-    state.tabs = state.tabs.map((tab) => {
-      if (tab.id !== id) {
-        return tab
-      }
-      return {
-        ...tab,
-        favicon
+        ...params
       }
     })
   },
   activateTab(state, { id }) {
     state.activeTabId = id
+  },
+  closeTab(state, { id }) {
+    if (id === state.activeTabId) {
+      let index = state.tabs.findIndex((tab) => tab.id === id)
+      index = index < state.tabs.length - 1 ? index + 1 : index - 1
+      state.activeTabId =
+        index >= 0 && index < state.tabs.length ? state.tabs[index].id : 0
+    }
+    state.tabs = state.tabs.filter((tab) => tab.id !== id)
   }
 }
