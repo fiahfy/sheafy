@@ -2,32 +2,7 @@
   <v-navigation-drawer class="explorer-tabbar" permanent app clipped>
     <v-list dense>
       <v-list-item-group v-model="active">
-        <v-list-item
-          v-for="tab in tabs"
-          :key="tab.id"
-          :value="tab.id"
-          :title="tab.title"
-          transition="slide-y-transition"
-        >
-          <v-list-item-icon class="mr-4 px-1 align-self-center">
-            <v-progress-circular
-              v-if="tab.loading"
-              indeterminate
-              size="16"
-              width="2"
-              color="primary"
-            />
-            <v-img v-else :src="tab.favicon" height="16" width="16" contain />
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ tab.title }}</v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-action class="my-0">
-            <v-btn icon small @click="closeTab({ id: tab.id })">
-              <v-icon small>close</v-icon>
-            </v-btn>
-          </v-list-item-action>
-        </v-list-item>
+        <explorer-tabbar-item v-for="tab in tabs" :key="tab.id" :tab="tab" />
       </v-list-item-group>
       <v-list-item class="mt-4" @click="newTab">
         <v-list-item-icon class="mr-4 px-1 align-self-center">
@@ -42,9 +17,13 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import ExplorerTabbarItem from '~/components/ExplorerTabbarItem'
 
 export default {
+  components: {
+    ExplorerTabbarItem
+  },
   computed: {
     active: {
       get() {
@@ -57,13 +36,7 @@ export default {
     ...mapState('tab', ['tabs', 'activeTabId'])
   },
   methods: {
-    ...mapMutations('tab', ['newTab', 'activateTab', 'closeTab'])
+    ...mapActions('tab', ['newTab', 'activateTab'])
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.explorer-tabbar .v-list-item:not(:hover) ::v-deep .v-list-item__action {
-  display: none;
-}
-</style>

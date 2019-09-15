@@ -1,47 +1,49 @@
+import { remote } from 'electron'
+
 export const state = () => ({
   activeTabId: 0,
   tabs: []
 })
 
 export const getters = {
+  activeTab(state) {
+    return state.tabs.find((tab) => tab.id === state.activeTabId)
+  },
   isActiveTab(state) {
     return (tab) => tab.id === state.activeTabId
   },
-  activeTab(state) {
-    return state.tabs.find((tab) => tab.id === state.activeTabId)
+  getSearchUrl() {
+    return (query) => 'https://www.google.com/search?q=' + query
   }
 }
 
 export const actions = {
-  toggleBookmarked({ commit, getters }, { filepath }) {
-    if (getters.isBookmarked({ filepath })) {
-      commit('removeBookmark', { filepath })
-    } else {
-      commit('addBookmark', { filepath })
+  newTabIfEmpty({ dispatch, state }) {
+    if (!state.tabs.length) {
+      dispatch('newTab')
     }
-  }
-}
-
-export const mutations = {
-  newTab(state) {
+  },
+  newTab({ commit, state }) {
     const id = Math.max.apply(null, [0, ...state.tabs.map((tab) => tab.id)]) + 1
-
-    state.activeTabId = id
-    state.tabs = [
+    const url = 'https://www.google.com'
+    const tabs = [
       ...state.tabs,
       {
         id,
-        url: 'https://www.google.com',
+        url,
         title: '',
         favicon: '',
         loading: false,
         canGoBack: false,
-        canGoForward: false
+        canGoForward: false,
+        query: url
       }
     ]
+    commit('setActiveTabId', { activeTabId: id })
+    commit('setTabs', { tabs })
   },
-  updateTab(state, { id, ...params }) {
-    state.tabs = state.tabs.map((tab) => {
+  updateTab({ commit, state }, { id, ...params }) {
+    const tabs = state.tabs.map((tab) => {
       if (tab.id !== id) {
         return tab
       }
@@ -50,17 +52,32 @@ export const mutations = {
         ...params
       }
     })
+    commit('setTabs', { tabs })
   },
-  activateTab(state, { id }) {
-    state.activeTabId = id
-  },
-  closeTab(state, { id }) {
+  closeTab({ commit, state }, { id }) {
     if (id === state.activeTabId) {
       let index = state.tabs.findIndex((tab) => tab.id === id)
       index = index < state.tabs.length - 1 ? index + 1 : index - 1
-      state.activeTabId =
+      const activeTabId =
         index >= 0 && index < state.tabs.length ? state.tabs[index].id : 0
+      commit('setActiveTabId', { activeTabId })
     }
-    state.tabs = state.tabs.filter((tab) => tab.id !== id)
+    const tabs = state.tabs.filter((tab) => tab.id !== id)
+    commit('setTabs', { tabs })
+    if (!tabs.length) {
+      remote.getCurrentWindow().close()
+    }
+  },
+  activateTab({ commit }, { id }) {
+    commit('setActiveTabId', { activeTabId: id })
+  }
+}
+
+export const mutations = {
+  setActiveTabId(state, { activeTabId }) {
+    state.activeTabId = activeTabId
+  },
+  setTabs(state, { tabs }) {
+    state.tabs = tabs
   }
 }

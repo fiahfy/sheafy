@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   data() {
@@ -54,7 +54,7 @@ export default {
       this.color = message.color
       this.text = message.text
     },
-    ...mapMutations(['setMessage'])
+    ...mapActions(['setMessage'])
   }
 }
 </script>

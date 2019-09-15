@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import ExplorerTabbar from '~/components/ExplorerTabbar'
 import ExplorerToolbar from '~/components/ExplorerToolbar'
 import ExplorerWebview from '~/components/ExplorerWebview'
@@ -28,12 +28,16 @@ export default {
     ...mapState('tab', ['tabs']),
     ...mapGetters('tab', ['isActiveTab'])
   },
+  created() {
+    this.newTabIfEmpty()
+  },
   methods: {
     getClasses(tab) {
       return {
         'd-none': !this.isActiveTab(tab)
       }
-    }
+    },
+    ...mapActions('tab', ['newTabIfEmpty'])
   }
 }
 </script>
