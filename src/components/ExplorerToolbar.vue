@@ -45,6 +45,7 @@
       outlined
       hide-details
       class="ml-2"
+      name="query"
       @focus="onFocus"
       @keydown.enter="onKeydownEnter"
     />

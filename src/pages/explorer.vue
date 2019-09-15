@@ -7,7 +7,7 @@
       :key="tab.id"
       :tab="tab"
       class="fill-height spacer"
-      :class="getClasses(tab)"
+      :class="{ 'd-none': !isActiveTab(tab) }"
     />
   </v-container>
 </template>
@@ -32,11 +32,6 @@ export default {
     this.newTabIfEmpty()
   },
   methods: {
-    getClasses(tab) {
-      return {
-        'd-none': !this.isActiveTab(tab)
-      }
-    },
     ...mapActions('tab', ['newTabIfEmpty'])
   }
 }

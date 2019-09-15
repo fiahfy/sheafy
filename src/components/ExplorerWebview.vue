@@ -1,9 +1,11 @@
 <template>
-  <webview :src="src" />
+  <webview :src="src" :preload="preload" />
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import path from 'path'
+import fileUrl from 'file-url'
 
 export default {
   props: {
@@ -18,7 +20,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('tab', ['isActiveTab', 'getSearchUrl'])
+    preload() {
+      return fileUrl(path.resolve('./src/preload/index.js'))
+    },
+    ...mapGetters('tab', ['isActiveTab', 'getUrlWithQuery'])
   },
   mounted() {
     this.$root.$on('goBack', () => {
@@ -38,13 +43,9 @@ export default {
     })
     this.$root.$on('load', () => {
       if (this.isActiveTab(this.tab)) {
-        if (!this.tab.query) {
-          return
-        }
-        if (this.tab.query.match(/^https?:\/\//)) {
-          this.$el.loadURL(this.tab.query)
-        } else {
-          this.$el.loadURL(this.getSearchUrl(this.tab.query))
+        const url = this.getUrlWithQuery(this.tab.query)
+        if (url) {
+          this.$el.loadURL(url)
         }
       }
     })

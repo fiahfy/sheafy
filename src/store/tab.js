@@ -12,8 +12,17 @@ export const getters = {
   isActiveTab(state) {
     return (tab) => tab.id === state.activeTabId
   },
-  getSearchUrl() {
-    return (query) => 'https://www.google.com/search?q=' + query
+  getUrlWithQuery() {
+    return (query) => {
+      if (!query) {
+        return ''
+      }
+      if (query.match(/^https?:\/\//)) {
+        return query
+      } else {
+        return 'https://www.google.com/search?q=' + query
+      }
+    }
   }
 }
 
@@ -23,7 +32,7 @@ export const actions = {
       dispatch('newTab')
     }
   },
-  newTab({ commit, state }) {
+  newTab({ commit, state }, { ...params }) {
     const id = Math.max.apply(null, [0, ...state.tabs.map((tab) => tab.id)]) + 1
     const url = 'https://www.google.com'
     const tabs = [
@@ -36,7 +45,8 @@ export const actions = {
         loading: false,
         canGoBack: false,
         canGoForward: false,
-        query: url
+        query: url,
+        ...params
       }
     ]
     commit('setActiveTabId', { activeTabId: id })

@@ -1,5 +1,12 @@
 <template>
-  <v-navigation-drawer class="explorer-tabbar" permanent app clipped>
+  <v-navigation-drawer
+    class="explorer-tabbar"
+    permanent
+    app
+    clipped
+    @drop.native.prevent="onDrop"
+    @dragover.native.prevent="onDragover"
+  >
     <v-list dense>
       <v-list-item-group v-model="active">
         <explorer-tabbar-item v-for="tab in tabs" :key="tab.id" :tab="tab" />
@@ -17,7 +24,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import ExplorerTabbarItem from '~/components/ExplorerTabbarItem'
 
 export default {
@@ -33,9 +40,20 @@ export default {
         this.activateTab({ id: value })
       }
     },
-    ...mapState('tab', ['tabs', 'activeTabId'])
+    ...mapState('tab', ['tabs', 'activeTabId']),
+    ...mapGetters('tab', ['getUrlWithQuery'])
   },
   methods: {
+    onDragover(e) {
+      e.dataTransfer.dropEffect = 'link'
+    },
+    onDrop(e) {
+      const query = e.dataTransfer.getData('text')
+      const url = this.getUrlWithQuery(query)
+      if (url) {
+        this.newTab({ url })
+      }
+    },
     ...mapActions('tab', ['newTab', 'activateTab'])
   }
 }

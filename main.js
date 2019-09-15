@@ -17,9 +17,20 @@ const createTemplate = () => {
       label: 'File',
       submenu: [
         {
-          label: 'Open...',
-          accelerator: 'CmdOrCtrl+O',
-          click: () => send('openDirectory')
+          label: 'New Tab',
+          accelerator: 'CmdOrCtrl+T',
+          click: () => send('newTab')
+        },
+        {
+          label: 'Open Location...',
+          accelerator: 'CmdOrCtrl+L',
+          click: () => send('openLocation')
+        },
+        { type: 'separator' },
+        {
+          label: 'Close Tab',
+          accelerator: 'CmdOrCtrl+W',
+          click: () => send('closeTab')
         }
       ]
     },
@@ -46,17 +57,6 @@ const createTemplate = () => {
     {
       label: 'View',
       submenu: [
-        {
-          label: 'Explorer',
-          accelerator: 'CmdOrCtrl+Shift+E',
-          click: () => send('showExplorer')
-        },
-        {
-          label: 'Bookmark',
-          accelerator: 'CmdOrCtrl+Shift+B',
-          click: () => send('showBookmark')
-        },
-        { type: 'separator' },
         { role: 'reload' },
         { role: 'forcereload' },
         { role: 'toggledevtools' },
@@ -66,63 +66,6 @@ const createTemplate = () => {
         // { role: 'zoomout' },
         // { type: 'separator' },
         { role: 'togglefullscreen' }
-      ]
-    },
-    {
-      label: 'Explorer',
-      submenu: [
-        {
-          label: 'Open Location...',
-          accelerator: 'CmdOrCtrl+L',
-          click: () => send('openLocation')
-        },
-        { type: 'separator' },
-        {
-          label: 'Back',
-          accelerator: 'CmdOrCtrl+Left',
-          click: () => send('backDirectory')
-        },
-        {
-          label: 'Forward',
-          accelerator: 'CmdOrCtrl+Right',
-          click: () => send('forwardDirectory')
-        },
-        {
-          label: 'Up',
-          accelerator: 'CmdOrCtrl+Shift+P',
-          click: () => send('upDirectory')
-        },
-        {
-          label: 'Home',
-          accelerator: 'CmdOrCtrl+Shift+H',
-          click: () => send('changeHomeDirectory')
-        },
-        {
-          label: 'Bookmark',
-          accelerator: 'CmdOrCtrl+D',
-          click: () => send('bookmarkDirectory')
-        },
-        { label: 'Browse', click: () => send('browseDirectory') }
-      ]
-    },
-    {
-      label: 'Viewer',
-      submenu: [
-        {
-          label: 'Zoom In',
-          accelerator: 'CmdOrCtrl+Plus',
-          click: () => send('zoomIn')
-        },
-        {
-          label: 'Zoom Out',
-          accelerator: 'CmdOrCtrl+-',
-          click: () => send('zoomOut')
-        },
-        {
-          label: 'Reset Zoom',
-          accelerator: 'CmdOrCtrl+0',
-          click: () => send('resetZoom')
-        }
       ]
     },
     {
@@ -251,10 +194,6 @@ const createWindow = async () => {
   mainWindow.on('closed', () => (mainWindow = null))
   mainWindow.on('enter-full-screen', () => send('enterFullScreen'))
   mainWindow.on('leave-full-screen', () => send('leaveFullScreen'))
-  mainWindow.on('app-command', (e, cmd) => {
-    e.preventDefault()
-    send('appCommand', cmd)
-  })
 }
 
 app.on('ready', createWindow)
