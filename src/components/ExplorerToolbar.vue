@@ -33,7 +33,7 @@
       width="36"
       height="36"
       class="mr-1"
-      @click="reload"
+      @click="stop"
     >
       <v-icon>close</v-icon>
     </v-btn>
@@ -77,6 +77,9 @@ export default {
     },
     reload() {
       this.$root.$emit('reload')
+    },
+    stop() {
+      this.$root.$emit('stop')
     },
     onFocus(e) {
       e.target.select()

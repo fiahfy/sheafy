@@ -45,7 +45,7 @@ export const actions = {
         loading: false,
         canGoBack: false,
         canGoForward: false,
-        query: url,
+        query: '',
         ...params
       }
     ]

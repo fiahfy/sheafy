@@ -39,6 +39,12 @@ export default {
     this.$root.$on('reload', () => {
       if (this.isActiveTab(this.tab)) {
         this.$el.reload()
+        this.$el.openDevTools()
+      }
+    })
+    this.$root.$on('stop', () => {
+      if (this.isActiveTab(this.tab)) {
+        this.$el.stop()
       }
     })
     this.$root.$on('load', () => {
@@ -73,13 +79,37 @@ export default {
     this.$el.addEventListener('did-stop-loading', () => {
       this.updateTab({ id: this.tab.id, loading: false })
     })
+    this.$el.addEventListener('ipc-message', ({ channel, args }) => {
+      switch (channel) {
+        case 'inspectElement': {
+          const rect = this.$el.getBoundingClientRect()
+          let [x, y] = args
+          x += rect.left
+          y += rect.top
+          this.$el.inspectElement(x, y)
+          break
+        }
+        case 'newTab': {
+          const [url] = args
+          this.newTab({ url })
+          break
+        }
+        case 'requestContextMenu': {
+          this.$el.send('showContextMenu', {
+            canGoBack: this.$el.canGoBack(),
+            canGoForward: this.$el.canGoForward()
+          })
+          break
+        }
+      }
+    })
     this.src = this.tab.url
   },
   destroyed() {
     this.$root.$off(['goBack', 'goForward', 'reload', 'load'])
   },
   methods: {
-    ...mapActions('tab', ['updateTab'])
+    ...mapActions('tab', ['newTab', 'updateTab'])
   }
 }
 </script>
