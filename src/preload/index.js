@@ -24,23 +24,32 @@ const show = (menus = []) => {
 }
 
 ipcRenderer.on('showContextMenu', (e, { canGoBack, canGoForward }) => {
-  console.log(window.getSelection(), window.getSelection().toString())
-  show([
-    {
-      label: 'Back',
-      click: () => history.back(),
-      enabled: canGoBack
-    },
-    {
-      label: 'Forward',
-      click: () => history.forward(),
-      enabled: canGoForward
-    },
-    {
-      label: 'Reload',
-      click: () => location.reload()
-    }
-  ])
+  const selection = window.getSelection().toString()
+  if (selection) {
+    show([
+      {
+        label: 'Copy',
+        click: () => navigator.clipboard.writeText(selection)
+      }
+    ])
+  } else {
+    show([
+      {
+        label: 'Back',
+        click: () => history.back(),
+        enabled: canGoBack
+      },
+      {
+        label: 'Forward',
+        click: () => history.forward(),
+        enabled: canGoForward
+      },
+      {
+        label: 'Reload',
+        click: () => location.reload()
+      }
+    ])
+  }
 })
 
 window.addEventListener('contextmenu', (e) => {
@@ -48,26 +57,45 @@ window.addEventListener('contextmenu', (e) => {
   ipcRenderer.sendToHost('requestContextMenu')
 })
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('a').forEach((element) => {
-    element.addEventListener('click', (e) => {
-      if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-        e.preventDefault()
-        ipcRenderer.sendToHost('newTab', element.href)
+const onClick = (e, target) => {
+  target = target || e.target
+  if (target.tagName.toLowerCase() === 'a') {
+    if (
+      target.target === '_blank' ||
+      (e.ctrlKey && !e.metaKey) ||
+      (!e.ctrlKey && e.metaKey)
+    ) {
+      ipcRenderer.sendToHost('newTab', target.href)
+    }
+  } else {
+    if (target.parentElement) {
+      onClick(e, target.parentElement)
+    }
+  }
+}
+
+const onContextMenu = (e, target) => {
+  target = target || e.target
+  if (target.tagName.toLowerCase() === 'a') {
+    e.stopPropagation()
+    show([
+      {
+        label: 'Open Link in a New Tab',
+        click: () => ipcRenderer.sendToHost('newTab', target.href)
+      },
+      {
+        label: 'Copy Link',
+        click: () => navigator.clipboard.writeText(target.href)
       }
-    })
-    element.addEventListener('contextmenu', (e) => {
-      e.stopPropagation()
-      show([
-        {
-          label: 'Open Link in a New Tab',
-          click: () => ipcRenderer.sendToHost('newTab', element.href)
-        },
-        {
-          label: 'Copy Link',
-          click: () => navigator.clipboard.writeText(element.href)
-        }
-      ])
-    })
-  })
+    ])
+  } else {
+    if (target.parentElement) {
+      onContextMenu(e, target.parentElement)
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', onClick)
+  document.addEventListener('contextmenu', onContextMenu)
 })
