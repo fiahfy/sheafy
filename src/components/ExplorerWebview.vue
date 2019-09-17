@@ -105,9 +105,6 @@ export default {
     })
     this.src = this.tab.url
   },
-  destroyed() {
-    this.$root.$off(['goBack', 'goForward', 'reload', 'load'])
-  },
   methods: {
     ...mapActions('tab', ['newTab', 'updateTab'])
   }
