@@ -5,17 +5,18 @@
     clipped-left
     flat
     dense
+    height="44"
     extension-height="1"
   >
     <v-btn
       icon
-      width="36"
-      height="36"
+      width="30"
+      height="30"
       class="mr-1"
       :disabled="!activeTab.canGoBack"
       @click="goBack"
     >
-      <v-icon>arrow_back</v-icon>
+      <v-icon size="20">arrow_back</v-icon>
     </v-btn>
     <v-btn
       icon
@@ -25,7 +26,7 @@
       :disabled="!activeTab.canGoForward"
       @click="goForward"
     >
-      <v-icon>arrow_forward</v-icon>
+      <v-icon size="20">arrow_forward</v-icon>
     </v-btn>
     <v-btn
       v-if="activeTab.loading"
@@ -35,16 +36,16 @@
       class="mr-1"
       @click="stop"
     >
-      <v-icon>close</v-icon>
+      <v-icon size="20">close</v-icon>
     </v-btn>
     <v-btn v-else icon width="36" height="36" class="mr-1" @click="reload">
-      <v-icon>refresh</v-icon>
+      <v-icon size="20">refresh</v-icon>
     </v-btn>
     <v-text-field
       v-model="query"
       outlined
       hide-details
-      class="ml-2"
+      class="ml-1 body-2"
       name="query"
       @focus="onFocus"
       @keydown.enter="onKeydownEnter"
@@ -100,6 +101,9 @@ export default {
   }
   .v-text-field--outlined > .v-input__control > .v-input__slot {
     min-height: unset;
+    > .v-text-field__slot > input {
+      padding: 4px 0;
+    }
   }
 }
 </style>
