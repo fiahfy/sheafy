@@ -10,6 +10,10 @@ export const state = () => ({
 })
 
 export const getters = {
+  title(state, getters) {
+    const tab = getters['tab/activeTab']
+    return tab ? tab.title : ''
+  },
   titleBar(state) {
     return process.platform === 'darwin' && !state.fullScreen
   }
