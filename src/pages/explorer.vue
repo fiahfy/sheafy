@@ -1,6 +1,6 @@
 <template>
   <v-container class="explorer" fill-height fluid pa-0>
-    <explorer-tabbar />
+    <explorer-tab-bar />
     <explorer-toolbar />
     <explorer-webview
       v-for="tab in tabs"
@@ -14,13 +14,13 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import ExplorerTabbar from '~/components/ExplorerTabbar'
+import ExplorerTabBar from '~/components/ExplorerTabBar'
 import ExplorerToolbar from '~/components/ExplorerToolbar'
 import ExplorerWebview from '~/components/ExplorerWebview'
 
 export default {
   components: {
-    ExplorerTabbar,
+    ExplorerTabBar,
     ExplorerToolbar,
     ExplorerWebview
   },

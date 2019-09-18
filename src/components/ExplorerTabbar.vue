@@ -1,6 +1,6 @@
 <template>
   <v-navigation-drawer
-    class="explorer-tabbar"
+    class="explorer-tab-bar"
     permanent
     app
     clipped
@@ -9,7 +9,7 @@
   >
     <v-list dense>
       <v-list-item-group v-model="active">
-        <explorer-tabbar-item v-for="tab in tabs" :key="tab.id" :tab="tab" />
+        <explorer-tab-bar-item v-for="tab in tabs" :key="tab.id" :tab="tab" />
       </v-list-item-group>
       <v-list-item class="mt-4" @click="newTab">
         <v-list-item-icon class="mr-4 px-1 align-self-center">
@@ -25,11 +25,11 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import ExplorerTabbarItem from '~/components/ExplorerTabbarItem'
+import ExplorerTabBarItem from '~/components/ExplorerTabBarItem'
 
 export default {
   components: {
-    ExplorerTabbarItem
+    ExplorerTabBarItem
   },
   computed: {
     active: {

@@ -1,5 +1,5 @@
 <template>
-  <v-list-item class="exporer-tabbar-item" :value="tab.id" :title="tab.title">
+  <v-list-item class="exporer-tab-bar-item" :value="tab.id" :title="tab.title">
     <v-list-item-icon class="mr-4 px-1 align-self-center">
       <v-progress-circular
         v-if="tab.loading"
@@ -63,7 +63,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.exporer-tabbar-item:not(:hover) ::v-deep .v-list-item__action {
+.exporer-tab-bar-item:not(:hover) ::v-deep .v-list-item__action {
   display: none;
 }
 </style>
