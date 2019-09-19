@@ -1,5 +1,5 @@
 <template>
-  <webview :src="src" :preload="preload" />
+  <webview :class="{ 'd-none': !active }" :src="src" :preload="preload" />
 </template>
 
 <script>
@@ -23,32 +23,42 @@ export default {
     preload() {
       return fileUrl(path.resolve('./src/preload/index.js'))
     },
+    active() {
+      return this.isActiveTab(this.tab)
+    },
     ...mapGetters('tab', ['isActiveTab', 'getUrlWithQuery'])
+  },
+  watch: {
+    active(value) {
+      if (value && !this.src) {
+        this.src = this.tab.url
+      }
+    }
   },
   mounted() {
     this.$root.$on('goBack', () => {
-      if (this.isActiveTab(this.tab)) {
+      if (this.active) {
         this.$el.goBack()
       }
     })
     this.$root.$on('goForward', () => {
-      if (this.isActiveTab(this.tab)) {
+      if (this.active) {
         this.$el.goForward()
       }
     })
     this.$root.$on('reload', () => {
-      if (this.isActiveTab(this.tab)) {
+      if (this.active) {
         this.$el.reload()
         this.$el.openDevTools()
       }
     })
     this.$root.$on('stop', () => {
-      if (this.isActiveTab(this.tab)) {
+      if (this.active) {
         this.$el.stop()
       }
     })
     this.$root.$on('load', () => {
-      if (this.isActiveTab(this.tab)) {
+      if (this.active) {
         const url = this.getUrlWithQuery(this.tab.query)
         if (url) {
           this.$el.loadURL(url)
@@ -77,7 +87,7 @@ export default {
       this.updateTab({ id: this.tab.id, loading: true })
     })
     this.$el.addEventListener('did-stop-loading', () => {
-      this.updateTab({ id: this.tab.id, loading: false })
+      this.updateTab({ id: this.tab.id, loading: false, firstLoaded: true })
     })
     this.$el.addEventListener('new-window', ({ disposition, url }) => {
       switch (disposition) {
@@ -113,7 +123,9 @@ export default {
         }
       }
     })
-    this.src = this.tab.url
+    if (this.active || !this.tab.firstLoaded) {
+      this.src = this.tab.url
+    }
   },
   methods: {
     ...mapActions('tab', ['newTab', 'newTabInBackground', 'updateTab'])

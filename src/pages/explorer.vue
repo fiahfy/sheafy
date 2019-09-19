@@ -7,7 +7,6 @@
       :key="tab.id"
       :tab="tab"
       class="fill-height spacer"
-      :class="{ 'd-none': !isActiveTab(tab) }"
     />
   </v-container>
 </template>
