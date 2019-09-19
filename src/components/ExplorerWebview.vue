@@ -79,6 +79,16 @@ export default {
     this.$el.addEventListener('did-stop-loading', () => {
       this.updateTab({ id: this.tab.id, loading: false })
     })
+    this.$el.addEventListener('new-window', ({ disposition, url }) => {
+      switch (disposition) {
+        case 'foreground-tab':
+          this.newTab({ url })
+          break
+        case 'background-tab':
+          this.newTabInBackground({ url })
+          break
+      }
+    })
     this.$el.addEventListener('ipc-message', ({ channel, args }) => {
       switch (channel) {
         case 'inspectElement': {
@@ -106,7 +116,7 @@ export default {
     this.src = this.tab.url
   },
   methods: {
-    ...mapActions('tab', ['newTab', 'updateTab'])
+    ...mapActions('tab', ['newTab', 'newTabInBackground', 'updateTab'])
   }
 }
 </script>

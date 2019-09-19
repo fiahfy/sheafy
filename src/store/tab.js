@@ -27,12 +27,18 @@ export const getters = {
 }
 
 export const actions = {
-  newTabIfEmpty({ dispatch, state }) {
+  async newTabIfEmpty({ dispatch, state }) {
     if (!state.tabs.length) {
-      dispatch('newTab')
+      return await dispatch('newTab')
     }
   },
-  newTab({ commit, state }, { ...params }) {
+  async newTab({ commit, dispatch }, payload) {
+    const id = await dispatch('newTabInBackground', payload)
+    commit('setActiveTabId', { activeTabId: id })
+    return id
+  },
+  newTabInBackground({ commit, state }, { ...params }) {
+    // TODO: generate random unique id
     const id = Math.max.apply(null, [0, ...state.tabs.map((tab) => tab.id)]) + 1
     const url = 'https://www.google.com'
     const tabs = [
@@ -49,8 +55,8 @@ export const actions = {
         ...params
       }
     ]
-    commit('setActiveTabId', { activeTabId: id })
     commit('setTabs', { tabs })
+    return id
   },
   updateTab({ commit, state }, { id, ...params }) {
     const tabs = state.tabs.map((tab) => {

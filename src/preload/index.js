@@ -57,23 +57,6 @@ window.addEventListener('contextmenu', (e) => {
   ipcRenderer.sendToHost('requestContextMenu')
 })
 
-const onClick = (e, target) => {
-  target = target || e.target
-  if (target.tagName.toLowerCase() === 'a') {
-    if (
-      target.target === '_blank' ||
-      (e.ctrlKey && !e.metaKey) ||
-      (!e.ctrlKey && e.metaKey)
-    ) {
-      ipcRenderer.sendToHost('newTab', target.href)
-    }
-  } else {
-    if (target.parentElement) {
-      onClick(e, target.parentElement)
-    }
-  }
-}
-
 const onContextMenu = (e, target) => {
   target = target || e.target
   if (target.tagName.toLowerCase() === 'a') {
@@ -96,6 +79,5 @@ const onContextMenu = (e, target) => {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.addEventListener('click', onClick)
   document.addEventListener('contextmenu', onContextMenu)
 })
