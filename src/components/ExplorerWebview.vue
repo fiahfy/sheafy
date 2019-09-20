@@ -53,7 +53,6 @@ export default {
     this.$root.$on('reload', () => {
       if (this.active) {
         this.$el.reload()
-        this.$el.openDevTools()
       }
     })
     this.$root.$on('stop', () => {
