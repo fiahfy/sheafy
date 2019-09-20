@@ -1,5 +1,10 @@
 <template>
-  <webview :class="{ 'd-none': !active }" :src="src" :preload="preload" />
+  <webview
+    class="explorer-webview"
+    :class="{ 'd-none': !active }"
+    :src="src"
+    :preload="preload"
+  />
 </template>
 
 <script>

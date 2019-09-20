@@ -1,6 +1,12 @@
 <template>
-  <v-container class="explorer" fill-height fluid pa-0>
-    <explorer-tab-bar />
+  <v-container
+    class="explorer"
+    fill-height
+    fluid
+    pa-0
+    :class="{ resizing: resizing }"
+  >
+    <explorer-tab-bar :resizing.sync="resizing" />
     <explorer-toolbar />
     <explorer-webview
       v-for="tab in tabs"
@@ -23,6 +29,11 @@ export default {
     ExplorerToolbar,
     ExplorerWebview
   },
+  data() {
+    return {
+      resizing: false
+    }
+  },
   computed: {
     ...mapState('tab', ['tabs']),
     ...mapGetters('tab', ['isActiveTab'])
@@ -35,3 +46,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.explorer.resizing > .explorer-webview {
+  pointer-events: none;
+}
+</style>

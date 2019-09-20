@@ -94,6 +94,6 @@ export const mutations = {
 
 export const plugins = [
   createPersistedState({
-    paths: ['tab']
+    paths: ['settings', 'tab']
   })
 ]

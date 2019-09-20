@@ -4,6 +4,7 @@
     permanent
     app
     clipped
+    :width="width"
     @drop.native.prevent="onDrop"
     @dragover.native.prevent="onDragover"
   >
@@ -24,12 +25,18 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
 import ExplorerTabBarItem from '~/components/ExplorerTabBarItem'
 
 export default {
   components: {
     ExplorerTabBarItem
+  },
+  props: {
+    resizing: {
+      type: Boolean,
+      required: true
+    }
   },
   computed: {
     active: {
@@ -40,8 +47,52 @@ export default {
         this.activateTab({ id: value })
       }
     },
+    width: {
+      get() {
+        return this.tabBarWidth
+      },
+      set(value) {
+        this.setTabBarWidth({ tabBarWidth: value })
+      }
+    },
+    ...mapState('settings', ['tabBarWidth']),
     ...mapState('tab', ['tabs', 'activeTabId']),
     ...mapGetters('tab', ['getUrlWithQuery'])
+  },
+  mounted() {
+    const resizer = document.createElement('div')
+    const border = this.$el.querySelector('.v-navigation-drawer__border')
+    border.append(resizer)
+
+    const direction = this.$el.classList.contains('v-navigation-drawer--right')
+      ? 'right'
+      : 'left'
+
+    const resize = (e) => {
+      document.body.style.cursor = 'ew-resize'
+      const width =
+        direction === 'right'
+          ? document.body.scrollWidth - e.clientX
+          : e.clientX
+      if (width < 55 || width > window.innerWidth - 55) {
+        return
+      }
+      this.$el.style.width = width + 'px'
+    }
+
+    resizer.addEventListener('mousedown', () => {
+      this.$emit('update:resizing', true)
+      this.$el.style.transition = 'initial'
+      document.addEventListener('mousemove', resize, false)
+    })
+
+    document.addEventListener('mouseup', () => {
+      this.$emit('update:resizing', false)
+      this.$el.style.transition = ''
+      this.width = this.$el.style.width
+      document.body.style.cursor = ''
+      document.removeEventListener('mousemove', resize, false)
+    })
   },
   methods: {
     onDragover(e) {
@@ -54,7 +105,21 @@ export default {
         this.newTab({ url })
       }
     },
+    ...mapMutations('settings', ['setTabBarWidth']),
     ...mapActions('tab', ['newTab', 'activateTab'])
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.explorer-tab-bar {
+  overflow: visible;
+  ::v-deep .v-navigation-drawer__border > div {
+    position: absolute;
+    left: -5px;
+    height: 100%;
+    width: 11px;
+    cursor: ew-resize;
+  }
+}
+</style>
