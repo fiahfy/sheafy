@@ -1,14 +1,8 @@
 <template>
-  <v-system-bar
-    v-if="titleBar"
-    class="title-bar caption"
-    app
-    color="white"
-    height="16"
-  >
-    <div>
-      <span>{{ title }}</span>
-    </div>
+  <v-system-bar v-if="titleBar" class="title-bar caption px-0" app height="16">
+    <v-card flat tile class="spacer">
+      <div>{{ title }}</div>
+    </v-card>
   </v-system-bar>
 </template>
 
@@ -24,23 +18,20 @@ export default {
 
 <style lang="scss" scoped>
 .title-bar {
-  padding: 0 72px;
   user-select: none;
   z-index: 9999;
   -webkit-app-region: drag;
-  > div {
+  > .v-card {
     position: relative;
     height: 16px;
-    width: 100%;
-    text-align: center;
-    > span {
-      position: absolute;
-      top: 2px;
-      left: 0;
-      width: 100%;
+    padding: 0 72px;
+    min-width: 0;
+    > div {
+      margin-top: 2px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      text-align: center;
     }
   }
 }

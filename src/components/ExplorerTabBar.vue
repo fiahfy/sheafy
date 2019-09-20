@@ -8,9 +8,9 @@
     @drop.native.prevent="onDrop"
     @dragover.native.prevent="onDragover"
   >
-    <v-app-bar fixed flat extension-height="1" dense>
+    <v-app-bar fixed flat tile extension-height="1" dense>
       <v-list>
-        <v-subheader class="grey--text text--darken-1 px-0 font-weight-bold">
+        <v-subheader class="px-0 font-weight-bold">
           TABS
         </v-subheader>
       </v-list>
