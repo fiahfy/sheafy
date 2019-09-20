@@ -3,9 +3,8 @@
 </template>
 
 <script>
+import { remote } from 'electron'
 import { mapActions, mapGetters } from 'vuex'
-import path from 'path'
-import fileUrl from 'file-url'
 
 export default {
   props: {
@@ -21,7 +20,7 @@ export default {
   },
   computed: {
     preload() {
-      return fileUrl(path.resolve('./src/preload/index.js'))
+      return `file://${remote.app.getAppPath()}/preload.js`
     },
     active() {
       return this.isActiveTab(this.tab)

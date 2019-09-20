@@ -1,6 +1,6 @@
 module.exports = {
-  appId: 'net.fiahfy.picty',
-  files: ['app', 'main.js'],
+  appId: 'net.fiahfy.shelf-browser',
+  files: ['app', 'main.js', 'preload.js'],
   mac: {
     target: ['dmg']
   },
