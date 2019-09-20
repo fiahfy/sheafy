@@ -8,18 +8,23 @@
     @drop.native.prevent="onDrop"
     @dragover.native.prevent="onDragover"
   >
+    <v-app-bar fixed flat extension-height="1" dense>
+      <v-list>
+        <v-subheader class="grey--text text--darken-1 px-0 font-weight-bold">
+          TABS
+        </v-subheader>
+      </v-list>
+      <v-card flat class="d-flex justify-center">
+        <v-btn icon width="36" height="36" @click="newTab">
+          <v-icon size="20">add_circle_outline</v-icon>
+        </v-btn>
+      </v-card>
+      <v-divider slot="extension" />
+    </v-app-bar>
     <v-list dense>
       <v-list-item-group v-model="active">
         <explorer-tab-bar-item v-for="tab in tabs" :key="tab.id" :tab="tab" />
       </v-list-item-group>
-      <v-list-item class="mt-4" @click="newTab">
-        <v-list-item-icon class="mr-4 px-1 align-self-center">
-          <v-icon small color="grey darken-1">add_circle_outline</v-icon>
-        </v-list-item-icon>
-        <v-list-item-title class="grey--text text--darken-1"
-          >New Tab</v-list-item-title
-        >
-      </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -114,12 +119,26 @@ export default {
 <style lang="scss" scoped>
 .explorer-tab-bar {
   overflow: visible;
-  ::v-deep .v-navigation-drawer__border > div {
+  .v-app-bar .v-card {
     position: absolute;
-    left: -5px;
-    height: 100%;
-    width: 11px;
-    cursor: ew-resize;
+    right: 0;
+    width: 55px;
+  }
+  ::v-deep .v-navigation-drawer__border {
+    z-index: 5;
+    > div {
+      position: absolute;
+      left: -5px;
+      height: 100%;
+      width: 11px;
+      cursor: ew-resize;
+    }
+  }
+  ::v-deep .v-navigation-drawer__content {
+    margin-top: 48px;
+  }
+  ::v-deep .v-toolbar__extension {
+    padding: 0;
   }
 }
 </style>

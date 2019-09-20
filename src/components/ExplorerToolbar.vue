@@ -10,8 +10,8 @@
   >
     <v-btn
       icon
-      width="30"
-      height="30"
+      width="36"
+      height="36"
       class="mr-1"
       :disabled="!activeTab || !activeTab.canGoBack"
       @click="goBack"
