@@ -13,7 +13,7 @@
       width="30"
       height="30"
       class="mr-1"
-      :disabled="!activeTab.canGoBack"
+      :disabled="!activeTab || !activeTab.canGoBack"
       @click="goBack"
     >
       <v-icon size="20">arrow_back</v-icon>
@@ -23,13 +23,13 @@
       width="36"
       height="36"
       class="mr-1"
-      :disabled="!activeTab.canGoForward"
+      :disabled="!activeTab || !activeTab.canGoForward"
       @click="goForward"
     >
       <v-icon size="20">arrow_forward</v-icon>
     </v-btn>
     <v-btn
-      v-if="activeTab.loading"
+      v-if="activeTab && activeTab.loading"
       icon
       width="36"
       height="36"
@@ -61,10 +61,12 @@ export default {
   computed: {
     query: {
       get() {
-        return this.activeTab.query
+        return this.activeTab && this.activeTab.query
       },
       set(value) {
-        this.updateTab({ id: this.activeTab.id, query: value })
+        if (this.activeTab) {
+          this.updateTab({ id: this.activeTab.id, query: value })
+        }
       }
     },
     ...mapGetters('tab', ['activeTab'])
