@@ -27,36 +27,52 @@ export const getters = {
 }
 
 export const actions = {
-  async newTabIfEmpty({ dispatch, state }) {
+  newTabIfEmpty({ dispatch, state }) {
     if (!state.tabs.length) {
-      return await dispatch('newTab')
+      dispatch('newTab')
     }
   },
-  async newTab({ commit, dispatch }, payload) {
-    const id = await dispatch('newTabInBackground', payload)
-    commit('setActiveTabId', { activeTabId: id })
-    return id
-  },
-  newTabInBackground({ commit, state }, { ...params }) {
+  newTab({ commit, state }, { options, ...params }) {
+    const { activate = true, position = 'last', baseId = state.activeTabId } =
+      options || {}
     // TODO: generate random unique id
     const id = Math.max.apply(null, [0, ...state.tabs.map((tab) => tab.id)]) + 1
     const url = 'https://www.google.com'
+    const tab = {
+      id,
+      url,
+      title: '',
+      favicon: '',
+      loading: false,
+      canGoBack: false,
+      canGoForward: false,
+      query: '',
+      ...params
+    }
+
+    const baseIndex =
+      state.tabs.findIndex((tab) => tab.id === baseId) || state.tabs.length - 1
+
+    let index
+    switch (position) {
+      case 'next':
+        index = baseIndex + 1
+        break
+      case 'last':
+      default:
+        index = state.tabs.length
+        break
+    }
+
     const tabs = [
-      ...state.tabs,
-      {
-        id,
-        url,
-        title: '',
-        favicon: '',
-        loading: false,
-        canGoBack: false,
-        canGoForward: false,
-        query: '',
-        ...params
-      }
+      ...state.tabs.slice(0, index),
+      tab,
+      ...state.tabs.slice(index)
     ]
     commit('setTabs', { tabs })
-    return id
+    if (activate) {
+      commit('setActiveTabId', { activeTabId: id })
+    }
   },
   updateTab({ commit, state }, { id, ...params }) {
     const tabs = state.tabs.map((tab) => {

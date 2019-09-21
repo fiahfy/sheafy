@@ -13,6 +13,7 @@
       width="36"
       height="36"
       class="mr-1"
+      title="Go Back"
       :disabled="!activeTab || !activeTab.canGoBack"
       @click="goBack"
     >
@@ -23,6 +24,7 @@
       width="36"
       height="36"
       class="mr-1"
+      title="Go Forward"
       :disabled="!activeTab || !activeTab.canGoForward"
       @click="goForward"
     >
@@ -34,11 +36,20 @@
       width="36"
       height="36"
       class="mr-1"
+      title="Stop"
       @click="stop"
     >
       <v-icon size="20">close</v-icon>
     </v-btn>
-    <v-btn v-else icon width="36" height="36" class="mr-1" @click="reload">
+    <v-btn
+      v-else
+      icon
+      width="36"
+      height="36"
+      class="mr-1"
+      title="Reload"
+      @click="reload"
+    >
       <v-icon size="20">refresh</v-icon>
     </v-btn>
     <v-text-field
@@ -48,7 +59,7 @@
       class="ml-1 body-2"
       name="query"
       @focus="onFocus"
-      @keydown.enter="onKeydownEnter"
+      @keydown.enter="onKeyDownEnter"
     />
     <v-divider slot="extension" />
   </v-app-bar>
@@ -87,7 +98,7 @@ export default {
     onFocus(e) {
       e.target.select()
     },
-    onKeydownEnter(e) {
+    onKeyDownEnter(e) {
       e.target.blur()
       this.$root.$emit('load')
     },

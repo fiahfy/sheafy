@@ -95,10 +95,10 @@ export default {
     this.$el.addEventListener('new-window', ({ disposition, url }) => {
       switch (disposition) {
         case 'foreground-tab':
-          this.newTab({ url })
+          this.newTab({ url, options: { position: 'next', activate: true } })
           break
         case 'background-tab':
-          this.newTabInBackground({ url })
+          this.newTab({ url, options: { position: 'next', activate: false } })
           break
       }
     })
@@ -114,7 +114,12 @@ export default {
         }
         case 'newTab': {
           const [url] = args
-          this.newTab({ url })
+          this.newTab({ url, options: { position: 'next' } })
+          break
+        }
+        case 'openDefaultBrowser': {
+          const [url] = args
+          remote.shell.openExternal(url)
           break
         }
         case 'requestContextMenu': {
@@ -128,6 +133,7 @@ export default {
     })
     if (this.active || !this.tab.firstLoaded) {
       this.src = this.tab.url
+      this.$el.focus()
     }
   },
   methods: {

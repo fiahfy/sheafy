@@ -67,6 +67,11 @@ const onContextMenu = (e, target) => {
         click: () => ipcRenderer.sendToHost('newTab', target.href)
       },
       {
+        label: 'Open Link in a Default Browser',
+        click: () => ipcRenderer.sendToHost('openDefaultBrowser', target.href)
+      },
+      { type: 'separator' },
+      {
         label: 'Copy Link',
         click: () => navigator.clipboard.writeText(target.href)
       }

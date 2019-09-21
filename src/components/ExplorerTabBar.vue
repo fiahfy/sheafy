@@ -6,7 +6,7 @@
     clipped
     :width="width"
     @drop.native.prevent="onDrop"
-    @dragover.native.prevent="onDragover"
+    @dragover.native.prevent="onDragOver"
   >
     <v-app-bar fixed flat tile extension-height="1" dense>
       <v-list>
@@ -15,7 +15,7 @@
         </v-subheader>
       </v-list>
       <v-card flat class="d-flex justify-center">
-        <v-btn icon width="36" height="36" @click="newTab">
+        <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
           <v-icon size="20">add_circle_outline</v-icon>
         </v-btn>
       </v-card>
@@ -23,13 +23,19 @@
     </v-app-bar>
     <v-list dense>
       <v-list-item-group v-model="active">
-        <explorer-tab-bar-item v-for="tab in tabs" :key="tab.id" :tab="tab" />
+        <explorer-tab-bar-item
+          v-for="tab in tabs"
+          :key="tab.id"
+          :tab="tab"
+          @contextmenu.native.stop="onContextMenu(tab)"
+        />
       </v-list-item-group>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script>
+import { remote } from 'electron'
 import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
 import ExplorerTabBarItem from '~/components/ExplorerTabBarItem'
 
@@ -100,7 +106,7 @@ export default {
     })
   },
   methods: {
-    onDragover(e) {
+    onDragOver(e) {
       e.dataTransfer.dropEffect = 'link'
     },
     onDrop(e) {
@@ -110,8 +116,27 @@ export default {
         this.newTab({ url })
       }
     },
+    onContextMenu(tab) {
+      this.$contextMenu.show([
+        {
+          label: 'New Tab',
+          click: () =>
+            this.newTab({ options: { baseId: tab.id, position: 'next' } })
+        },
+        { type: 'separator' },
+        {
+          label: 'Open Current Page in a Default Browser',
+          click: () => remote.shell.openExternal(tab.url)
+        },
+        { type: 'separator' },
+        {
+          label: 'Close Tab',
+          click: () => this.closeTab({ id: tab.id })
+        }
+      ])
+    },
     ...mapMutations('settings', ['setTabBarWidth']),
-    ...mapActions('tab', ['newTab', 'activateTab'])
+    ...mapActions('tab', ['newTab', 'closeTab', 'activateTab'])
   }
 }
 </script>
