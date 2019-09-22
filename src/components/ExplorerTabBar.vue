@@ -52,7 +52,7 @@ export default {
       }
     },
     ...mapState('settings', ['tabBarWidth']),
-    ...mapGetters('tab', ['groups', 'getUrlWithQuery'])
+    ...mapGetters('tab', ['groups'])
   },
   mounted() {
     const resizer = document.createElement('div')
@@ -97,8 +97,7 @@ export default {
       e.dataTransfer.dropEffect = 'link'
     },
     onDrop(e) {
-      const query = e.dataTransfer.getData('text')
-      const url = this.getUrlWithQuery(query)
+      const url = e.dataTransfer.getData('text')
       if (url) {
         this.newTab({ url })
       }

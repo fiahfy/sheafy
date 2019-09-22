@@ -85,4 +85,15 @@ const onContextMenu = (e, target) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('contextmenu', onContextMenu)
+  document.addEventListener('dragover', (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'link'
+  })
+  document.addEventListener('drop', (e) => {
+    e.preventDefault()
+    const url = e.dataTransfer.getData('text')
+    if (url) {
+      location.href = url
+    }
+  })
 })

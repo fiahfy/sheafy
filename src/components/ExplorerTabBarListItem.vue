@@ -68,7 +68,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.exporer-tab-bar-list-item:not(:hover) ::v-deep .v-list-item__action {
+.exporer-tab-bar-list-item:not(.v-list-item--active):not(:hover)
+  ::v-deep
+  .v-list-item__action {
   display: none;
 }
 </style>
