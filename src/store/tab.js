@@ -84,7 +84,7 @@ export const actions = {
       dispatch('newTab')
     }
   },
-  newTab({ commit, state }, { options, ...params }) {
+  newTab({ commit, state }, { options, ...params } = {}) {
     const { activate = true, position = 'last', baseId = state.activeTabId } =
       options || {}
     // TODO: generate random unique id

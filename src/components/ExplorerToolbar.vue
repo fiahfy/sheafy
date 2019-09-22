@@ -17,7 +17,7 @@
       :disabled="!activeTab || !activeTab.canGoBack"
       @click="goBack"
     >
-      <v-icon size="20">arrow_back</v-icon>
+      <v-icon size="20">mdi-arrow-left</v-icon>
     </v-btn>
     <v-btn
       icon
@@ -28,7 +28,7 @@
       :disabled="!activeTab || !activeTab.canGoForward"
       @click="goForward"
     >
-      <v-icon size="20">arrow_forward</v-icon>
+      <v-icon size="20">mdi-arrow-right</v-icon>
     </v-btn>
     <v-btn
       v-if="activeTab && activeTab.loading"
@@ -39,7 +39,7 @@
       title="Stop"
       @click="stop"
     >
-      <v-icon size="20">close</v-icon>
+      <v-icon size="20">mdi-close</v-icon>
     </v-btn>
     <v-btn
       v-else
@@ -50,7 +50,7 @@
       title="Reload"
       @click="reload"
     >
-      <v-icon size="20">refresh</v-icon>
+      <v-icon size="20">mdi-refresh</v-icon>
     </v-btn>
     <v-text-field
       v-model="query"

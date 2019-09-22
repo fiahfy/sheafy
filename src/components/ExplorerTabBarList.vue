@@ -1,31 +1,29 @@
 <template>
   <v-list class="explorer-tab-bar-list" dense>
-    <v-subheader>
-      {{ group.host || 'Not Grouped' }}
-      <v-spacer />
-      <v-btn
-        icon
-        small
-        color="grey darken-1"
-        @click="closeGroup({ host: group.host })"
-      >
-        <v-icon small>close</v-icon>
-      </v-btn>
-    </v-subheader>
-    <v-list-item-group v-model="active">
+    <v-list-group v-model="expand">
+      <template v-slot:activator>
+        <v-list-item-content>
+          <v-list-item-title v-text="group.host || 'Not Grouped'" />
+        </v-list-item-content>
+        <v-list-item-action class="my-0">
+          <v-btn icon small @click.stop="closeGroup({ host: group.host })">
+            <v-icon small>mdi-close</v-icon>
+          </v-btn>
+        </v-list-item-action>
+      </template>
       <explorer-tab-bar-list-item
         v-for="tab in group.tabs"
         :key="tab.id"
         :tab="tab"
         @contextmenu.native.stop="onContextMenu(tab)"
       />
-    </v-list-item-group>
+    </v-list-group>
   </v-list>
 </template>
 
 <script>
 import { remote } from 'electron'
-import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
 import ExplorerTabBarListItem from '~/components/ExplorerTabBarListItem'
 
 export default {
@@ -38,19 +36,23 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      expand: true
+    }
+  },
   computed: {
-    active: {
-      get() {
-        return this.activeTabId
-      },
-      set(value) {
-        if (value) {
-          this.activateTab({ id: value })
-        }
+    ...mapState('tab', ['activeTabId'])
+  },
+  watch: {
+    activeTabId(value) {
+      console.log(value)
+      if (this.group.tabs.find((tab) => tab.id === value)) {
+        console.log('ex', this.expand)
+        this.expand = true
+        console.log('ex', this.expand)
       }
-    },
-    ...mapState('tab', ['activeTabId']),
-    ...mapGetters('tab', ['groups'])
+    }
   },
   methods: {
     onContextMenu(tab) {
@@ -73,13 +75,18 @@ export default {
       ])
     },
     ...mapMutations('settings', ['setTabBarWidth']),
-    ...mapActions('tab', ['newTab', 'closeTab', 'activateTab', 'closeGroup'])
+    ...mapActions('tab', ['newTab', 'closeTab', 'closeGroup'])
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.explorer-tab-bar-list > .v-subheader:not(:hover) > .v-btn {
-  display: none;
+.explorer-tab-bar-list ::v-deep .v-list-group__header {
+  &:not(:hover) .v-list-item__action {
+    display: none;
+  }
+  &:hover .v-list-item__icon {
+    display: none;
+  }
 }
 </style>

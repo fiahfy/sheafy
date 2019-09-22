@@ -16,7 +16,7 @@
       </v-list>
       <v-card flat class="d-flex justify-center">
         <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
-          <v-icon size="20">add_circle_outline</v-icon>
+          <v-icon size="20">mdi-plus-circle-outline</v-icon>
         </v-btn>
       </v-card>
     </v-app-bar>

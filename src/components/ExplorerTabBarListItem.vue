@@ -1,8 +1,9 @@
 <template>
   <v-list-item
     class="exporer-tab-bar-list-item"
-    :value="tab.id"
     :title="tab.title"
+    :input-value="isActiveTab(tab)"
+    @click="activateTab({ id: tab.id })"
   >
     <v-list-item-icon class="mr-4 px-1 align-self-center">
       <v-progress-circular
@@ -13,14 +14,14 @@
         color="primary"
       />
       <template v-else>
-        <v-icon v-if="error" small color="grey darken-1">public</v-icon>
+        <v-icon v-if="error" small color="grey darken-1">mdi-earth</v-icon>
         <v-img
           v-else
           :src="tab.favicon"
           height="16"
           width="16"
           contain
-          @error="onError"
+          @error="error = true"
         />
       </template>
     </v-list-item-icon>
@@ -29,14 +30,14 @@
     </v-list-item-content>
     <v-list-item-action class="my-0">
       <v-btn icon small @click.stop="closeTab({ id: tab.id })">
-        <v-icon small>close</v-icon>
+        <v-icon small>mdi-close</v-icon>
       </v-btn>
     </v-list-item-action>
   </v-list-item>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   props: {
@@ -50,6 +51,9 @@ export default {
       error: false
     }
   },
+  computed: {
+    ...mapGetters('tab', ['isActiveTab'])
+  },
   watch: {
     tab(newValue, prevValue) {
       if (newValue.loading && !prevValue.loading) {
@@ -58,10 +62,7 @@ export default {
     }
   },
   methods: {
-    onError() {
-      this.error = true
-    },
-    ...mapActions('tab', ['closeTab'])
+    ...mapActions('tab', ['closeTab', 'activateTab'])
   }
 }
 </script>

@@ -10,10 +10,10 @@
   "dependencies": {
     "@fiahfy/electron-accelerator-formatter": "^0.0.3",
     "@fiahfy/electron-context-menu": "^0.0.3",
+    "@mdi/font": "^4.4.95",
     "@nuxtjs/vuetify": "^1.8.3",
     "electron-devtools-installer": "^2.2.4",
     "electron-window-state": "^5.0.3",
-    "material-design-icons-iconfont": "^5.0.1",
     "nuxt": "^2.9.2",
     "typeface-roboto": "^0.0.75",
     "vuex-persistedstate": "^2.5.4"
