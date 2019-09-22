@@ -46,11 +46,8 @@ export default {
   },
   watch: {
     activeTabId(value) {
-      console.log(value)
       if (this.group.tabs.find((tab) => tab.id === value)) {
-        console.log('ex', this.expand)
         this.expand = true
-        console.log('ex', this.expand)
       }
     }
   },
