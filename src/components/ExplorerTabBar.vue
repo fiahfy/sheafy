@@ -9,16 +9,15 @@
     @dragover.native.prevent="onDragOver"
   >
     <v-app-bar fixed flat tile dense>
-      <v-list>
+      <v-list class="spacer">
         <v-subheader class="px-0 font-weight-bold">
           TABS
+          <v-spacer />
+          <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
+            <v-icon size="20">mdi-plus-circle-outline</v-icon>
+          </v-btn>
         </v-subheader>
       </v-list>
-      <v-card flat class="d-flex justify-center">
-        <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
-          <v-icon size="20">mdi-plus-circle-outline</v-icon>
-        </v-btn>
-      </v-card>
     </v-app-bar>
     <explorer-tab-bar-list
       v-for="group in groups"
