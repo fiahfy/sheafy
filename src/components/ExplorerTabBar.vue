@@ -8,7 +8,7 @@
     @drop.native.prevent="onDrop"
     @dragover.native.prevent="onDragOver"
   >
-    <v-app-bar fixed flat tile extension-height="1" dense>
+    <v-app-bar fixed flat tile dense>
       <v-list>
         <v-subheader class="px-0 font-weight-bold">
           TABS
@@ -19,29 +19,22 @@
           <v-icon size="20">add_circle_outline</v-icon>
         </v-btn>
       </v-card>
-      <v-divider slot="extension" />
     </v-app-bar>
-    <v-list dense>
-      <v-list-item-group v-model="active">
-        <explorer-tab-bar-item
-          v-for="tab in tabs"
-          :key="tab.id"
-          :tab="tab"
-          @contextmenu.native.stop="onContextMenu(tab)"
-        />
-      </v-list-item-group>
-    </v-list>
+    <explorer-tab-bar-list
+      v-for="group in groups"
+      :key="group.id"
+      :group="group"
+    />
   </v-navigation-drawer>
 </template>
 
 <script>
-import { remote } from 'electron'
 import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
-import ExplorerTabBarItem from '~/components/ExplorerTabBarItem'
+import ExplorerTabBarList from '~/components/ExplorerTabBarList'
 
 export default {
   components: {
-    ExplorerTabBarItem
+    ExplorerTabBarList
   },
   props: {
     resizing: {
@@ -50,14 +43,6 @@ export default {
     }
   },
   computed: {
-    active: {
-      get() {
-        return this.activeTabId
-      },
-      set(value) {
-        this.activateTab({ id: value })
-      }
-    },
     width: {
       get() {
         return this.tabBarWidth
@@ -67,8 +52,7 @@ export default {
       }
     },
     ...mapState('settings', ['tabBarWidth']),
-    ...mapState('tab', ['tabs', 'activeTabId']),
-    ...mapGetters('tab', ['getUrlWithQuery'])
+    ...mapGetters('tab', ['groups', 'getUrlWithQuery'])
   },
   mounted() {
     const resizer = document.createElement('div')
@@ -85,7 +69,7 @@ export default {
         direction === 'right'
           ? document.body.scrollWidth - e.clientX
           : e.clientX
-      if (width < 55 || width > window.innerWidth - 55) {
+      if (width < 128 || width > window.innerWidth - 128) {
         return
       }
       this.$el.style.width = width + 'px'
@@ -98,6 +82,9 @@ export default {
     })
 
     document.addEventListener('mouseup', () => {
+      if (!this.resizing) {
+        return
+      }
       this.$emit('update:resizing', false)
       this.$el.style.transition = ''
       this.width = this.$el.style.width
@@ -116,27 +103,8 @@ export default {
         this.newTab({ url })
       }
     },
-    onContextMenu(tab) {
-      this.$contextMenu.show([
-        {
-          label: 'New Tab',
-          click: () =>
-            this.newTab({ options: { baseId: tab.id, position: 'next' } })
-        },
-        { type: 'separator' },
-        {
-          label: 'Open Current Page in a Default Browser',
-          click: () => remote.shell.openExternal(tab.url)
-        },
-        { type: 'separator' },
-        {
-          label: 'Close Tab',
-          click: () => this.closeTab({ id: tab.id })
-        }
-      ])
-    },
     ...mapMutations('settings', ['setTabBarWidth']),
-    ...mapActions('tab', ['newTab', 'closeTab', 'activateTab'])
+    ...mapActions('tab', ['newTab'])
   }
 }
 </script>
@@ -161,9 +129,6 @@ export default {
   }
   ::v-deep .v-navigation-drawer__content {
     margin-top: 48px;
-  }
-  ::v-deep .v-toolbar__extension {
-    padding: 0;
   }
 }
 </style>

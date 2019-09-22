@@ -1,7 +1,11 @@
 import { remote } from 'electron'
 
+const getHost = (url) => {
+  return url.replace(/^https?:\/\/([^/]+).*$/, '$1')
+}
+
 export const state = () => ({
-  activeTabId: 0,
+  activeTabId: null,
   tabs: []
 })
 
@@ -11,6 +15,54 @@ export const getters = {
   },
   isActiveTab(state) {
     return (tab) => tab.id === state.activeTabId
+  },
+  groups(state) {
+    return state.tabs
+      .reduce((carry, tab) => {
+        const exists = !!carry.find((group) => group.host === tab.host)
+        if (exists) {
+          return carry.map((group) => {
+            if (group.host !== tab.host) {
+              return group
+            }
+            return {
+              ...group,
+              tabs: [...group.tabs, tab]
+            }
+          })
+        }
+        return [
+          ...carry,
+          {
+            host: tab.host,
+            tabs: [tab]
+          }
+        ]
+      }, [])
+      .reduce(
+        ([groups, ungrouped], group) => {
+          if (group.tabs.length > 1) {
+            return [[...groups, group], ungrouped]
+          }
+          return [
+            groups,
+            {
+              ...ungrouped,
+              tabs: [...ungrouped.tabs, group.tabs[0]]
+            }
+          ]
+        },
+        [[], { host: null, tabs: [] }]
+      )
+      .reduce((carry, value, index) => {
+        if (index === 0) {
+          return value
+        }
+        if (value.tabs.length) {
+          return [value, ...carry]
+        }
+        return carry
+      })
   },
   getUrlWithQuery() {
     return (query) => {
@@ -41,6 +93,7 @@ export const actions = {
     const tab = {
       id,
       url,
+      host: getHost(url),
       title: '',
       favicon: '',
       loading: false,
@@ -79,21 +132,35 @@ export const actions = {
       if (tab.id !== id) {
         return tab
       }
+      const newTab = { ...tab, ...params }
       return {
-        ...tab,
-        ...params
+        ...newTab,
+        host: getHost(newTab.url)
       }
     })
     commit('setTabs', { tabs })
   },
-  closeTab({ commit, state }, { id }) {
+  closeTab({ commit, dispatch, getters, state }, { id }) {
     if (id === state.activeTabId) {
-      let index = state.tabs.findIndex((tab) => tab.id === id)
-      index = index < state.tabs.length - 1 ? index + 1 : index - 1
-      const activeTabId =
-        index >= 0 && index < state.tabs.length ? state.tabs[index].id : 0
-      commit('setActiveTabId', { activeTabId })
+      const group = getters.groups.find(
+        (group) => !!group.tabs.find((tab) => tab.id === id)
+      )
+      if (group.tabs.length <= 1) {
+        dispatch('closeGroup', { host: group.host })
+        return
+      }
+      const index = group.tabs.findIndex((tab) => tab.id === id)
+      if (index < group.tabs.length - 1) {
+        const activeTabId = group.tabs[index + 1].id
+        commit('setActiveTabId', { activeTabId })
+      } else if (index > 0) {
+        const activeTabId = group.tabs[index - 1].id
+        commit('setActiveTabId', { activeTabId })
+      } else {
+        commit('setActiveTabId', { activeTabId: null })
+      }
     }
+
     const tabs = state.tabs.filter((tab) => tab.id !== id)
     commit('setTabs', { tabs })
     if (!tabs.length) {
@@ -102,6 +169,32 @@ export const actions = {
   },
   activateTab({ commit }, { id }) {
     commit('setActiveTabId', { activeTabId: id })
+  },
+  closeGroup({ commit, getters, state }, { host }) {
+    const group = getters.groups.find((group) => group.host === host)
+    const tabIds = group.tabs.map((tab) => tab.id)
+    const active = tabIds.includes(state.activeTabId)
+    if (active) {
+      const index = getters.groups.findIndex((group) => group.host === host)
+      if (index < getters.groups.length - 1) {
+        const activeTabId = getters.groups[index + 1].tabs[0].id
+        commit('setActiveTabId', { activeTabId })
+      } else if (index > 0) {
+        const activeTabId =
+          getters.groups[index - 1].tabs[
+            getters.groups[index - 1].tabs.length - 1
+          ].id
+        commit('setActiveTabId', { activeTabId })
+      } else {
+        commit('setActiveTabId', { activeTabId: null })
+      }
+    }
+
+    const tabs = state.tabs.filter((tab) => !tabIds.includes(tab.id))
+    commit('setTabs', { tabs })
+    if (!tabs.length) {
+      remote.getCurrentWindow().close()
+    }
   }
 }
 

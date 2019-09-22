@@ -1,5 +1,9 @@
 <template>
-  <v-list-item class="exporer-tab-bar-item" :value="tab.id" :title="tab.title">
+  <v-list-item
+    class="exporer-tab-bar-list-item"
+    :value="tab.id"
+    :title="tab.title"
+  >
     <v-list-item-icon class="mr-4 px-1 align-self-center">
       <v-progress-circular
         v-if="tab.loading"
@@ -21,10 +25,10 @@
       </template>
     </v-list-item-icon>
     <v-list-item-content>
-      <v-list-item-title>{{ tab.title }}</v-list-item-title>
+      <v-list-item-title v-text="tab.title" />
     </v-list-item-content>
     <v-list-item-action class="my-0">
-      <v-btn icon small @click="closeTab({ id: tab.id })">
+      <v-btn icon small @click.stop="closeTab({ id: tab.id })">
         <v-icon small>close</v-icon>
       </v-btn>
     </v-list-item-action>
@@ -63,7 +67,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.exporer-tab-bar-item:not(:hover) ::v-deep .v-list-item__action {
+.exporer-tab-bar-list-item:not(:hover) ::v-deep .v-list-item__action {
   display: none;
 }
 </style>
