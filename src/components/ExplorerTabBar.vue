@@ -9,7 +9,7 @@
     @dragover.native.prevent="onDragOver"
   >
     <v-app-bar fixed flat tile dense>
-      <v-list class="spacer">
+      <v-list class="flex-grow-1">
         <v-subheader class="px-0 font-weight-bold">
           TABS
           <v-spacer />

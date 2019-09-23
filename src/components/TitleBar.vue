@@ -1,6 +1,6 @@
 <template>
   <v-system-bar v-if="titleBar" class="title-bar caption px-0" app height="16">
-    <v-card flat tile class="spacer">
+    <v-card flat tile class="flex-grow-1">
       <div>{{ title }}</div>
     </v-card>
   </v-system-bar>

@@ -16,4 +16,11 @@ export default ({ store }) => {
   ipcRenderer.on('openLocation', () => {
     document.querySelector('input[name=query]').focus()
   })
+  ipcRenderer.on('search', () => {
+    const id = store.state.tab.activeTabId
+    store.dispatch('tab/updateTab', { id, searching: true })
+    const el = document.querySelector('input[name=search-text]')
+    el && el.focus()
+    el && el.select()
+  })
 }
