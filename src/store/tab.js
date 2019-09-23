@@ -89,7 +89,7 @@ export const actions = {
       options || {}
     // TODO: generate random unique id
     const id = Math.max.apply(null, [0, ...state.tabs.map((tab) => tab.id)]) + 1
-    const url = 'https://www.google.com'
+    const url = 'https://www.google.com/?shelf-browser'
     const tab = {
       id,
       url,

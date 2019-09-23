@@ -94,7 +94,7 @@ export default {
         this.updateTab({
           id: this.tab.id,
           url,
-          query: url,
+          query: url === 'https://www.google.com/?shelf-browser' ? '' : url,
           canGoBack: this.$el.canGoBack(),
           canGoForward: this.$el.canGoForward()
         })
@@ -163,6 +163,7 @@ export default {
     if (this.active || !this.tab.firstLoaded) {
       this.src = this.tab.url
       this.$el.focus()
+      this.$el.getWebContents().focus()
     }
   },
   destroyed() {
