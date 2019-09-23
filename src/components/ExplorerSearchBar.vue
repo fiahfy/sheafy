@@ -3,13 +3,14 @@
     <v-text-field
       v-model="searchText"
       name="search-text"
+      class="body-2"
       autofocus
       hide-details
       @focus="onFocus"
       @keydown.enter="onKeyDownEnter"
       @keydown.esc="onKeyDownEsc"
     />
-    <div v-if="activeTab.searchMatches !== null">
+    <div v-if="activeTab.searchMatches !== null" class="ml-2 body-2">
       {{ activeTab.searchActiveMatchOrdinal }} / {{ activeTab.searchMatches }}
     </div>
     <v-btn
@@ -18,7 +19,29 @@
       height="36"
       class="ml-1"
       title="Close"
-      @click="onClick"
+      :disabled="!searchText"
+      @click="onUpClick"
+    >
+      <v-icon size="20">mdi-chevron-up</v-icon>
+    </v-btn>
+    <v-btn
+      icon
+      width="36"
+      height="36"
+      class="ml-1"
+      title="Close"
+      :disabled="!searchText"
+      @click="onDownClick"
+    >
+      <v-icon size="20">mdi-chevron-down</v-icon>
+    </v-btn>
+    <v-btn
+      icon
+      width="36"
+      height="36"
+      class="ml-1"
+      title="Close"
+      @click="onCloseClick"
     >
       <v-icon size="20">mdi-close</v-icon>
     </v-btn>
@@ -75,7 +98,23 @@ export default {
       this.$root.$emit('stopFindInPage')
       this.updateTab({ id: this.activeTab.id, searching: false })
     },
-    onClick() {
+    onUpClick() {
+      if (this.searchText) {
+        this.$root.$emit('findInPage', this.searchText, {
+          forward: false,
+          findNext: true
+        })
+      }
+    },
+    onDownClick() {
+      if (this.searchText) {
+        this.$root.$emit('findInPage', this.searchText, {
+          forward: true,
+          findNext: true
+        })
+      }
+    },
+    onCloseClick() {
       this.$root.$emit('stopFindInPage')
       this.updateTab({ id: this.activeTab.id, searching: false })
     },
@@ -86,6 +125,6 @@ export default {
 
 <style lang="scss" scoped>
 .explorer-search-bar {
-  width: 300px;
+  width: 480px;
 }
 </style>
