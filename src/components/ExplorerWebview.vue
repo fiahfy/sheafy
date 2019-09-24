@@ -96,7 +96,7 @@ export default {
         this.updateTab({
           id: this.tab.id,
           url,
-          query: url === 'https://www.google.com/?shelf-browser' ? '' : url,
+          query: url === 'https://www.google.com/?sheafy' ? '' : url,
           canGoBack: this.$el.canGoBack(),
           canGoForward: this.$el.canGoForward()
         })

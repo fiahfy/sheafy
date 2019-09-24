@@ -1,5 +1,5 @@
 module.exports = {
-  appId: 'net.fiahfy.shelf-browser',
+  appId: 'net.fiahfy.sheafy',
   files: ['app', 'main.js', 'preload.js'],
   mac: {
     target: ['dmg']

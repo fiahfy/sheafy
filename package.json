@@ -1,6 +1,6 @@
 {
-  "name": "shelf-browser",
-  "description": "",
+  "name": "sheafy",
+  "description": "Vertial and Grouped Tabs Browser",
   "version": "0.0.1",
   "author": {
     "name": "fiahfy",
@@ -43,10 +43,10 @@
   ],
   "main": "main.js",
   "private": true,
-  "productName": "",
+  "productName": "Sheafy",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fiahfy/picty"
+    "url": "https://github.com/fiahfy/sheafy"
   },
   "scripts": {
     "build": "nuxt generate",

@@ -108,7 +108,7 @@ const createTemplate = () => {
       submenu: [
         {
           label: 'Learn More',
-          click: () => shell.openExternal('https://github.com/fiahfy/picty')
+          click: () => shell.openExternal('https://github.com/fiahfy/sheafy')
         }
       ]
     }
