@@ -25,7 +25,6 @@ export default {
   data() {
     return {
       src: blank,
-      ready: false,
       destroyed: false
     }
   },
@@ -37,7 +36,7 @@ export default {
       return this.isActiveTab(this.tab)
     },
     handling() {
-      return this.active && this.ready && !this.destroyed
+      return this.active && !this.destroyed
     },
     ...mapGetters('tab', ['isActiveTab', 'getUrlWithQuery'])
   },
@@ -92,12 +91,8 @@ export default {
         this.$el.stopFindInPage('clearSelection')
       }
     })
-    this.$el.addEventListener('dom-ready', () => {
-      this.ready = true
-    })
     this.$el.addEventListener('load-commit', ({ url, isMainFrame }) => {
       if (isMainFrame && url !== blank) {
-        this.ready = false
         this.updateTab({
           id: this.tab.id,
           url,
