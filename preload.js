@@ -74,6 +74,11 @@ const onContextMenu = (e, target) => {
       {
         label: 'Copy Link',
         click: () => navigator.clipboard.writeText(target.href)
+      },
+      { type: 'separator' },
+      {
+        label: 'Copy',
+        click: () => navigator.clipboard.writeText(target.textContent)
       }
     ])
   } else {
