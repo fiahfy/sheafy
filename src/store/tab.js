@@ -4,6 +4,22 @@ const getHost = (url) => {
   return url.replace(/^https?:\/\/([^/]+).*$/, '$1')
 }
 
+const getBadge = (title) => {
+  const match = title.match(/\(([\d,]+)\)\s*/)
+  if (!match) {
+    return 0
+  }
+  return Number(match[1].replace(',', ''))
+}
+
+const convertTab = (tab) => {
+  return {
+    host: getHost(tab.url),
+    badge: getBadge(tab.title),
+    ...tab
+  }
+}
+
 export const state = () => ({
   activeTabId: null,
   tabs: []
@@ -90,11 +106,12 @@ export const actions = {
     // TODO: generate random unique id
     const id = Math.max.apply(null, [0, ...state.tabs.map((tab) => tab.id)]) + 1
     const url = 'https://www.google.com/?shelf-browser'
-    const tab = {
+    const tab = convertTab({
       id,
       url,
-      host: getHost(url),
+      host: '',
       title: '',
+      badge: 0,
       favicon: '',
       loading: false,
       canGoBack: false,
@@ -105,7 +122,7 @@ export const actions = {
       searchActiveMatchOrdinal: null,
       searchMatches: null,
       ...params
-    }
+    })
 
     const baseIndex =
       state.tabs.findIndex((tab) => tab.id === baseId) || state.tabs.length - 1
@@ -136,11 +153,7 @@ export const actions = {
       if (tab.id !== id) {
         return tab
       }
-      const newTab = { ...tab, ...params }
-      return {
-        ...newTab,
-        host: getHost(newTab.url)
-      }
+      return convertTab({ ...tab, ...params })
     })
     commit('setTabs', { tabs })
   },

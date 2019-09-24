@@ -85,5 +85,8 @@ export default {
   &:hover .v-list-item__icon {
     display: none;
   }
+  .v-list-item__icon {
+    padding: 0 2px;
+  }
 }
 </style>

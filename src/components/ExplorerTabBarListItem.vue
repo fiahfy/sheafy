@@ -28,6 +28,12 @@
     <v-list-item-content>
       <v-list-item-title v-text="tab.title" />
     </v-list-item-content>
+    <v-chip
+      v-if="tab.badge"
+      class="caption ml-3 px-2"
+      color="error"
+      v-text="badge"
+    />
     <v-list-item-action class="my-0">
       <v-btn icon small @click.stop="closeTab({ id: tab.id })">
         <v-icon small>mdi-close</v-icon>
@@ -52,6 +58,9 @@ export default {
     }
   },
   computed: {
+    badge() {
+      return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
+    },
     ...mapGetters('tab', ['isActiveTab'])
   },
   watch: {
@@ -68,9 +77,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.exporer-tab-bar-list-item:not(.v-list-item--active):not(:hover)
-  ::v-deep
-  .v-list-item__action {
-  display: none;
+.exporer-tab-bar-list-item {
+  .v-chip {
+    pointer-events: none;
+    height: 18px;
+    padding: 0 6px !important;
+  }
+  &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
+    opacity: 0;
+  }
 }
 </style>
