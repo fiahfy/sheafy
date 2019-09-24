@@ -85,6 +85,21 @@ const createTemplate = () => {
       ]
     },
     {
+      label: 'Navigation',
+      submenu: [
+        {
+          label: 'Back',
+          accelerator: 'CmdOrCtrl+Left',
+          click: () => send('goBack')
+        },
+        {
+          label: 'Forward',
+          accelerator: 'CmdOrCtrl+Right',
+          click: () => send('goForward')
+        }
+      ]
+    },
+    {
       role: 'window',
       submenu: [{ role: 'close' }, { role: 'minimize' }]
     },

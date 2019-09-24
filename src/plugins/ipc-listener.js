@@ -16,6 +16,12 @@ export default ({ store }) => {
   ipcRenderer.on('openLocation', () => {
     document.querySelector('input[name=query]').focus()
   })
+  ipcRenderer.on('goBack', () => {
+    store.$eventBus.$emit('goBack')
+  })
+  ipcRenderer.on('goForward', () => {
+    store.$eventBus.$emit('goForward')
+  })
   ipcRenderer.on('reload', () => {
     store.$eventBus.$emit('reload')
   })
