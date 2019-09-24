@@ -8,7 +8,7 @@
     @drop.native.prevent="onDrop"
     @dragover.native.prevent="onDragOver"
   >
-    <v-app-bar fixed flat tile dense>
+    <v-app-bar fixed tile dense :flat="!scrolling">
       <v-list class="flex-grow-1">
         <v-subheader class="px-0 font-weight-bold">
           TABS
@@ -41,6 +41,11 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      scrolling: false
+    }
+  },
   computed: {
     width: {
       get() {
@@ -54,44 +59,56 @@ export default {
     ...mapGetters('tab', ['groups'])
   },
   mounted() {
-    const resizer = document.createElement('div')
-    const border = this.$el.querySelector('.v-navigation-drawer__border')
-    border.append(resizer)
-
-    const direction = this.$el.classList.contains('v-navigation-drawer--right')
-      ? 'right'
-      : 'left'
-
-    const resize = (e) => {
-      document.body.style.cursor = 'ew-resize'
-      const width =
-        direction === 'right'
-          ? document.body.scrollWidth - e.clientX
-          : e.clientX
-      if (width < 128 || width > window.innerWidth - 128) {
-        return
-      }
-      this.$el.style.width = width + 'px'
-    }
-
-    resizer.addEventListener('mousedown', () => {
-      this.$emit('update:resizing', true)
-      this.$el.style.transition = 'initial'
-      document.addEventListener('mousemove', resize, false)
-    })
-
-    document.addEventListener('mouseup', () => {
-      if (!this.resizing) {
-        return
-      }
-      this.$emit('update:resizing', false)
-      this.$el.style.transition = ''
-      this.width = this.$el.style.width
-      document.body.style.cursor = ''
-      document.removeEventListener('mousemove', resize, false)
-    })
+    this.setupResizseHanlder()
+    this.setupScrollHandler()
   },
   methods: {
+    setupResizseHanlder() {
+      const resizer = document.createElement('div')
+      const border = this.$el.querySelector('.v-navigation-drawer__border')
+      border.append(resizer)
+
+      const direction = this.$el.classList.contains(
+        'v-navigation-drawer--right'
+      )
+        ? 'right'
+        : 'left'
+
+      const resize = (e) => {
+        document.body.style.cursor = 'ew-resize'
+        const width =
+          direction === 'right'
+            ? document.body.scrollWidth - e.clientX
+            : e.clientX
+        if (width < 128 || width > window.innerWidth - 128) {
+          return
+        }
+        this.$el.style.width = width + 'px'
+      }
+
+      resizer.addEventListener('mousedown', () => {
+        this.$emit('update:resizing', true)
+        this.$el.style.transition = 'initial'
+        document.addEventListener('mousemove', resize, false)
+      })
+
+      document.addEventListener('mouseup', () => {
+        if (!this.resizing) {
+          return
+        }
+        this.$emit('update:resizing', false)
+        this.$el.style.transition = ''
+        this.width = this.$el.style.width
+        document.body.style.cursor = ''
+        document.removeEventListener('mousemove', resize, false)
+      })
+    },
+    setupScrollHandler() {
+      const content = this.$el.querySelector('.v-navigation-drawer__content')
+      content.addEventListener('scroll', () => {
+        this.scrolling = content.scrollTop > 0
+      })
+    },
     onDragOver(e) {
       e.dataTransfer.dropEffect = 'link'
     },
@@ -109,11 +126,13 @@ export default {
 
 <style lang="scss" scoped>
 .explorer-tab-bar {
-  overflow: visible;
-  .v-app-bar .v-card {
-    position: absolute;
-    right: 0;
-    width: 55px;
+  .v-app-bar {
+    transition: none;
+    .v-card {
+      position: absolute;
+      right: 0;
+      width: 55px;
+    }
   }
   ::v-deep .v-navigation-drawer__border {
     z-index: 5;
