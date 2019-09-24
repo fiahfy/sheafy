@@ -57,9 +57,25 @@ const createTemplate = () => {
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
+        {
+          label: 'Reload',
+          accelerator: 'CmdOrCtrl+R',
+          click: () => send('reload')
+        },
+        {
+          label: 'Force Reload',
+          accelerator: 'CmdOrCtrl+Shift+R',
+          click: () => send('forceReload')
+        },
+        { type: 'separator' },
+        {
+          label: 'Developer',
+          submenu: [
+            { role: 'reload', accelerator: 'CmdOrCtrl+Alt+R' },
+            { role: 'forcereload', accelerator: 'CmdOrCtrl+Shift+Alt+R' },
+            { role: 'toggledevtools' }
+          ]
+        },
         { type: 'separator' },
         // { role: 'resetzoom' },
         // { role: 'zoomin' },

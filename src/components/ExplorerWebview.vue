@@ -11,6 +11,8 @@
 import { remote } from 'electron'
 import { mapActions, mapGetters } from 'vuex'
 
+// 空値にすると findInPage した際に hang するので何か入れておく
+// (findInPage(forward = false) で src が空の webview が存在する場合に hang する)
 const blank = 'data:'
 
 export default {
@@ -47,27 +49,32 @@ export default {
     }
   },
   mounted() {
-    this.$root.$on('goBack', () => {
+    this.$eventBus.$on('goBack', () => {
       if (this.handling) {
         this.$el.goBack()
       }
     })
-    this.$root.$on('goForward', () => {
+    this.$eventBus.$on('goForward', () => {
       if (this.handling) {
         this.$el.goForward()
       }
     })
-    this.$root.$on('reload', () => {
+    this.$eventBus.$on('reload', () => {
       if (this.handling) {
         this.$el.reload()
       }
     })
-    this.$root.$on('stop', () => {
+    this.$eventBus.$on('forceReload', () => {
+      if (this.handling) {
+        this.$el.reloadIgnoringCache()
+      }
+    })
+    this.$eventBus.$on('stop', () => {
       if (this.handling) {
         this.$el.stop()
       }
     })
-    this.$root.$on('load', () => {
+    this.$eventBus.$on('load', () => {
       if (this.handling) {
         const url = this.getUrlWithQuery(this.tab.query)
         if (url) {
@@ -75,12 +82,12 @@ export default {
         }
       }
     })
-    this.$root.$on('findInPage', (text, { forward, findNext }) => {
+    this.$eventBus.$on('findInPage', (text, { forward, findNext }) => {
       if (this.handling) {
         this.$el.findInPage(text, { forward, findNext })
       }
     })
-    this.$root.$on('stopFindInPage', () => {
+    this.$eventBus.$on('stopFindInPage', () => {
       if (this.handling) {
         this.$el.stopFindInPage('clearSelection')
       }
@@ -98,6 +105,9 @@ export default {
           canGoBack: this.$el.canGoBack(),
           canGoForward: this.$el.canGoForward()
         })
+        // TODO: https://github.com/electron/electron/issues/14474
+        this.$el.blur()
+        this.$el.focus()
       }
     })
     this.$el.addEventListener('page-title-updated', ({ title }) => {
@@ -162,8 +172,6 @@ export default {
     })
     if (this.active || !this.tab.firstLoaded) {
       this.src = this.tab.url
-      this.$el.focus()
-      this.$el.getWebContents().focus()
     }
   },
   destroyed() {

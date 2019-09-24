@@ -16,6 +16,12 @@ export default ({ store }) => {
   ipcRenderer.on('openLocation', () => {
     document.querySelector('input[name=query]').focus()
   })
+  ipcRenderer.on('reload', () => {
+    store.$eventBus.$emit('reload')
+  })
+  ipcRenderer.on('forceReload', () => {
+    store.$eventBus.$emit('forceReload')
+  })
   ipcRenderer.on('search', () => {
     const id = store.state.tab.activeTabId
     store.dispatch('tab/updateTab', { id, searching: true })

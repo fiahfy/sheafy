@@ -84,23 +84,23 @@ export default {
   },
   methods: {
     goBack() {
-      this.$root.$emit('goBack')
+      this.$eventBus.$emit('goBack')
     },
     goForward() {
-      this.$root.$emit('goForward')
+      this.$eventBus.$emit('goForward')
     },
     reload() {
-      this.$root.$emit('reload')
+      this.$eventBus.$emit('reload')
     },
     stop() {
-      this.$root.$emit('stop')
+      this.$eventBus.$emit('stop')
     },
     onFocus(e) {
       e.target.select()
     },
     onKeyDownEnter(e) {
       e.target.blur()
-      this.$root.$emit('load')
+      this.$eventBus.$emit('load')
     },
     ...mapActions('tab', ['updateTab'])
   }

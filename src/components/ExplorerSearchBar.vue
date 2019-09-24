@@ -60,12 +60,12 @@ export default {
       set(searchText) {
         this.updateTab({ id: this.activeTab.id, searchText })
         if (searchText) {
-          this.$root.$emit('findInPage', searchText, {
+          this.$eventBus.$emit('findInPage', searchText, {
             forward: true,
             findNext: false
           })
         } else {
-          this.$root.$emit('stopFindInPage')
+          this.$eventBus.$emit('stopFindInPage')
           this.updateTab({
             id: this.activeTab.id,
             searchActiveMatchOrdinal: null,
@@ -80,7 +80,7 @@ export default {
     onFocus(e) {
       e.target.select()
       if (this.searchText) {
-        this.$root.$emit('findInPage', this.searchText, {
+        this.$eventBus.$emit('findInPage', this.searchText, {
           forward: true,
           findNext: false
         })
@@ -88,19 +88,19 @@ export default {
     },
     onKeyDownEnter(e) {
       if (this.searchText) {
-        this.$root.$emit('findInPage', this.searchText, {
+        this.$eventBus.$emit('findInPage', this.searchText, {
           forward: !e.shiftKey,
           findNext: true
         })
       }
     },
     onKeyDownEsc() {
-      this.$root.$emit('stopFindInPage')
+      this.$eventBus.$emit('stopFindInPage')
       this.updateTab({ id: this.activeTab.id, searching: false })
     },
     onUpClick() {
       if (this.searchText) {
-        this.$root.$emit('findInPage', this.searchText, {
+        this.$eventBus.$emit('findInPage', this.searchText, {
           forward: false,
           findNext: true
         })
@@ -108,14 +108,14 @@ export default {
     },
     onDownClick() {
       if (this.searchText) {
-        this.$root.$emit('findInPage', this.searchText, {
+        this.$eventBus.$emit('findInPage', this.searchText, {
           forward: true,
           findNext: true
         })
       }
     },
     onCloseClick() {
-      this.$root.$emit('stopFindInPage')
+      this.$eventBus.$emit('stopFindInPage')
       this.updateTab({ id: this.activeTab.id, searching: false })
     },
     ...mapActions('tab', ['updateTab'])
