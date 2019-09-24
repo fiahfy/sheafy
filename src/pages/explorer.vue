@@ -53,7 +53,7 @@ export default {
 
 <style lang="scss" scoped>
 .explorer {
-  &.resizing > .explorer-webview {
+  &.resizing .explorer-webview {
     pointer-events: none;
   }
   .explorer-search-bar {

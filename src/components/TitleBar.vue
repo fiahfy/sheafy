@@ -21,7 +21,7 @@ export default {
   user-select: none;
   z-index: 9999;
   -webkit-app-region: drag;
-  > .v-card {
+  .v-card {
     position: relative;
     height: 16px;
     padding: 0 72px;
