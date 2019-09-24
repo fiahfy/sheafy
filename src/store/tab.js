@@ -14,9 +14,9 @@ const getBadge = (title) => {
 
 const convertTab = (tab) => {
   return {
+    ...tab,
     host: getHost(tab.url),
-    badge: getBadge(tab.title),
-    ...tab
+    badge: getBadge(tab.title)
   }
 }
 
