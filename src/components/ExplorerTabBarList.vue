@@ -2,16 +2,31 @@
   <v-list class="explorer-tab-bar-list" dense>
     <v-list-group v-model="expand">
       <template v-slot:activator>
-        <v-list-item-action class="my-0 mr-3">
-          <v-btn icon small @click.stop="unpinHost({ host: group.host })">
-            <v-icon small>{{ group.host ? 'mdi-pin' : 'mdi-pin-off' }}</v-icon>
-          </v-btn>
-        </v-list-item-action>
+        <v-hover v-slot:default="{ hover }">
+          <v-list-item-action class="my-0 mr-0">
+            <v-btn
+              icon
+              small
+              title="Unpin"
+              :disabled="!group.host"
+              @click.stop="unpinHost({ host: group.host })"
+            >
+              <v-icon small>{{
+                group.host && !hover ? 'mdi-pin' : 'mdi-pin-off'
+              }}</v-icon>
+            </v-btn>
+          </v-list-item-action>
+        </v-hover>
         <v-list-item-content>
           <v-list-item-title v-text="group.host || '(Not Pinned)'" />
         </v-list-item-content>
         <v-list-item-action class="my-0">
-          <v-btn icon small @click.stop="closeGroup({ host: group.host })">
+          <v-btn
+            icon
+            small
+            title="Close All"
+            @click.stop="closeGroup({ host: group.host })"
+          >
             <v-icon small>mdi-close</v-icon>
           </v-btn>
         </v-list-item-action>
@@ -106,11 +121,15 @@ export default {
 
 <style lang="scss" scoped>
 .explorer-tab-bar-list ::v-deep .v-list-group__header {
+  padding-left: 14px;
   &:not(:hover) .v-list-item__action:not(:first-child) {
     display: none;
   }
   &:hover .v-list-item__icon {
     display: none;
+  }
+  .v-list-item__content {
+    margin-left: 14px;
   }
   .v-list-item__icon {
     padding: 0 2px;
