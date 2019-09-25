@@ -43,7 +43,7 @@ export default {
   align-items: start;
   .v-card {
     position: relative;
-    height: 22px;
+    height: 20px;
     padding: 0 72px;
     min-width: 0;
     -webkit-app-region: drag;
