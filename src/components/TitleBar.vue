@@ -1,12 +1,6 @@
 <template>
-  <v-system-bar
-    v-if="titleBar"
-    class="title-bar caption px-0"
-    app
-    height="16"
-    @dblclick="onDoubleClick"
-  >
-    <v-card flat tile class="flex-grow-1">
+  <v-system-bar v-if="titleBar" class="title-bar caption px-0" app height="16">
+    <v-card flat tile class="flex-grow-1" @dblclick="onDoubleClick">
       <div>{{ title }}</div>
     </v-card>
   </v-system-bar>
@@ -46,12 +40,13 @@ export default {
 .title-bar {
   user-select: none;
   z-index: 9999;
-  -webkit-app-region: drag;
+  align-items: start;
   .v-card {
     position: relative;
-    height: 16px;
+    height: 22px;
     padding: 0 72px;
     min-width: 0;
+    -webkit-app-region: drag;
     > div {
       margin-top: 2px;
       white-space: nowrap;
