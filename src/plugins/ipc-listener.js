@@ -10,6 +10,13 @@ export default ({ store }) => {
   ipcRenderer.on('newTab', () => {
     store.dispatch('tab/newTab')
   })
+  ipcRenderer.on('duplicateTab', () => {
+    const tab = store.getters['tab/activeTab']
+    store.dispatch('tab/newTab', {
+      url: tab.url,
+      options: { baseId: tab.id, position: 'next' }
+    })
+  })
   ipcRenderer.on('closeTab', () => {
     store.dispatch('tab/closeTab', { id: store.state.tab.activeTabId })
   })

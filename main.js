@@ -22,6 +22,11 @@ const createTemplate = () => {
           click: () => send('newTab')
         },
         {
+          label: 'Duplicate Tab',
+          accelerator: 'CmdOrCtrl+D',
+          click: () => send('duplicateTab')
+        },
+        {
           label: 'Open Location...',
           accelerator: 'CmdOrCtrl+L',
           click: () => send('openLocation')

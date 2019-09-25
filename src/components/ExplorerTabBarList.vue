@@ -8,7 +8,7 @@
           </v-btn>
         </v-list-item-action>
         <v-list-item-content>
-          <v-list-item-title v-text="group.host || 'Not Pinned'" />
+          <v-list-item-title v-text="group.host || '(Not Pinned)'" />
         </v-list-item-content>
         <v-list-item-action class="my-0">
           <v-btn icon small @click.stop="closeGroup({ host: group.host })">
@@ -67,15 +67,23 @@ export default {
         },
         { type: 'separator' },
         {
+          label: 'Duplicate Tab',
+          click: () =>
+            this.newTab({
+              url: tab.url,
+              options: { baseId: tab.id, position: 'next' }
+            })
+        },
+        {
+          label: 'Open Current Page in a Default Browser',
+          click: () => remote.shell.openExternal(tab.url)
+        },
+        {
           label: this.isPinnedTab(tab) ? 'Unpin Host' : 'Pin Host',
           click: () =>
             this.isPinnedTab(tab)
               ? this.unpinHost({ host: tab.host })
               : this.pinHost({ host: tab.host })
-        },
-        {
-          label: 'Open Current Page in a Default Browser',
-          click: () => remote.shell.openExternal(tab.url)
         },
         { type: 'separator' },
         {
