@@ -8,17 +8,19 @@
     @drop.native.prevent="onDrop"
     @dragover.native.prevent="onDragOver"
   >
-    <v-app-bar fixed tile dense :flat="!scrolling">
-      <v-list class="flex-grow-1">
-        <v-subheader class="px-0 font-weight-bold">
-          TABS
-          <v-spacer />
-          <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
-            <v-icon size="20">mdi-plus-circle-outline</v-icon>
-          </v-btn>
-        </v-subheader>
-      </v-list>
-    </v-app-bar>
+    <div class="bar-container">
+      <v-app-bar tile dense :flat="!scrolling">
+        <v-list class="flex-grow-1">
+          <v-subheader class="px-0 font-weight-bold">
+            TABS
+            <v-spacer />
+            <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
+              <v-icon size="20">mdi-plus-circle-outline</v-icon>
+            </v-btn>
+          </v-subheader>
+        </v-list>
+      </v-app-bar>
+    </div>
     <explorer-tab-bar-list
       v-for="group in groups"
       :key="group.id"
@@ -126,6 +128,14 @@ export default {
 
 <style lang="scss" scoped>
 .explorer-tab-bar {
+  overflow: visible;
+  .bar-container {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    height: 96px;
+  }
   .v-app-bar {
     transition: none;
     .v-card {
