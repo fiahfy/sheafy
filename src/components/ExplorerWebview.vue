@@ -58,6 +58,11 @@ export default {
         this.$el.goForward()
       }
     })
+    this.$eventBus.$on('goToOffset', (offset) => {
+      if (this.handling) {
+        this.$el.goToOffset(offset)
+      }
+    })
     this.$eventBus.$on('reload', () => {
       if (this.handling) {
         this.$el.reload()
@@ -79,6 +84,22 @@ export default {
         if (url) {
           this.$el.loadURL(url)
         }
+      }
+    })
+    this.$eventBus.$on('requestBackHistories', () => {
+      if (this.handling) {
+        const contents = this.$el.getWebContents()
+        const histories = contents.history
+          .slice(0, contents.getActiveIndex())
+          .reverse()
+        this.$eventBus.$emit('showBackHistories', histories)
+      }
+    })
+    this.$eventBus.$on('requestForwardHistories', () => {
+      if (this.handling) {
+        const contents = this.$el.getWebContents()
+        const histories = contents.history.slice(contents.getActiveIndex() + 1)
+        this.$eventBus.$emit('showForwardHistories', histories)
       }
     })
     this.$eventBus.$on('findInPage', (text, { forward, findNext }) => {

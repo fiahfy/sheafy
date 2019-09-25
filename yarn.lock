@@ -9405,6 +9405,11 @@ vue-loader@^15.7.1:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
+vue-long-press-directive@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/vue-long-press-directive/-/vue-long-press-directive-1.0.2.tgz#97720c599185b7b10b7292d75739a4c26a78da4c"
+  integrity sha512-1X1DRU96xJyBKCj7qzxHeIXb/2dnz0HLaNRws+R+PCDF3sm36WzavY1dhXw/Qw3uNFe6iXnfiqt7cLE6RhXO3Q==
+
 vue-meta@^2.2.1:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/vue-meta/-/vue-meta-2.2.2.tgz#ec6be76d75b7d6e4abb6d995d92245487081428b"

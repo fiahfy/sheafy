@@ -80,7 +80,8 @@ module.exports = {
     '~/plugins/event-bus',
     '~/plugins/filter',
     '~/plugins/ipc-listener',
-    '~/plugins/vuetify'
+    '~/plugins/vuetify',
+    '~/plugins/vue-long-press'
   ],
 
   /*

@@ -9,6 +9,7 @@
     extension-height="1"
   >
     <v-btn
+      v-long-press="onBackContextMenu"
       icon
       width="36"
       height="36"
@@ -16,10 +17,12 @@
       title="Go Back"
       :disabled="!activeTab || !activeTab.canGoBack"
       @click="goBack"
+      @contextmenu.stop="onBackContextMenu"
     >
       <v-icon size="20">mdi-arrow-left</v-icon>
     </v-btn>
     <v-btn
+      v-long-press="onForwardContextMenu"
       icon
       width="36"
       height="36"
@@ -27,6 +30,7 @@
       title="Go Forward"
       :disabled="!activeTab || !activeTab.canGoForward"
       @click="goForward"
+      @contextmenu.stop="onForwardContextMenu"
     >
       <v-icon size="20">mdi-arrow-right</v-icon>
     </v-btn>
@@ -82,6 +86,28 @@ export default {
     },
     ...mapGetters('tab', ['activeTab'])
   },
+  mounted() {
+    this.$eventBus.$on('showBackHistories', (histories) => {
+      this.$contextMenu.show(
+        histories.map((history, index) => {
+          return {
+            label: history,
+            click: () => this.$eventBus.$emit('goToOffset', -index - 1)
+          }
+        })
+      )
+    })
+    this.$eventBus.$on('showForwardHistories', (histories) => {
+      this.$contextMenu.show(
+        histories.map((history, index) => {
+          return {
+            label: history,
+            click: () => this.$eventBus.$emit('goToOffset', index + 1)
+          }
+        })
+      )
+    })
+  },
   methods: {
     goBack() {
       this.$eventBus.$emit('goBack')
@@ -94,6 +120,12 @@ export default {
     },
     stop() {
       this.$eventBus.$emit('stop')
+    },
+    onBackContextMenu() {
+      this.$eventBus.$emit('requestBackHistories')
+    },
+    onForwardContextMenu() {
+      this.$eventBus.$emit('requestForwardHistories')
     },
     onFocus(e) {
       e.target.select()
