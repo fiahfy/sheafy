@@ -22,7 +22,8 @@ const convertTab = (tab) => {
 
 export const state = () => ({
   activeTabId: null,
-  tabs: []
+  tabs: [],
+  hosts: []
 })
 
 export const getters = {
@@ -32,53 +33,25 @@ export const getters = {
   isActiveTab(state) {
     return (tab) => tab.id === state.activeTabId
   },
+  isPinnedTab(state) {
+    return (tab) => state.hosts.includes(tab.host)
+  },
   groups(state) {
-    return state.tabs
-      .reduce((carry, tab) => {
-        const exists = !!carry.find((group) => group.host === tab.host)
-        if (exists) {
-          return carry.map((group) => {
-            if (group.host !== tab.host) {
-              return group
-            }
-            return {
-              ...group,
-              tabs: [...group.tabs, tab]
-            }
-          })
-        }
-        return [
-          ...carry,
-          {
-            host: tab.host,
-            tabs: [tab]
+    return [null, ...state.hosts.slice().reverse()]
+      .map((host, i) => {
+        const tabs = state.tabs.filter((tab) =>
+          i === 0 ? !state.hosts.includes(tab.host) : tab.host === host
+        )
+        if (tabs.length) {
+          return {
+            host,
+            tabs
           }
-        ]
-      }, [])
-      .reduce(
-        ([groups, ungrouped], group) => {
-          if (group.tabs.length > 1) {
-            return [[...groups, group], ungrouped]
-          }
-          return [
-            groups,
-            {
-              ...ungrouped,
-              tabs: [...ungrouped.tabs, group.tabs[0]]
-            }
-          ]
-        },
-        [[], { host: null, tabs: [] }]
-      )
-      .reduce((carry, value, index) => {
-        if (index === 0) {
-          return value
         }
-        if (value.tabs.length) {
-          return [value, ...carry]
-        }
-        return carry
+        return null
       })
+      .filter((group) => !!group)
+      .reverse()
   },
   getUrlWithQuery() {
     return (query) => {
@@ -187,6 +160,14 @@ export const actions = {
   activateTab({ commit }, { id }) {
     commit('setActiveTabId', { activeTabId: id })
   },
+  pinHost({ commit, state }, { host }) {
+    const hosts = [...state.hosts, host]
+    commit('setHosts', { hosts })
+  },
+  unpinHost({ commit, state }, { host }) {
+    const hosts = state.hosts.filter((value) => value !== host)
+    commit('setHosts', { hosts })
+  },
   closeGroup({ commit, getters, state }, { host }) {
     const group = getters.groups.find((group) => group.host === host)
     const tabIds = group.tabs.map((tab) => tab.id)
@@ -221,5 +202,8 @@ export const mutations = {
   },
   setTabs(state, { tabs }) {
     state.tabs = tabs
+  },
+  setHosts(state, { hosts }) {
+    state.hosts = hosts
   }
 }
