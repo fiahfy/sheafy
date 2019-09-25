@@ -93,16 +93,22 @@ export default {
     })
     this.$el.addEventListener('load-commit', ({ url, isMainFrame }) => {
       if (isMainFrame && url !== blank) {
+        const home = url === 'https://www.google.com/?sheafy'
         this.updateTab({
           id: this.tab.id,
           url,
-          query: url === 'https://www.google.com/?sheafy' ? '' : url,
+          query: home ? '' : url,
           canGoBack: this.$el.canGoBack(),
           canGoForward: this.$el.canGoForward()
         })
-        // TODO: https://github.com/electron/electron/issues/14474
-        this.$el.blur()
-        this.$el.focus()
+        if (home) {
+          // TODO:
+          document.querySelector('[name=query]').focus()
+        } else {
+          // TODO: https://github.com/electron/electron/issues/14474
+          this.$el.blur()
+          this.$el.focus()
+        }
       }
     })
     this.$el.addEventListener('page-title-updated', ({ title }) => {
