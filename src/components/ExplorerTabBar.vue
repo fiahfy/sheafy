@@ -138,11 +138,6 @@ export default {
   }
   .v-app-bar {
     transition: none;
-    .v-card {
-      position: absolute;
-      right: 0;
-      width: 55px;
-    }
   }
   ::v-deep .v-navigation-drawer__border {
     z-index: 5;

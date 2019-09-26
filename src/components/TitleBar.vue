@@ -1,8 +1,8 @@
 <template>
   <v-system-bar v-if="titleBar" class="title-bar caption px-0" app height="16">
-    <v-card flat tile class="flex-grow-1" @dblclick="onDoubleClick">
+    <v-sheet tile class="flex-grow-1" @dblclick="onDoubleClick">
       <div>{{ title }}</div>
-    </v-card>
+    </v-sheet>
   </v-system-bar>
 </template>
 
@@ -41,7 +41,7 @@ export default {
   user-select: none;
   z-index: 9999;
   align-items: start;
-  .v-card {
+  .v-sheet {
     position: relative;
     height: 20px;
     padding: 0 72px;
