@@ -81,6 +81,7 @@ module.exports = {
     '~/plugins/filter',
     '~/plugins/ipc-listener',
     '~/plugins/vuetify',
+    '~/plugins/vue-draggable',
     '~/plugins/vue-long-press'
   ],
 

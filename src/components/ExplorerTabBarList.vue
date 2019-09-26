@@ -11,9 +11,9 @@
               :disabled="!group.host"
               @click.stop="unpinHost({ host: group.host })"
             >
-              <v-icon small>{{
-                group.host && !hover ? 'mdi-pin' : 'mdi-pin-off'
-              }}</v-icon>
+              <v-icon small>
+                {{ group.host && !hover ? 'mdi-pin' : 'mdi-pin-off' }}
+              </v-icon>
             </v-btn>
           </v-list-item-action>
         </v-hover>
@@ -31,19 +31,19 @@
           </v-btn>
         </v-list-item-action>
       </template>
-      <explorer-tab-bar-list-item
-        v-for="tab in group.tabs"
-        :key="tab.id"
-        :tab="tab"
-        @contextmenu.native.stop="onContextMenu(tab)"
-      />
+      <draggable v-model="tabs">
+        <explorer-tab-bar-list-item
+          v-for="tab in tabs"
+          :key="tab.id"
+          :tab="tab"
+        />
+      </draggable>
     </v-list-group>
   </v-list>
 </template>
 
 <script>
-import { remote } from 'electron'
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import ExplorerTabBarListItem from '~/components/ExplorerTabBarListItem'
 
 export default {
@@ -62,8 +62,16 @@ export default {
     }
   },
   computed: {
-    ...mapState('tab', ['activeTabId']),
-    ...mapGetters('tab', ['isPinnedTab'])
+    tabs: {
+      get() {
+        return this.group.tabs
+      },
+      set(v) {
+        // TODO: update tab order
+        console.log(v)
+      }
+    },
+    ...mapState('tab', ['activeTabId'])
   },
   watch: {
     activeTabId(value) {
@@ -73,48 +81,7 @@ export default {
     }
   },
   methods: {
-    onContextMenu(tab) {
-      this.$contextMenu.show([
-        {
-          label: 'New Tab',
-          click: () =>
-            this.newTab({ options: { baseId: tab.id, position: 'next' } })
-        },
-        { type: 'separator' },
-        {
-          label: 'Duplicate Tab',
-          click: () =>
-            this.newTab({
-              url: tab.url,
-              options: { baseId: tab.id, position: 'next' }
-            })
-        },
-        {
-          label: 'Open Current Page in a Default Browser',
-          click: () => remote.shell.openExternal(tab.url)
-        },
-        {
-          label: this.isPinnedTab(tab) ? 'Unpin Host' : 'Pin Host',
-          click: () =>
-            this.isPinnedTab(tab)
-              ? this.unpinHost({ host: tab.host })
-              : this.pinHost({ host: tab.host })
-        },
-        { type: 'separator' },
-        {
-          label: 'Close Tab',
-          click: () => this.closeTab({ id: tab.id })
-        }
-      ])
-    },
-    ...mapMutations('settings', ['setTabBarWidth']),
-    ...mapActions('tab', [
-      'newTab',
-      'closeTab',
-      'pinHost',
-      'unpinHost',
-      'closeGroup'
-    ])
+    ...mapActions('tab', ['unpinHost', 'closeGroup'])
   }
 }
 </script>

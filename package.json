@@ -17,6 +17,7 @@
     "nuxt": "^2.9.2",
     "typeface-roboto": "^0.0.75",
     "vue-long-press-directive": "^1.0.2",
+    "vuedraggable": "^2.23.1",
     "vuex-persistedstate": "^2.5.4"
   },
   "devDependencies": {

@@ -115,6 +115,11 @@ export default {
       e.dataTransfer.dropEffect = 'link'
     },
     onDrop(e) {
+      const effectAllowed = e.dataTransfer.effectAllowed
+      // Prevent for sorting tabs
+      if (effectAllowed === 'move') {
+        return
+      }
       const url = e.dataTransfer.getData('text')
       if (url) {
         this.newTab({ url })
