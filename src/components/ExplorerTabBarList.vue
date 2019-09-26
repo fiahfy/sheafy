@@ -20,7 +20,8 @@
         <v-list-item-content>
           <v-list-item-title v-text="group.host || '(Not Pinned)'" />
         </v-list-item-content>
-        <v-list-item-action class="my-0">
+        <v-chip class="caption ml-3 px-2" v-text="tabs.length" />
+        <v-list-item-action class="my-0 ml-4">
           <v-btn
             icon
             small
@@ -100,6 +101,12 @@ export default {
   }
   .v-list-item__icon {
     padding: 0 2px;
+    min-width: unset;
+  }
+  .v-chip {
+    pointer-events: none;
+    height: 18px;
+    padding: 0 6px !important;
   }
 }
 </style>
