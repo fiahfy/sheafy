@@ -127,7 +127,9 @@ export default {
     height: 18px;
     padding: 0 6px !important;
   }
-  &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
+  .v-list-item:not(.v-list-item--active):not(:hover)
+    ::v-deep
+    .v-list-item__action {
     opacity: 0;
   }
 }
