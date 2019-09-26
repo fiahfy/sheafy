@@ -63,7 +63,7 @@
       class="ml-1 body-2"
       name="query"
       @focus="onFocus"
-      @keydown.enter="onKeyDownEnter"
+      @keypress.enter="onKeyPressEnter"
     />
     <v-divider slot="extension" />
   </v-app-bar>
@@ -130,7 +130,7 @@ export default {
     onFocus(e) {
       e.target.select()
     },
-    onKeyDownEnter(e) {
+    onKeyPressEnter(e) {
       e.target.blur()
       this.$eventBus.$emit('load')
     },
