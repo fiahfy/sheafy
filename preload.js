@@ -96,6 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
   })
   document.addEventListener('drop', (e) => {
     e.preventDefault()
+    const effectAllowed = e.dataTransfer.effectAllowed
+    if (effectAllowed === 'move') {
+      return
+    }
     const url = e.dataTransfer.getData('text')
     if (url) {
       location.href = url

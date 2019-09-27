@@ -6,7 +6,7 @@
     pa-0
     :class="{ resizing: resizing }"
   >
-    <explorer-tab-bar :resizing.sync="resizing" />
+    <explorer-sidebar :resizing.sync="resizing" />
     <explorer-toolbar />
     <div class="flex-grow-1 fill-height">
       <explorer-webview
@@ -23,14 +23,14 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import ExplorerSearchBar from '~/components/ExplorerSearchBar'
-import ExplorerTabBar from '~/components/ExplorerTabBar'
+import ExplorerSidebar from '~/components/ExplorerSidebar'
 import ExplorerToolbar from '~/components/ExplorerToolbar'
 import ExplorerWebview from '~/components/ExplorerWebview'
 
 export default {
   components: {
     ExplorerSearchBar,
-    ExplorerTabBar,
+    ExplorerSidebar,
     ExplorerToolbar,
     ExplorerWebview
   },

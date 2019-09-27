@@ -8,6 +8,7 @@
               icon
               small
               title="Unpin"
+              :color="hover ? null : 'primary'"
               :disabled="!group.host"
               @click.stop="unpinHost({ host: group.host })"
             >
@@ -32,12 +33,10 @@
           </v-btn>
         </v-list-item-action>
       </template>
-      <draggable v-model="tabs">
-        <explorer-tab-bar-list-item
-          v-for="tab in tabs"
-          :key="tab.id"
-          :tab="tab"
-        />
+      <draggable v-model="tabs" animation="150">
+        <v-sheet v-for="tab in tabs" :key="tab.id" tile>
+          <explorer-tab-bar-list-item :tab="tab" />
+        </v-sheet>
       </draggable>
     </v-list-group>
   </v-list>
@@ -88,25 +87,33 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.explorer-tab-bar-list ::v-deep .v-list-group__header {
-  padding-left: 14px;
-  &:not(:hover) .v-list-item__action:not(:first-child) {
-    display: none;
+.explorer-tab-bar-list {
+  ::v-deep .v-list-group__header {
+    padding-left: 14px;
+    &:not(:hover) .v-list-item__action:not(:first-child) {
+      display: none;
+    }
+    &:hover .v-list-item__icon {
+      display: none;
+    }
+    .v-list-item__content {
+      margin-left: 14px;
+    }
+    .v-list-item__icon {
+      padding: 0 2px;
+      min-width: unset;
+    }
+    .v-chip {
+      pointer-events: none;
+      height: 18px;
+      padding: 0 6px !important;
+    }
   }
-  &:hover .v-list-item__icon {
-    display: none;
-  }
-  .v-list-item__content {
-    margin-left: 14px;
-  }
-  .v-list-item__icon {
-    padding: 0 2px;
-    min-width: unset;
-  }
-  .v-chip {
-    pointer-events: none;
-    height: 18px;
-    padding: 0 6px !important;
+  .v-sheet {
+    color: inherit;
+    &.sortable-ghost {
+      opacity: 0;
+    }
   }
 }
 </style>

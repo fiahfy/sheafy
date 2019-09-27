@@ -193,6 +193,9 @@ export const actions = {
     if (!tabs.length) {
       remote.getCurrentWindow().close()
     }
+  },
+  sortGroups({ commit }, { hosts }) {
+    commit('setHosts', { hosts: hosts.filter((host) => !!host) })
   }
 }
 
