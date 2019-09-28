@@ -66,9 +66,9 @@ export default {
       get() {
         return this.group.tabs
       },
-      set(v) {
-        // TODO: update tab order
-        console.log(v)
+      set(tabs) {
+        const ids = tabs.map((tab) => tab.id)
+        this.sortTabs({ ids })
       }
     },
     ...mapState('tab', ['activeTabId'])
@@ -81,7 +81,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('tab', ['unpinHost', 'closeGroup'])
+    ...mapActions('tab', ['sortTabs', 'unpinHost', 'closeGroup'])
   }
 }
 </script>

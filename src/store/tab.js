@@ -160,6 +160,14 @@ export const actions = {
   activateTab({ commit }, { id }) {
     commit('setActiveTabId', { activeTabId: id })
   },
+  sortTabs({ commit, state }, { ids }) {
+    const sortedTabs = ids.map((id) => state.tabs.find((tab) => tab.id === id))
+    const tabs = [
+      ...state.tabs.filter((tab) => !ids.includes(tab.id)),
+      ...sortedTabs
+    ]
+    commit('setTabs', { tabs })
+  },
   pinHost({ commit, state }, { host }) {
     const hosts = [...state.hosts, host]
     commit('setHosts', { hosts })
