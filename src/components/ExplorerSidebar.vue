@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { mapActions, mapState, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
 import ExplorerTabBar from '~/components/ExplorerTabBar'
 
 export default {
@@ -53,7 +53,28 @@ export default {
         this.setTabBarWidth({ tabBarWidth: value })
       }
     },
-    ...mapState('settings', ['tabBarWidth'])
+    ...mapState('settings', ['tabBarWidth']),
+    ...mapGetters('tab', ['activeTab'])
+  },
+  watch: {
+    activeTab() {
+      this.$nextTick(() => {
+        const tab = this.$el.querySelector(
+          '.exporer-tab-bar-list-item.v-list-item--active'
+        )
+        const content = this.$el.querySelector('.v-navigation-drawer__content')
+        const offsetTop = 48
+        const top = tab.offsetTop - offsetTop
+        const bottom =
+          tab.offsetTop - offsetTop - content.offsetHeight + tab.offsetHeight
+        if (content.scrollTop > top) {
+          content.scrollTop = top
+        }
+        if (content.scrollTop < bottom) {
+          content.scrollTop = bottom
+        }
+      })
+    }
   },
   mounted() {
     this.setupResizseHanlder()
