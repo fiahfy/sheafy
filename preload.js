@@ -28,8 +28,14 @@ ipcRenderer.on('showContextMenu', (e, { canGoBack, canGoForward }) => {
   if (selection) {
     show([
       {
-        label: 'Copy',
-        click: () => navigator.clipboard.writeText(selection)
+        label: `Look Up “${selection}”`,
+        click: () => ipcRenderer.sendToHost('lookUp')
+      },
+      { type: 'separator' },
+      { role: 'copy' },
+      {
+        label: `Search Google for “${selection}”`,
+        click: () => ipcRenderer.sendToHost('search', selection)
       }
     ])
   } else {
@@ -76,9 +82,27 @@ const onContextMenu = (e, target) => {
         click: () => navigator.clipboard.writeText(target.href)
       },
       { type: 'separator' },
+      { role: 'copy' },
       {
-        label: 'Copy',
-        click: () => navigator.clipboard.writeText(target.textContent)
+        label: `Search Google for “${target.textContent}”`,
+        click: () => ipcRenderer.sendToHost('search', target.textContent)
+      }
+    ])
+  } else if (['input', 'textarea'].includes(target.tagName.toLowerCase())) {
+    e.stopPropagation()
+    show([
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      { role: 'pasteAndMatchStyle' },
+      { role: 'selectAll' },
+      { type: 'separator' },
+      {
+        label: `Search Google for “${target.textContent}”`,
+        click: () => ipcRenderer.sendToHost('search', target.textContent)
       }
     ])
   } else {

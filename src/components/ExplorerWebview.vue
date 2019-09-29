@@ -199,6 +199,16 @@ export default {
               remote.shell.openExternal(url)
               break
             }
+            case 'lookUp': {
+              this.$el.showDefinitionForSelection()
+              break
+            }
+            case 'search': {
+              const [text] = args
+              const url = this.getUrlWithQuery(text)
+              this.newTab({ url, options: { position: 'next' } })
+              break
+            }
             case 'requestContextMenu': {
               this.$el.send('showContextMenu', {
                 canGoBack: this.$el.canGoBack(),
