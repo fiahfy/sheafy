@@ -1,7 +1,7 @@
 <template>
   <webview
     v-if="src"
-    class="explorer-webview"
+    class="webview"
     :class="{ 'd-none': !active }"
     :src="src"
     :preload="preload"

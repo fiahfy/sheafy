@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar v-if="activeTab.searching" dense class="explorer-search-bar">
+  <v-toolbar v-if="activeTab.searching" dense class="search-bar">
     <v-text-field
       v-model="searchText"
       name="search-text"
@@ -124,7 +124,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.explorer-search-bar {
+.search-bar {
   width: 480px;
 }
 </style>

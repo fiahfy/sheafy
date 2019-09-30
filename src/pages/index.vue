@@ -1,38 +1,38 @@
 <template>
   <v-container
-    class="explorer"
+    class="index"
     fill-height
     fluid
     pa-0
     :class="{ resizing: resizing }"
   >
-    <explorer-sidebar :resizing.sync="resizing" />
-    <explorer-toolbar />
+    <sidebar :resizing.sync="resizing" />
+    <toolbar />
     <div class="flex-grow-1 fill-height">
-      <explorer-webview
+      <webview
         v-for="tab in tabs"
         :key="tab.id"
         :tab="tab"
         class="flex-grow-1 fill-height"
       />
-      <explorer-search-bar />
+      <search-bar />
     </div>
   </v-container>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import ExplorerSearchBar from '~/components/ExplorerSearchBar'
-import ExplorerSidebar from '~/components/ExplorerSidebar'
-import ExplorerToolbar from '~/components/ExplorerToolbar'
-import ExplorerWebview from '~/components/ExplorerWebview'
+import SearchBar from '~/components/SearchBar'
+import Sidebar from '~/components/Sidebar'
+import Toolbar from '~/components/Toolbar'
+import Webview from '~/components/Webview'
 
 export default {
   components: {
-    ExplorerSearchBar,
-    ExplorerSidebar,
-    ExplorerToolbar,
-    ExplorerWebview
+    SearchBar,
+    Sidebar,
+    Toolbar,
+    Webview
   },
   data() {
     return {
@@ -52,11 +52,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.explorer {
-  &.resizing .explorer-webview {
+.index {
+  &.resizing .webview {
     pointer-events: none;
   }
-  .explorer-search-bar {
+  .search-bar {
     position: absolute;
     top: 0;
     right: 0;

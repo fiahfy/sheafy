@@ -1,5 +1,5 @@
 <template>
-  <div class="explorer-tab-bar">
+  <div class="tab-bar">
     <draggable v-model="groups" animation="150" handle=".draggable">
       <v-sheet
         v-for="group in groups"
@@ -7,7 +7,7 @@
         :class="{ draggable: group.host }"
         tile
       >
-        <explorer-tab-bar-list :group="group" />
+        <tab-bar-list :group="group" />
       </v-sheet>
     </draggable>
   </div>
@@ -15,11 +15,11 @@
 
 <script>
 import { mapActions } from 'vuex'
-import ExplorerTabBarList from '~/components/ExplorerTabBarList'
+import TabBarList from '~/components/TabBarList'
 
 export default {
   components: {
-    ExplorerTabBarList
+    TabBarList
   },
   computed: {
     groups: {
@@ -39,7 +39,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.explorer-tab-bar .v-sheet.sortable-ghost {
+.tab-bar .v-sheet.sortable-ghost {
   opacity: 0;
 }
 </style>

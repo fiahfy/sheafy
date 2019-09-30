@@ -1,5 +1,5 @@
 <template>
-  <v-list class="explorer-tab-bar-list" dense>
+  <v-list class="tab-bar-list" dense>
     <v-list-group v-model="expand">
       <template v-slot:activator>
         <v-hover v-slot:default="{ hover }">
@@ -35,7 +35,7 @@
       </template>
       <draggable v-model="tabs" animation="150">
         <v-sheet v-for="tab in tabs" :key="tab.id" tile>
-          <explorer-tab-bar-list-item :tab="tab" />
+          <tab-bar-list-item :tab="tab" />
         </v-sheet>
       </draggable>
     </v-list-group>
@@ -44,11 +44,11 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import ExplorerTabBarListItem from '~/components/ExplorerTabBarListItem'
+import TabBarListItem from '~/components/TabBarListItem'
 
 export default {
   components: {
-    ExplorerTabBarListItem
+    TabBarListItem
   },
   props: {
     group: {
@@ -87,7 +87,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.explorer-tab-bar-list {
+.tab-bar-list {
   ::v-deep .v-list-group__header {
     padding-left: 14px;
     &:not(:hover) .v-list-item__action:not(:first-child) {

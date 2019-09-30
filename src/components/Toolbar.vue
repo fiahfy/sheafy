@@ -1,6 +1,6 @@
 <template>
   <v-app-bar
-    class="explorer-toolbar"
+    class="toolbar"
     app
     clipped-left
     flat
@@ -140,7 +140,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.explorer-toolbar ::v-deep {
+.toolbar ::v-deep {
   .v-toolbar__extension {
     padding: 0;
   }

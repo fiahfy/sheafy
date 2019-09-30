@@ -185,7 +185,7 @@ const createWindow = async () => {
     }
   }
 
-  const path = '#/explorer'
+  const path = ''
 
   mainWindow = new BrowserWindow(options)
 

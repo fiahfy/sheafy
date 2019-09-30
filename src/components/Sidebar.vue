@@ -1,6 +1,6 @@
 <template>
   <v-navigation-drawer
-    class="explorer-tab-bar"
+    class="tab-bar"
     permanent
     app
     clipped
@@ -21,17 +21,17 @@
         </v-list>
       </v-app-bar>
     </div>
-    <explorer-tab-bar />
+    <tab-bar />
   </v-navigation-drawer>
 </template>
 
 <script>
 import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
-import ExplorerTabBar from '~/components/ExplorerTabBar'
+import TabBar from '~/components/TabBar'
 
 export default {
   components: {
-    ExplorerTabBar
+    TabBar
   },
   props: {
     resizing: {
@@ -148,7 +148,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.explorer-tab-bar {
+.tab-bar {
   overflow: visible;
   .bar-container {
     overflow: hidden;
