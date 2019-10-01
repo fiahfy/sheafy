@@ -39,8 +39,13 @@ export default {
   },
   watch: {
     active(value) {
-      if (value && !this.src) {
-        this.load()
+      if (value) {
+        if (!this.src) {
+          this.load()
+        }
+        this.$nextTick(() => {
+          this.$el.focus()
+        })
       }
     }
   },
