@@ -91,8 +91,15 @@ const onContextMenu = (e, target) => {
   } else if (['input', 'textarea'].includes(target.tagName.toLowerCase())) {
     e.stopPropagation()
     show([
-      { role: 'undo' },
-      { role: 'redo' },
+      // TODO: https://github.com/electron/electron/issues/15728
+      {
+        label: 'Undo',
+        click: () => ipcRenderer.sendToHost('undo')
+      },
+      {
+        label: 'Redo',
+        click: () => ipcRenderer.sendToHost('redo')
+      },
       { type: 'separator' },
       { role: 'cut' },
       { role: 'copy' },

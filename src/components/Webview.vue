@@ -61,6 +61,16 @@ export default {
     load() {
       this.src = this.tab.url
       this.$nextTick(() => {
+        this.$eventBus.$on('undo', () => {
+          if (this.handling) {
+            this.$el.undo()
+          }
+        })
+        this.$eventBus.$on('redo', () => {
+          if (this.handling) {
+            this.$el.redo()
+          }
+        })
         this.$eventBus.$on('goBack', () => {
           if (this.handling) {
             this.$el.goBack()
@@ -194,18 +204,21 @@ export default {
               this.$el.inspectElement(x, y)
               break
             }
-            case 'newTab': {
-              const [url] = args
-              this.newTab({ url, options: { position: 'next' } })
+            case 'undo': {
+              this.$el.undo()
               break
             }
-            case 'openDefaultBrowser': {
-              const [url] = args
-              remote.shell.openExternal(url)
+            case 'redo': {
+              this.$el.redo()
               break
             }
             case 'lookUp': {
               this.$el.showDefinitionForSelection()
+              break
+            }
+            case 'newTab': {
+              const [url] = args
+              this.newTab({ url, options: { position: 'next' } })
               break
             }
             case 'search': {
@@ -216,6 +229,11 @@ export default {
             }
             case 'focus': {
               this.activateTab({ id: this.tab.id })
+              break
+            }
+            case 'openDefaultBrowser': {
+              const [url] = args
+              remote.shell.openExternal(url)
               break
             }
             case 'requestContextMenu': {

@@ -42,8 +42,17 @@ const createTemplate = () => {
     {
       label: 'Edit',
       submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
+        // TODO: https://github.com/electron/electron/issues/15728
+        {
+          label: 'Undo',
+          accelerator: 'CmdOrCtrl+Z',
+          click: () => send('undo')
+        },
+        {
+          label: 'Redo',
+          accelerator: 'CmdOrCtrl+Shift+Z',
+          click: () => send('redo')
+        },
         { type: 'separator' },
         { role: 'cut' },
         { role: 'copy' },

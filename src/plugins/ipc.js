@@ -39,4 +39,19 @@ export default ({ store }) => {
     el && el.focus()
     el && el.select()
   })
+  // TODO: https://github.com/electron/electron/issues/15728
+  ipcRenderer.on('undo', () => {
+    if (document.activeElement.tagName.toLocaleLowerCase() === 'webview') {
+      store.$eventBus.$emit('undo')
+    } else {
+      document.execCommand('undo')
+    }
+  })
+  ipcRenderer.on('redo', () => {
+    if (document.activeElement.tagName.toLocaleLowerCase() === 'webview') {
+      store.$eventBus.$emit('redo')
+    } else {
+      document.execCommand('redo')
+    }
+  })
 }

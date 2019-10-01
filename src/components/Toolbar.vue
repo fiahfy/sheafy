@@ -64,6 +64,7 @@
       name="query"
       @focus="onFocus"
       @keypress.enter="onKeyPressEnter"
+      @contextmenu.stop="onTextFieldContextMenu"
     />
     <v-divider slot="extension" />
   </v-app-bar>
@@ -126,6 +127,13 @@ export default {
     },
     onForwardContextMenu() {
       this.$eventBus.$emit('requestForwardHistories')
+    },
+    onTextFieldContextMenu() {
+      this.$contextMenu.show([
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' }
+      ])
     },
     onFocus(e) {
       e.target.select()
