@@ -130,3 +130,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 })
+
+window.focus = ((focus) => {
+  return (...args) => {
+    ipcRenderer.sendToHost('focus')
+    return focus.apply(window, args)
+  }
+})(window.focus)
+
+Notification.requestPermission = ((requestPermission) => {
+  return (...args) => {
+    // TODO: Handle requestPermission
+    console.log('requestPermission')
+    return requestPermission.apply(Notification, args)
+  }
+})(Notification.requestPermission)

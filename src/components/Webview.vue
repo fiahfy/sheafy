@@ -214,6 +214,10 @@ export default {
               this.newTab({ url, options: { position: 'next' } })
               break
             }
+            case 'focus': {
+              this.activateTab({ id: this.tab.id })
+              break
+            }
             case 'requestContextMenu': {
               this.$el.send('showContextMenu', {
                 canGoBack: this.$el.canGoBack(),
@@ -225,7 +229,12 @@ export default {
         })
       })
     },
-    ...mapActions('tab', ['newTab', 'newTabInBackground', 'updateTab'])
+    ...mapActions('tab', [
+      'newTab',
+      'newTabInBackground',
+      'updateTab',
+      'activateTab'
+    ])
   }
 }
 </script>
