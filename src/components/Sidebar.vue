@@ -1,6 +1,6 @@
 <template>
   <v-navigation-drawer
-    class="tab-bar"
+    class="side-bar"
     permanent
     app
     clipped
@@ -21,17 +21,17 @@
         </v-list>
       </v-app-bar>
     </div>
-    <tab-bar />
+    <tabs />
   </v-navigation-drawer>
 </template>
 
 <script>
 import { mapActions, mapState, mapMutations } from 'vuex'
-import TabBar from '~/components/TabBar'
+import Tabs from '~/components/Tabs'
 
 export default {
   components: {
-    TabBar
+    Tabs
   },
   props: {
     resizing: {
@@ -47,21 +47,19 @@ export default {
   computed: {
     width: {
       get() {
-        return this.tabBarWidth
+        return this.sideBarWidth
       },
       set(value) {
-        this.setTabBarWidth({ tabBarWidth: value })
+        this.setSideBarWidth({ sideBarWidth: value })
       }
     },
-    ...mapState('settings', ['tabBarWidth']),
+    ...mapState('settings', ['sideBarWidth']),
     ...mapState('tab', ['activeTabId'])
   },
   watch: {
     activeTabId() {
       this.$nextTick(() => {
-        const tab = this.$el.querySelector(
-          '.exporer-tab-bar-list-item.v-list-item--active'
-        )
+        const tab = this.$el.querySelector('.tab-list-item.v-list-item--active')
         const content = this.$el.querySelector('.v-navigation-drawer__content')
         const offsetTop = 48
         const top = tab.offsetTop - offsetTop
@@ -141,14 +139,14 @@ export default {
         this.newTab({ url })
       }
     },
-    ...mapMutations('settings', ['setTabBarWidth']),
+    ...mapMutations('settings', ['setSideBarWidth']),
     ...mapActions('tab', ['newTab'])
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.tab-bar {
+.side-bar {
   overflow: visible;
   .bar-container {
     overflow: hidden;

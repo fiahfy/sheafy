@@ -1,7 +1,7 @@
 export const state = () => ({
   darkTheme: false,
   fullScreen: false,
-  tabBarWidth: 256
+  sideBarWidth: 256
 })
 
 export const mutations = {
@@ -11,7 +11,7 @@ export const mutations = {
   setFullScreen(state, { fullScreen }) {
     state.fullScreen = fullScreen
   },
-  setTabBarWidth(state, { tabBarWidth }) {
-    state.tabBarWidth = tabBarWidth
+  setSideBarWidth(state, { sideBarWidth }) {
+    state.sideBarWidth = sideBarWidth
   }
 }

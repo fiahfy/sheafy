@@ -1,6 +1,6 @@
 <template>
   <v-list-item
-    class="exporer-tab-bar-list-item"
+    class="tab-list-item"
     :title="tab.title"
     :input-value="active"
     @click="activateTab({ id: tab.id })"
@@ -121,7 +121,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.exporer-tab-bar-list-item {
+.tab-list-item {
   &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
     opacity: 0;
   }
