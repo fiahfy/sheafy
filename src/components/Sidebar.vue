@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
+import { mapActions, mapState, mapMutations } from 'vuex'
 import TabBar from '~/components/TabBar'
 
 export default {
@@ -54,10 +54,10 @@ export default {
       }
     },
     ...mapState('settings', ['tabBarWidth']),
-    ...mapGetters('tab', ['activeTab'])
+    ...mapState('tab', ['activeTabId'])
   },
   watch: {
-    activeTab() {
+    activeTabId() {
       this.$nextTick(() => {
         const tab = this.$el.querySelector(
           '.exporer-tab-bar-list-item.v-list-item--active'
