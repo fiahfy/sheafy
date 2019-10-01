@@ -89,11 +89,7 @@ export default {
         { type: 'separator' },
         {
           label: 'Duplicate Tab',
-          click: () =>
-            this.newTab({
-              url: this.tab.url,
-              options: { baseId: this.tab.id, position: 'next' }
-            })
+          click: () => this.duplicateTab({ id: this.tab.id })
         },
         {
           label: 'Open Current Page in a Default Browser',
@@ -113,7 +109,13 @@ export default {
         }
       ])
     },
-    ...mapActions('tab', ['newTab', 'closeTab', 'activateTab', 'pinHost'])
+    ...mapActions('tab', [
+      'newTab',
+      'duplicateTab',
+      'closeTab',
+      'activateTab',
+      'pinHost'
+    ])
   }
 }
 </script>

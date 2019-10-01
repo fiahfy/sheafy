@@ -68,11 +68,6 @@ export const getters = {
 }
 
 export const actions = {
-  newTabIfEmpty({ dispatch, state }) {
-    if (!state.tabs.length) {
-      dispatch('newTab')
-    }
-  },
   newTab({ commit, state }, { options, ...params } = {}) {
     const { activate = true, position = 'last', baseId = state.activeTabId } =
       options || {}
@@ -120,6 +115,21 @@ export const actions = {
     if (activate) {
       commit('setActiveTabId', { activeTabId: id })
     }
+  },
+  newTabIfEmpty({ dispatch, state }) {
+    if (!state.tabs.length) {
+      dispatch('newTab')
+    }
+  },
+  duplicateTab({ dispatch, state }, { id }) {
+    const tab = state.tabs.find((tab) => tab.id === id)
+    if (!tab) {
+      return
+    }
+    dispatch('newTab', {
+      url: tab.url,
+      options: { baseId: tab.id, position: 'next' }
+    })
   },
   updateTab({ commit, state }, { id, ...params }) {
     const tabs = state.tabs.map((tab) => {
