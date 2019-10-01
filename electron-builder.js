@@ -1,12 +1,6 @@
 module.exports = {
-  appId: 'net.fiahfy.picty',
-  files: ['app', 'main.js'],
-  mac: {
-    target: ['dmg']
-  },
-  win: {
-    target: ['nsis']
-  },
+  appId: 'net.fiahfy.sheafy',
+  files: ['app', 'main.js', 'preload.js'],
   nsis: {
     oneClick: false,
     allowToChangeInstallationDirectory: true

@@ -17,17 +17,42 @@ const createTemplate = () => {
       label: 'File',
       submenu: [
         {
-          label: 'Open...',
-          accelerator: 'CmdOrCtrl+O',
-          click: () => send('openDirectory')
+          label: 'New Tab',
+          accelerator: 'CmdOrCtrl+T',
+          click: () => send('newTab')
+        },
+        {
+          label: 'Duplicate Tab',
+          accelerator: 'CmdOrCtrl+D',
+          click: () => send('duplicateTab')
+        },
+        {
+          label: 'Open Location...',
+          accelerator: 'CmdOrCtrl+L',
+          click: () => send('openLocation')
+        },
+        { type: 'separator' },
+        {
+          label: 'Close Tab',
+          accelerator: 'CmdOrCtrl+W',
+          click: () => send('closeTab')
         }
       ]
     },
     {
       label: 'Edit',
       submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
+        // TODO: https://github.com/electron/electron/issues/15728
+        {
+          label: 'Undo',
+          accelerator: 'CmdOrCtrl+Z',
+          click: () => send('undo')
+        },
+        {
+          label: 'Redo',
+          accelerator: 'CmdOrCtrl+Shift+Z',
+          click: () => send('redo')
+        },
         { type: 'separator' },
         { role: 'cut' },
         { role: 'copy' },
@@ -47,19 +72,24 @@ const createTemplate = () => {
       label: 'View',
       submenu: [
         {
-          label: 'Explorer',
-          accelerator: 'CmdOrCtrl+Shift+E',
-          click: () => send('showExplorer')
+          label: 'Reload',
+          accelerator: 'CmdOrCtrl+R',
+          click: () => send('reload')
         },
         {
-          label: 'Bookmark',
-          accelerator: 'CmdOrCtrl+Shift+B',
-          click: () => send('showBookmark')
+          label: 'Force Reload',
+          accelerator: 'CmdOrCtrl+Shift+R',
+          click: () => send('forceReload')
         },
         { type: 'separator' },
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
+        {
+          label: 'Developer',
+          submenu: [
+            { role: 'reload', accelerator: 'CmdOrCtrl+Alt+R' },
+            { role: 'forcereload', accelerator: 'CmdOrCtrl+Shift+Alt+R' },
+            { role: 'toggledevtools' }
+          ]
+        },
         { type: 'separator' },
         // { role: 'resetzoom' },
         // { role: 'zoomin' },
@@ -69,59 +99,17 @@ const createTemplate = () => {
       ]
     },
     {
-      label: 'Explorer',
+      label: 'Navigation',
       submenu: [
-        {
-          label: 'Open Location...',
-          accelerator: 'CmdOrCtrl+L',
-          click: () => send('openLocation')
-        },
-        { type: 'separator' },
         {
           label: 'Back',
           accelerator: 'CmdOrCtrl+Left',
-          click: () => send('backDirectory')
+          click: () => send('goBack')
         },
         {
           label: 'Forward',
           accelerator: 'CmdOrCtrl+Right',
-          click: () => send('forwardDirectory')
-        },
-        {
-          label: 'Up',
-          accelerator: 'CmdOrCtrl+Shift+P',
-          click: () => send('upDirectory')
-        },
-        {
-          label: 'Home',
-          accelerator: 'CmdOrCtrl+Shift+H',
-          click: () => send('changeHomeDirectory')
-        },
-        {
-          label: 'Bookmark',
-          accelerator: 'CmdOrCtrl+D',
-          click: () => send('bookmarkDirectory')
-        },
-        { label: 'Browse', click: () => send('browseDirectory') }
-      ]
-    },
-    {
-      label: 'Viewer',
-      submenu: [
-        {
-          label: 'Zoom In',
-          accelerator: 'CmdOrCtrl+Plus',
-          click: () => send('zoomIn')
-        },
-        {
-          label: 'Zoom Out',
-          accelerator: 'CmdOrCtrl+-',
-          click: () => send('zoomOut')
-        },
-        {
-          label: 'Reset Zoom',
-          accelerator: 'CmdOrCtrl+0',
-          click: () => send('resetZoom')
+          click: () => send('goForward')
         }
       ]
     },
@@ -134,7 +122,7 @@ const createTemplate = () => {
       submenu: [
         {
           label: 'Learn More',
-          click: () => shell.openExternal('https://github.com/fiahfy/picty')
+          click: () => shell.openExternal('https://github.com/fiahfy/sheafy')
         }
       ]
     }
@@ -195,7 +183,7 @@ const createWindow = async () => {
     titleBarStyle: 'hidden',
     webPreferences: {
       nodeIntegration: true,
-      nodeIntegrationInWorker: true
+      webviewTag: true
     }
   }
 
@@ -206,7 +194,7 @@ const createWindow = async () => {
     }
   }
 
-  const path = '#/explorer'
+  const path = ''
 
   mainWindow = new BrowserWindow(options)
 
@@ -251,10 +239,6 @@ const createWindow = async () => {
   mainWindow.on('closed', () => (mainWindow = null))
   mainWindow.on('enter-full-screen', () => send('enterFullScreen'))
   mainWindow.on('leave-full-screen', () => send('leaveFullScreen'))
-  mainWindow.on('app-command', (e, cmd) => {
-    e.preventDefault()
-    send('appCommand', cmd)
-  })
 }
 
 app.on('ready', createWindow)

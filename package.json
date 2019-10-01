@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "sheafy",
+  "description": "Vertial and Grouped Tabs Browser",
   "version": "0.0.1",
   "author": {
     "name": "fiahfy",
@@ -10,23 +10,25 @@
   "dependencies": {
     "@fiahfy/electron-accelerator-formatter": "^0.0.3",
     "@fiahfy/electron-context-menu": "^0.0.3",
-    "@nuxtjs/vuetify": "^1.8.3",
+    "@mdi/font": "^4.4.95",
+    "@nuxtjs/vuetify": "^1.8.5",
     "electron-devtools-installer": "^2.2.4",
     "electron-window-state": "^5.0.3",
-    "material-design-icons-iconfont": "^5.0.1",
     "nuxt": "^2.9.2",
     "typeface-roboto": "^0.0.75",
+    "vue-long-press-directive": "^1.0.2",
+    "vuedraggable": "^2.23.1",
     "vuex-persistedstate": "^2.5.4"
   },
   "devDependencies": {
     "@fiahfy/icns-convert": "^0.0.6",
     "@fiahfy/ico-convert": "^0.0.5",
-    "cross-env": "^5.2.1",
-    "electron": "^6.0.9",
+    "cross-env": "^6.0.0",
+    "electron": "^6.0.10",
     "electron-builder": "^21.2.0",
-    "eslint": "^6.3.0",
+    "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.3.0",
-    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^5.2.3",
     "husky": "^3.0.5",
     "node-sass": "^4.12.0",
@@ -43,17 +45,17 @@
   ],
   "main": "main.js",
   "private": true,
-  "productName": "",
+  "productName": "Sheafy",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fiahfy/picty"
+    "url": "https://github.com/fiahfy/sheafy"
   },
   "scripts": {
     "build": "nuxt generate",
     "dev": "cross-env NODE_ENV=development run-p serve electron",
     "electron": "electron main.js",
     "lint": "eslint -f codeframe --ext .js,.vue --ignore-path .gitignore .",
-    "release": "build -mw",
+    "release": "electron-builder",
     "resources": "run-p resources:*",
     "resources:icns": "icns-convert build/icon.png",
     "resources:ico": "ico-convert build/icon.png",

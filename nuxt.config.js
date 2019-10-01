@@ -1,4 +1,5 @@
-const pkg = require('./package')
+import colors from 'vuetify/es5/util/colors'
+import pkg from './package'
 
 module.exports = {
   /*
@@ -18,11 +19,7 @@ module.exports = {
   /*
    ** Global CSS
    */
-  css: [
-    'material-design-icons-iconfont/dist/material-design-icons.css',
-    'typeface-roboto/index.css',
-    '~/assets/css/app.css'
-  ],
+  css: ['@mdi/font/css/materialdesignicons.css', 'typeface-roboto/index.css'],
 
   /*
    ** Generate configuration
@@ -56,10 +53,20 @@ module.exports = {
     [
       '@nuxtjs/vuetify',
       {
-        materialIcons: false,
+        customVariables: ['~/assets/variables.scss'],
+        defaultAssets: false,
         theme: {
-          primary: '#ff4081',
-          accent: '#ff4081'
+          themes: {
+            light: {
+              primary: colors.blue.darken2,
+              accent: colors.grey.darken3,
+              secondary: colors.amber.darken3,
+              info: colors.teal.lighten1,
+              warning: colors.amber.base,
+              error: colors.deepOrange.accent4,
+              success: colors.green.accent3
+            }
+          }
         }
       }
     ]
@@ -69,10 +76,12 @@ module.exports = {
    ** Plugins to load before mounting the App
    */
   plugins: [
-    '~/plugins/context-menu',
-    '~/plugins/filter',
-    '~/plugins/ipc-listener',
-    '~/plugins/vuetify'
+    '~/plugins/electron-accelerator-formatter',
+    '~/plugins/electron-context-menu',
+    '~/plugins/event-bus',
+    '~/plugins/ipc',
+    '~/plugins/vue-draggable',
+    '~/plugins/vue-long-press'
   ],
 
   /*
