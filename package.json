@@ -55,7 +55,7 @@
     "dev": "cross-env NODE_ENV=development run-p serve electron",
     "electron": "electron main.js",
     "lint": "eslint -f codeframe --ext .js,.vue --ignore-path .gitignore .",
-    "release": "electron-builder -mw",
+    "release": "electron-builder",
     "resources": "run-p resources:*",
     "resources:icns": "icns-convert build/icon.png",
     "resources:ico": "ico-convert build/icon.png",
