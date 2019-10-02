@@ -5,6 +5,7 @@
     :class="{ 'd-none': !active }"
     :src="src"
     :preload="preload"
+    allowpopups
   />
 </template>
 
