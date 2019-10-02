@@ -100,6 +100,7 @@ export default {
       margin-left: 14px;
     }
     .v-list-item__icon {
+      margin-left: 16px;
       padding: 0 2px;
       min-width: unset;
     }
