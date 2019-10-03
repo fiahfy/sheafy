@@ -1,6 +1,6 @@
 <template>
   <webview
-    v-if="src"
+    v-if="mounted"
     class="webview"
     :class="{ 'd-none': !active }"
     :src="src"
@@ -27,6 +27,9 @@ export default {
     }
   },
   computed: {
+    mounted() {
+      return this.src && !this.tab.replaced
+    },
     preload() {
       return `file://${remote.app.getAppPath()}/preload.js`
     },
@@ -41,7 +44,8 @@ export default {
   watch: {
     active(value) {
       if (value) {
-        if (!this.src) {
+        if (!this.mounted) {
+          this.updateTab({ id: this.tab.id, replaced: false })
           this.load()
         }
         this.$nextTick(() => {
@@ -51,7 +55,7 @@ export default {
     }
   },
   mounted() {
-    if (this.active || !this.tab.firstLoaded) {
+    if (this.active || !this.tab.loaded) {
       this.load()
     }
   },
@@ -171,7 +175,7 @@ export default {
           this.$el.stopFindInPage('clearSelection')
         })
         this.$el.addEventListener('did-stop-loading', () => {
-          this.updateTab({ id: this.tab.id, loading: false, firstLoaded: true })
+          this.updateTab({ id: this.tab.id, loading: false, loaded: true })
         })
         this.$el.addEventListener('found-in-page', ({ result }) => {
           this.updateTab({

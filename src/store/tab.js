@@ -89,6 +89,8 @@ export const actions = {
       searchText: '',
       searchActiveMatchOrdinal: null,
       searchMatches: null,
+      loaded: false,
+      replaced: false,
       ...params
     })
 
@@ -175,7 +177,10 @@ export const actions = {
     const tabs = [
       ...state.tabs.filter((tab) => !ids.includes(tab.id)),
       ...sortedTabs
-    ]
+    ].map((tab) => ({
+      ...tab,
+      replaced: tab.id !== state.activeTabId
+    }))
     commit('setTabs', { tabs })
   },
   pinHost({ commit, state }, { host }) {
