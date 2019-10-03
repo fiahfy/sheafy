@@ -140,6 +140,7 @@ export default {
         })
         this.$el.addEventListener('load-commit', ({ url, isMainFrame }) => {
           if (isMainFrame) {
+            const urlChanged = url !== this.tab.url
             const home = url === 'https://www.google.com/?sheafy'
             this.updateTab({
               id: this.tab.id,
@@ -151,7 +152,7 @@ export default {
             if (home) {
               // TODO:
               document.querySelector('[name=query]').focus()
-            } else {
+            } else if (urlChanged) {
               // TODO: https://github.com/electron/electron/issues/14474
               this.$el.blur()
               this.$el.focus()
