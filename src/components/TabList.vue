@@ -1,20 +1,26 @@
 <template>
-  <v-list class="tab-list" dense>
-    <v-list-group v-model="expand">
+  <v-list class="tab-list py-1" dense>
+    <tab-list-item v-if="group.tabs.length < 2" :tab="group.tabs[0]" />
+    <v-list-group v-else v-model="expand">
       <template v-slot:activator>
         <v-hover v-slot:default="{ hover }">
-          <v-list-item-action class="my-0 mr-0">
+          <v-list-item-action class="ma-0">
             <v-btn
               icon
               small
               title="Unpin"
-              :color="hover ? null : 'primary'"
               :disabled="!group.host"
               @click.stop="unpinHost({ host: group.host })"
             >
-              <v-icon small>
-                {{ group.host && !hover ? 'mdi-pin' : 'mdi-pin-off' }}
-              </v-icon>
+              <v-icon v-if="hover" small>mdi-pin-off</v-icon>
+              <v-img
+                v-else
+                :src="group.tabs[0].favicon"
+                height="16"
+                width="16"
+                contain
+                @error="error = true"
+              />
             </v-btn>
           </v-list-item-action>
         </v-hover>
@@ -35,7 +41,7 @@
       </template>
       <draggable v-model="tabs" animation="150">
         <v-sheet v-for="tab in tabs" :key="tab.id" tile>
-          <tab-list-item :tab="tab" />
+          <tab-list-item :tab="tab" sub-group />
         </v-sheet>
       </draggable>
     </v-list-group>
@@ -114,6 +120,9 @@ export default {
     color: inherit;
     &.sortable-ghost {
       opacity: 0;
+    }
+    .tab-list-item {
+      padding-left: 32px;
     }
   }
 }

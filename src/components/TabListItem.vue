@@ -1,33 +1,47 @@
 <template>
   <v-list-item
     class="tab-list-item"
-    :title="tab.title"
+    :class="{ 'sub-group': subGroup }"
+    :title="title"
     :input-value="active"
     @click="activateTab({ id: tab.id })"
     @contextmenu.stop="onContextMenu"
   >
-    <v-list-item-icon class="mr-4 px-1 align-self-center">
-      <v-progress-circular
-        v-if="tab.loading"
-        indeterminate
-        size="16"
-        width="2"
-        color="primary"
-      />
-      <template v-else>
-        <v-icon v-if="error" small color="grey darken-1">mdi-earth</v-icon>
-        <v-img
-          v-else
-          :src="tab.favicon"
-          height="16"
-          width="16"
-          contain
-          @error="error = true"
+    <v-hover v-slot:default="{ hover }">
+      <v-list-item-action v-if="hover && !subGroup" class="my-0 mr-3">
+        <v-btn
+          icon
+          small
+          title="Unpin"
+          :disabled="!tab.host"
+          @click.stop="unpinHost({ host: tab.host })"
+        >
+          <v-icon small>mdi-pin-off</v-icon>
+        </v-btn>
+      </v-list-item-action>
+      <v-list-item-icon v-else class="mr-4 px-1 align-self-center">
+        <v-progress-circular
+          v-if="tab.loading"
+          indeterminate
+          size="16"
+          width="2"
+          color="primary"
         />
-      </template>
-    </v-list-item-icon>
+        <template v-else>
+          <v-icon v-if="error" small color="grey darken-1">mdi-earth</v-icon>
+          <v-img
+            v-else
+            :src="tab.favicon"
+            height="16"
+            width="16"
+            contain
+            @error="error = true"
+          />
+        </template>
+      </v-list-item-icon>
+    </v-hover>
     <v-list-item-content>
-      <v-list-item-title v-text="tab.title" />
+      <v-list-item-title v-text="title" />
     </v-list-item-content>
     <v-chip
       v-if="tab.badge"
@@ -36,7 +50,7 @@
       v-text="badge"
     />
     <v-list-item-action class="my-0">
-      <v-btn icon small @click.stop="closeTab({ id: tab.id })">
+      <v-btn icon small title="Close" @click.stop="closeTab({ id: tab.id })">
         <v-icon small>mdi-close</v-icon>
       </v-btn>
     </v-list-item-action>
@@ -52,6 +66,10 @@ export default {
     tab: {
       type: Object,
       required: true
+    },
+    subGroup: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -65,6 +83,9 @@ export default {
     },
     pinned() {
       return this.isPinnedTab(this.tab)
+    },
+    title() {
+      return this.subGroup ? this.tab.title : this.tab.host
     },
     badge() {
       return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
@@ -114,7 +135,8 @@ export default {
       'duplicateTab',
       'closeTab',
       'activateTab',
-      'pinHost'
+      'pinHost',
+      'unpinHost'
     ])
   }
 }
@@ -122,6 +144,9 @@ export default {
 
 <style lang="scss" scoped>
 .tab-list-item {
+  &.sub-group {
+    padding-left: 32px;
+  }
   &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
     opacity: 0;
   }
