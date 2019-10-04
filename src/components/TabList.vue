@@ -1,29 +1,13 @@
 <template>
-  <v-list class="tab-list py-1" dense>
+  <v-list class="tab-list py-1 primary--text" dense>
     <tab-list-item v-if="group.tabs.length < 2" :tab="group.tabs[0]" />
     <v-list-group v-else v-model="expand">
       <template v-slot:activator>
-        <v-hover v-slot:default="{ hover }">
-          <v-list-item-action class="ma-0">
-            <v-btn
-              icon
-              small
-              title="Unpin"
-              :disabled="!group.host"
-              @click.stop="unpinHost({ host: group.host })"
-            >
-              <v-icon v-if="hover" small>mdi-pin-off</v-icon>
-              <v-img
-                v-else
-                :src="group.tabs[0].favicon"
-                height="16"
-                width="16"
-                contain
-                @error="error = true"
-              />
-            </v-btn>
-          </v-list-item-action>
-        </v-hover>
+        <tab-list-item-icon
+          class="mr-4"
+          :url="group.favicon"
+          :host="group.host"
+        />
         <v-list-item-content>
           <v-list-item-title v-text="group.host || '(Not Pinned)'" />
         </v-list-item-content>
@@ -51,10 +35,12 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import TabListItem from '~/components/TabListItem'
+import TabListItemIcon from '~/components/TabListItemIcon'
 
 export default {
   components: {
-    TabListItem
+    TabListItem,
+    TabListItemIcon
   },
   props: {
     group: {
@@ -95,17 +81,13 @@ export default {
 <style lang="scss" scoped>
 .tab-list {
   ::v-deep .v-list-group__header {
-    padding-left: 14px;
     &:not(:hover) .v-list-item__action:not(:first-child) {
       display: none;
     }
-    &:hover .v-list-item__icon {
+    &:hover .v-list-group__header__append-icon {
       display: none;
     }
-    .v-list-item__content {
-      margin-left: 14px;
-    }
-    .v-list-item__icon {
+    .v-list-group__header__append-icon {
       margin-left: 16px;
       padding: 0 2px;
       min-width: unset;

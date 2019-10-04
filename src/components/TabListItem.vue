@@ -7,39 +7,13 @@
     @click="activateTab({ id: tab.id })"
     @contextmenu.stop="onContextMenu"
   >
-    <v-hover v-slot:default="{ hover }">
-      <v-list-item-action v-if="hover && !subGroup" class="my-0 mr-3">
-        <v-btn
-          icon
-          small
-          title="Unpin"
-          :disabled="!tab.host"
-          @click.stop="unpinHost({ host: tab.host })"
-        >
-          <v-icon small>mdi-pin-off</v-icon>
-        </v-btn>
-      </v-list-item-action>
-      <v-list-item-icon v-else class="mr-4 px-1 align-self-center">
-        <v-progress-circular
-          v-if="tab.loading"
-          indeterminate
-          size="16"
-          width="2"
-          color="primary"
-        />
-        <template v-else>
-          <v-icon v-if="error" small color="grey darken-1">mdi-earth</v-icon>
-          <v-img
-            v-else
-            :src="tab.favicon"
-            height="16"
-            width="16"
-            contain
-            @error="error = true"
-          />
-        </template>
-      </v-list-item-icon>
-    </v-hover>
+    <tab-list-item-icon
+      class="mr-4"
+      :url="tab.favicon"
+      :host="tab.host"
+      :sub-group="subGroup"
+      :loading="tab.loading"
+    />
     <v-list-item-content>
       <v-list-item-title v-text="title" />
     </v-list-item-content>
@@ -60,8 +34,12 @@
 <script>
 import { remote } from 'electron'
 import { mapActions, mapGetters } from 'vuex'
+import TabListItemIcon from '~/components/TabListItemIcon'
 
 export default {
+  components: {
+    TabListItemIcon
+  },
   props: {
     tab: {
       type: Object,
@@ -70,11 +48,6 @@ export default {
     subGroup: {
       type: Boolean,
       default: false
-    }
-  },
-  data() {
-    return {
-      error: false
     }
   },
   computed: {

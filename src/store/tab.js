@@ -45,6 +45,7 @@ export const getters = {
         if (tabs.length) {
           return {
             host,
+            favicon: tabs[0].favicon,
             tabs
           }
         }
