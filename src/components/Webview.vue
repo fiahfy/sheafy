@@ -23,6 +23,7 @@ export default {
   data() {
     return {
       src: '',
+      needFocus: false,
       destroyed: false
     }
   },
@@ -45,7 +46,6 @@ export default {
     active(value) {
       if (value) {
         if (!this.mounted) {
-          this.updateTab({ id: this.tab.id, replaced: false })
           this.load()
         }
         this.$nextTick(() => {
@@ -65,6 +65,9 @@ export default {
   methods: {
     load() {
       this.src = this.tab.url
+      this.needFocus = true
+      this.updateTab({ id: this.tab.id, replaced: false })
+
       this.$nextTick(() => {
         this.$eventBus.$on('undo', () => {
           if (this.handling) {
@@ -93,11 +96,13 @@ export default {
         })
         this.$eventBus.$on('reload', () => {
           if (this.handling) {
+            this.needFocus = true
             this.$el.reload()
           }
         })
         this.$eventBus.$on('forceReload', () => {
           if (this.handling) {
+            this.needFocus = true
             this.$el.reloadIgnoringCache()
           }
         })
@@ -156,7 +161,8 @@ export default {
             if (home) {
               // TODO:
               document.querySelector('[name=query]').focus()
-            } else if (urlChanged) {
+            } else if (urlChanged || this.needFocus) {
+              this.needFocus = false
               // TODO: https://github.com/electron/electron/issues/14474
               this.$el.blur()
               this.$el.focus()
