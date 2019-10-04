@@ -1,6 +1,6 @@
 <template>
   <v-hover v-slot:default="{ hover }" class="tab-list-item-icon">
-    <v-list-item-action v-if="hover && !subGroup" class="my-0 mr-3">
+    <v-list-item-action v-if="hover && !subGroup" class="my-0">
       <v-btn
         icon
         small

@@ -4,7 +4,7 @@
     <v-list-group v-else v-model="expand">
       <template v-slot:activator>
         <tab-list-item-icon
-          class="mr-4"
+          class="mr-2"
           :url="group.favicon"
           :host="group.host"
         />

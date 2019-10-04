@@ -8,7 +8,7 @@
     @contextmenu.stop="onContextMenu"
   >
     <tab-list-item-icon
-      class="mr-4"
+      class="mr-2"
       :url="tab.favicon"
       :host="tab.host"
       :sub-group="subGroup"
