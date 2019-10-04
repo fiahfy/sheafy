@@ -11,8 +11,8 @@
       class="mr-2"
       :url="tab.favicon"
       :host="tab.host"
-      :sub-group="subGroup"
       :loading="tab.loading"
+      :no-action="subGroup || temporary"
     />
     <v-list-item-content>
       <v-list-item-title v-text="title" />
@@ -48,6 +48,10 @@ export default {
     subGroup: {
       type: Boolean,
       default: false
+    },
+    temporary: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -58,7 +62,7 @@ export default {
       return this.isPinnedTab(this.tab)
     },
     title() {
-      return this.subGroup ? this.tab.title : this.tab.host
+      return this.subGroup || this.temporary ? this.tab.title : this.tab.host
     },
     badge() {
       return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
@@ -90,11 +94,11 @@ export default {
           click: () => remote.shell.openExternal(this.tab.url)
         },
         {
-          label: this.pinned ? 'Unpin Host' : 'Pin Host',
+          label: this.pinned ? 'Unpin App' : 'Pin App',
           click: () =>
             this.pinned
-              ? this.unpinHost({ host: this.tab.host })
-              : this.pinHost({ host: this.tab.host })
+              ? this.unpinApp({ host: this.tab.host })
+              : this.pinApp({ host: this.tab.host })
         },
         { type: 'separator' },
         {
@@ -108,8 +112,8 @@ export default {
       'duplicateTab',
       'closeTab',
       'activateTab',
-      'pinHost',
-      'unpinHost'
+      'pinApp',
+      'unpinApp'
     ])
   }
 }

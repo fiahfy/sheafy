@@ -11,8 +11,8 @@
     <div class="bar-container">
       <v-app-bar tile dense :flat="!scrolling">
         <v-list class="flex-grow-1">
-          <v-subheader class="px-0 font-weight-bold">
-            TABS
+          <v-subheader class="px-0 font-weight-bold text-uppercase">
+            Apps
             <v-spacer />
             <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
               <v-icon size="20">mdi-plus-circle-outline</v-icon>
@@ -21,17 +21,21 @@
         </v-list>
       </v-app-bar>
     </div>
-    <tabs />
+    <app-list />
+    <v-divider />
+    <temporary-tab-list />
   </v-navigation-drawer>
 </template>
 
 <script>
-import { mapActions, mapState, mapMutations } from 'vuex'
-import Tabs from '~/components/Tabs'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import AppList from '~/components/AppList'
+import TemporaryTabList from '~/components/TemporaryTabList'
 
 export default {
   components: {
-    Tabs
+    AppList,
+    TemporaryTabList
   },
   props: {
     resizing: {
@@ -54,24 +58,13 @@ export default {
       }
     },
     ...mapState('settings', ['sideBarWidth']),
-    ...mapState('tab', ['activeTabId'])
+    ...mapGetters('tab', ['activeTab'])
   },
   watch: {
-    activeTabId() {
-      this.$nextTick(() => {
-        const tab = this.$el.querySelector('.tab-list-item.v-list-item--active')
-        const content = this.$el.querySelector('.v-navigation-drawer__content')
-        const offsetTop = 48
-        const top = tab.offsetTop - offsetTop
-        const bottom =
-          tab.offsetTop - offsetTop - content.offsetHeight + tab.offsetHeight
-        if (content.scrollTop > top) {
-          content.scrollTop = top
-        }
-        if (content.scrollTop < bottom) {
-          content.scrollTop = bottom
-        }
-      })
+    activeTab(oldValue, newValue) {
+      if (oldValue.id !== newValue.id || oldValue.host !== newValue.host) {
+        this.scrollIn()
+      }
     }
   },
   mounted() {
@@ -123,6 +116,22 @@ export default {
       const content = this.$el.querySelector('.v-navigation-drawer__content')
       content.addEventListener('scroll', () => {
         this.scrolling = content.scrollTop > 0
+      })
+    },
+    scrollIn() {
+      this.$nextTick(() => {
+        const tab = this.$el.querySelector('.tab-list-item.v-list-item--active')
+        const content = this.$el.querySelector('.v-navigation-drawer__content')
+        const offsetTop = 48
+        const top = tab.offsetTop - offsetTop
+        const bottom =
+          tab.offsetTop - offsetTop - content.offsetHeight + tab.offsetHeight
+        if (content.scrollTop > top) {
+          content.scrollTop = top
+        }
+        if (content.scrollTop < bottom) {
+          content.scrollTop = bottom
+        }
       })
     },
     onDragOver(e) {

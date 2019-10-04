@@ -1,12 +1,12 @@
 <template>
   <v-hover v-slot:default="{ hover }" class="tab-list-item-icon">
-    <v-list-item-action v-if="hover && !subGroup" class="my-0">
+    <v-list-item-action v-if="hover && !noAction" class="my-0">
       <v-btn
         icon
         small
         title="Unpin"
         :disabled="!host"
-        @click.stop="unpinHost({ host })"
+        @click.stop="unpinApp({ host })"
       >
         <v-icon small>mdi-pin-off</v-icon>
       </v-btn>
@@ -51,7 +51,7 @@ export default {
       type: Boolean,
       default: false
     },
-    subGroup: {
+    noAction: {
       type: Boolean,
       default: false
     }
@@ -62,7 +62,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('tab', ['unpinHost'])
+    ...mapActions('tab', ['unpinApp'])
   }
 }
 </script>

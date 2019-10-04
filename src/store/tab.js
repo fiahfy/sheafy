@@ -36,23 +36,24 @@ export const getters = {
   isPinnedTab(state) {
     return (tab) => state.hosts.includes(tab.host)
   },
-  groups(state) {
-    return [null, ...state.hosts.slice().reverse()]
-      .map((host, i) => {
-        const tabs = state.tabs.filter((tab) =>
-          i === 0 ? !state.hosts.includes(tab.host) : tab.host === host
-        )
+  apps(state) {
+    return state.hosts
+      .slice()
+      .map((host) => {
+        const tabs = state.tabs.filter((tab) => tab.host === host)
         if (tabs.length) {
           return {
             host,
-            favicon: tabs[0].favicon,
-            tabs
+            tabs,
+            favicon: tabs[0].favicon
           }
         }
         return null
       })
-      .filter((group) => !!group)
-      .reverse()
+      .filter((app) => !!app)
+  },
+  temporaryTabs(state) {
+    return state.tabs.slice().filter((tab) => !state.hosts.includes(tab.host))
   },
   getUrlWithQuery() {
     return (query) => {
@@ -145,22 +146,35 @@ export const actions = {
   },
   closeTab({ commit, dispatch, getters, state }, { id }) {
     if (id === state.activeTabId) {
-      const group = getters.groups.find(
-        (group) => !!group.tabs.find((tab) => tab.id === id)
+      const app = getters.apps.find(
+        (app) => !!app.tabs.find((tab) => tab.id === id)
       )
-      if (group.tabs.length <= 1) {
-        dispatch('closeGroup', { host: group.host })
-        return
-      }
-      const index = group.tabs.findIndex((tab) => tab.id === id)
-      if (index < group.tabs.length - 1) {
-        const activeTabId = group.tabs[index + 1].id
-        commit('setActiveTabId', { activeTabId })
-      } else if (index > 0) {
-        const activeTabId = group.tabs[index - 1].id
-        commit('setActiveTabId', { activeTabId })
+      if (app) {
+        if (app.tabs.length <= 1) {
+          dispatch('closeApp', { host: app.host })
+          return
+        }
+        const index = app.tabs.findIndex((tab) => tab.id === id)
+        if (index < app.tabs.length - 1) {
+          const activeTabId = app.tabs[index + 1].id
+          commit('setActiveTabId', { activeTabId })
+        } else if (index > 0) {
+          const activeTabId = app.tabs[index - 1].id
+          commit('setActiveTabId', { activeTabId })
+        } else {
+          commit('setActiveTabId', { activeTabId: null })
+        }
       } else {
-        commit('setActiveTabId', { activeTabId: null })
+        const index = getters.temporaryTabs.findIndex((tab) => tab.id === id)
+        if (index < getters.temporaryTabs.length - 1) {
+          const activeTabId = getters.temporaryTabs[index + 1].id
+          commit('setActiveTabId', { activeTabId })
+        } else if (index > 0) {
+          const activeTabId = getters.temporaryTabs[index - 1].id
+          commit('setActiveTabId', { activeTabId })
+        } else {
+          commit('setActiveTabId', { activeTabId: null })
+        }
       }
     }
 
@@ -184,28 +198,27 @@ export const actions = {
     }))
     commit('setTabs', { tabs })
   },
-  pinHost({ commit, state }, { host }) {
+  pinApp({ commit, state }, { host }) {
     const hosts = [...state.hosts, host]
     commit('setHosts', { hosts })
   },
-  unpinHost({ commit, state }, { host }) {
+  unpinApp({ commit, state }, { host }) {
     const hosts = state.hosts.filter((value) => value !== host)
     commit('setHosts', { hosts })
   },
-  closeGroup({ commit, getters, state }, { host }) {
-    const group = getters.groups.find((group) => group.host === host)
-    const tabIds = group.tabs.map((tab) => tab.id)
+  closeApp({ commit, getters, state }, { host }) {
+    const app = getters.apps.find((app) => app.host === host)
+    const tabIds = app.tabs.map((tab) => tab.id)
     const active = tabIds.includes(state.activeTabId)
     if (active) {
-      const index = getters.groups.findIndex((group) => group.host === host)
-      if (index < getters.groups.length - 1) {
-        const activeTabId = getters.groups[index + 1].tabs[0].id
+      const index = getters.apps.findIndex((app) => app.host === host)
+      if (index < getters.apps.length - 1) {
+        const activeTabId = getters.apps[index + 1].tabs[0].id
         commit('setActiveTabId', { activeTabId })
       } else if (index > 0) {
         const activeTabId =
-          getters.groups[index - 1].tabs[
-            getters.groups[index - 1].tabs.length - 1
-          ].id
+          getters.apps[index - 1].tabs[getters.apps[index - 1].tabs.length - 1]
+            .id
         commit('setActiveTabId', { activeTabId })
       } else {
         commit('setActiveTabId', { activeTabId: null })
@@ -218,7 +231,7 @@ export const actions = {
       remote.getCurrentWindow().close()
     }
   },
-  sortGroups({ commit }, { hosts }) {
+  sortApps({ commit }, { hosts }) {
     commit('setHosts', { hosts: hosts.filter((host) => !!host) })
   }
 }
