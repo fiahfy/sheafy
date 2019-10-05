@@ -1,20 +1,20 @@
 <template>
-  <div class="tab-list">
-    <draggable v-model="modelTabs" animation="150">
-      <v-sheet v-for="tab in modelTabs" :key="tab.id" tile>
-        <tab-list-item :tab="tab" sub-group />
+  <v-list class="temporary-app-tab-list primary--text py-1" dense>
+    <draggable v-model="model" animation="150">
+      <v-sheet v-for="tab in model" :key="tab.id" tile>
+        <app-tab-list-item :tab="tab" temporary />
       </v-sheet>
     </draggable>
-  </div>
+  </v-list>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
-import TabListItem from '~/components/TabListItem'
+import AppTabListItem from '~/components/AppTabListItem'
 
 export default {
   components: {
-    TabListItem
+    AppTabListItem
   },
   props: {
     tabs: {
@@ -23,7 +23,7 @@ export default {
     }
   },
   computed: {
-    modelTabs: {
+    model: {
       get() {
         return this.tabs
       },
@@ -40,7 +40,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tab-list .v-sheet {
+.temporary-app-tab-list .v-sheet {
   color: inherit;
   &.sortable-ghost {
     opacity: 0;

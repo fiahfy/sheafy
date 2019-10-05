@@ -119,6 +119,7 @@ export const actions = {
     if (activate) {
       commit('setActiveTabId', { activeTabId: id })
     }
+    return tab
   },
   newTabIfEmpty({ dispatch, state }) {
     if (!state.tabs.length) {
@@ -162,7 +163,13 @@ export const actions = {
           const activeTabId = app.tabs[index - 1].id
           commit('setActiveTabId', { activeTabId })
         } else {
-          commit('setActiveTabId', { activeTabId: null })
+          const tab = getters.temporaryTabs[0]
+          if (tab) {
+            const activeTabId = tab.id
+            commit('setActiveTabId', { activeTabId })
+          } else {
+            commit('setActiveTabId', { activeTabId: null })
+          }
         }
       } else {
         const index = getters.temporaryTabs.findIndex((tab) => tab.id === id)
@@ -173,12 +180,38 @@ export const actions = {
           const activeTabId = getters.temporaryTabs[index - 1].id
           commit('setActiveTabId', { activeTabId })
         } else {
-          commit('setActiveTabId', { activeTabId: null })
+          const app = getters.apps[getters.apps.length - 1]
+          if (app) {
+            const activeTabId = app.tabs[app.tabs.length - 1].id
+            commit('setActiveTabId', { activeTabId })
+          } else {
+            commit('setActiveTabId', { activeTabId: null })
+          }
         }
       }
     }
 
     const tabs = state.tabs.filter((tab) => tab.id !== id)
+    commit('setTabs', { tabs })
+    if (!tabs.length) {
+      remote.getCurrentWindow().close()
+    }
+  },
+  closeTemporaryTabs({ commit, getters, state }) {
+    const active = state.tabs
+      .filter((tab) => !state.hosts.includes(tab.host))
+      .map((tab) => tab.id)
+      .includes(state.activeTabId)
+    if (active) {
+      const app = getters.apps[getters.apps.length - 1]
+      if (app) {
+        const activeTabId = app.tabs[app.tabs.length - 1].id
+        commit('setActiveTabId', { activeTabId })
+      } else {
+        commit('setActiveTabId', { activeTabId: null })
+      }
+    }
+    const tabs = state.tabs.filter((tab) => state.hosts.includes(tab.host))
     commit('setTabs', { tabs })
     if (!tabs.length) {
       remote.getCurrentWindow().close()
@@ -199,6 +232,9 @@ export const actions = {
     commit('setTabs', { tabs })
   },
   pinApp({ commit, state }, { host }) {
+    if (state.hosts.includes(host)) {
+      return
+    }
     const hosts = [...state.hosts, host]
     commit('setHosts', { hosts })
   },
@@ -221,7 +257,13 @@ export const actions = {
             .id
         commit('setActiveTabId', { activeTabId })
       } else {
-        commit('setActiveTabId', { activeTabId: null })
+        const tab = getters.temporaryTabs[0]
+        if (tab) {
+          const activeTabId = tab.id
+          commit('setActiveTabId', { activeTabId })
+        } else {
+          commit('setActiveTabId', { activeTabId: null })
+        }
       }
     }
 

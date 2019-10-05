@@ -1,41 +1,32 @@
 <template>
   <v-navigation-drawer
-    class="side-bar"
+    class="side-bar overflow-visible"
     permanent
     app
     clipped
     :width="width"
-    @drop.native.prevent="onDrop"
-    @dragover.native.prevent="onDragOver"
   >
-    <div class="bar-container">
-      <v-app-bar tile dense :flat="!scrolling">
-        <v-list class="flex-grow-1">
-          <v-subheader class="px-0 font-weight-bold text-uppercase">
-            Apps
-            <v-spacer />
-            <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
-              <v-icon size="20">mdi-plus-circle-outline</v-icon>
-            </v-btn>
-          </v-subheader>
-        </v-list>
-      </v-app-bar>
+    <div class="fill-height d-flex flex-column">
+      <div class="content content--top flex-grow-1">
+        <app-content class="fill-height" />
+      </div>
+      <div ref="resizer" class="py-1 resizer"><v-divider /></div>
+      <div ref="bottom" class="content content--bottom" :style="{ height }">
+        <temporary-app-content class="fill-height" />
+      </div>
     </div>
-    <app-list />
-    <v-divider />
-    <temporary-tab-list />
   </v-navigation-drawer>
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import AppList from '~/components/AppList'
-import TemporaryTabList from '~/components/TemporaryTabList'
+import { mapMutations, mapState } from 'vuex'
+import AppContent from '~/components/AppContent'
+import TemporaryAppContent from '~/components/TemporaryAppContent'
 
 export default {
   components: {
-    AppList,
-    TemporaryTabList
+    AppContent,
+    TemporaryAppContent
   },
   props: {
     resizing: {
@@ -45,7 +36,7 @@ export default {
   },
   data() {
     return {
-      scrolling: false
+      verticalResizing: false
     }
   },
   computed: {
@@ -57,22 +48,22 @@ export default {
         this.setSideBarWidth({ sideBarWidth: value })
       }
     },
-    ...mapState('settings', ['sideBarWidth']),
-    ...mapGetters('tab', ['activeTab'])
-  },
-  watch: {
-    activeTab(oldValue, newValue) {
-      if (oldValue.id !== newValue.id || oldValue.host !== newValue.host) {
-        this.scrollIn()
+    height: {
+      get() {
+        return this.sideBarBottom
+      },
+      set(value) {
+        this.setSideBarBottom({ sideBarBottom: value })
       }
-    }
+    },
+    ...mapState('settings', ['sideBarWidth', 'sideBarBottom'])
   },
   mounted() {
-    this.setupResizseHanlder()
-    this.setupScrollHandler()
+    this.setupHorizonResizeHandler()
+    this.setupVerticalResizeHandler()
   },
   methods: {
-    setupResizseHanlder() {
+    setupHorizonResizeHandler() {
       const resizer = document.createElement('div')
       const border = this.$el.querySelector('.v-navigation-drawer__border')
       border.append(resizer)
@@ -112,60 +103,41 @@ export default {
         document.removeEventListener('mousemove', resize, false)
       })
     },
-    setupScrollHandler() {
-      const content = this.$el.querySelector('.v-navigation-drawer__content')
-      content.addEventListener('scroll', () => {
-        this.scrolling = content.scrollTop > 0
+    setupVerticalResizeHandler() {
+      const resize = (e) => {
+        document.body.style.cursor = 'ns-resize'
+        const height = this.$el.offsetHeight - e.clientY + 61 - 4
+        if (height < 128 || height > this.$el.offsetHeight - 128) {
+          return
+        }
+        this.$refs.bottom.style.height = height + 'px'
+      }
+
+      this.$refs.resizer.addEventListener('mousedown', () => {
+        this.verticalResizing = true
+        document.addEventListener('mousemove', resize, false)
+      })
+
+      document.addEventListener('mouseup', () => {
+        if (!this.verticalResizing) {
+          return
+        }
+        this.verticalResizing = false
+        this.height = this.$refs.bottom.style.height
+        document.body.style.cursor = ''
+        document.removeEventListener('mousemove', resize, false)
       })
     },
-    scrollIn() {
-      this.$nextTick(() => {
-        const tab = this.$el.querySelector('.tab-list-item.v-list-item--active')
-        const content = this.$el.querySelector('.v-navigation-drawer__content')
-        const offsetTop = 48
-        const top = tab.offsetTop - offsetTop
-        const bottom =
-          tab.offsetTop - offsetTop - content.offsetHeight + tab.offsetHeight
-        if (content.scrollTop > top) {
-          content.scrollTop = top
-        }
-        if (content.scrollTop < bottom) {
-          content.scrollTop = bottom
-        }
-      })
-    },
-    onDragOver(e) {
-      e.dataTransfer.dropEffect = 'link'
-    },
-    onDrop(e) {
-      const effectAllowed = e.dataTransfer.effectAllowed
-      // Prevent for sorting tabs
-      if (effectAllowed === 'move') {
-        return
-      }
-      const url = e.dataTransfer.getData('text')
-      if (url) {
-        this.newTab({ url })
-      }
-    },
-    ...mapMutations('settings', ['setSideBarWidth']),
-    ...mapActions('tab', ['newTab'])
+    ...mapMutations('settings', ['setSideBarWidth', 'setSideBarBottom'])
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .side-bar {
-  overflow: visible;
-  .bar-container {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    height: 96px;
-  }
-  .v-app-bar {
-    transition: none;
+  .resizer {
+    cursor: ns-resize;
+    z-index: 5;
   }
   ::v-deep .v-navigation-drawer__border {
     z-index: 5;
@@ -176,9 +148,6 @@ export default {
       width: 11px;
       cursor: ew-resize;
     }
-  }
-  ::v-deep .v-navigation-drawer__content {
-    margin-top: 48px;
   }
 }
 </style>

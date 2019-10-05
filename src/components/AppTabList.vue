@@ -1,9 +1,13 @@
 <template>
-  <v-list class="app-list-item py-1 primary--text" dense>
-    <tab-list-item v-if="app.tabs.length < 2" :tab="app.tabs[0]" />
+  <v-list class="app-tab-list primary--text py-1" dense>
+    <app-tab-list-item v-if="app.tabs.length < 2" :tab="app.tabs[0]" />
     <v-list-group v-else v-model="expand">
       <template v-slot:activator>
-        <tab-list-item-icon class="mr-2" :url="app.favicon" :host="app.host" />
+        <app-tab-list-item-icon
+          class="mr-2"
+          :url="app.favicon"
+          :host="app.host"
+        />
         <v-list-item-content>
           <v-list-item-title v-text="app.host" />
         </v-list-item-content>
@@ -19,22 +23,24 @@
           </v-btn>
         </v-list-item-action>
       </template>
-      <tab-list :tabs="app.tabs" />
+      <draggable v-model="tabs" animation="150">
+        <v-sheet v-for="tab in tabs" :key="tab.id" tile>
+          <app-tab-list-item :tab="tab" sub-group />
+        </v-sheet>
+      </draggable>
     </v-list-group>
   </v-list>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import TabList from '~/components/TabList'
-import TabListItem from '~/components/TabListItem'
-import TabListItemIcon from '~/components/TabListItemIcon'
+import AppTabListItem from '~/components/AppTabListItem'
+import AppTabListItemIcon from '~/components/AppTabListItemIcon'
 
 export default {
   components: {
-    TabList,
-    TabListItem,
-    TabListItemIcon
+    AppTabListItem,
+    AppTabListItemIcon
   },
   props: {
     app: {
@@ -48,6 +54,15 @@ export default {
     }
   },
   computed: {
+    tabs: {
+      get() {
+        return this.app.tabs
+      },
+      set(tabs) {
+        const ids = tabs.map((tab) => tab.id)
+        this.sortTabs({ ids })
+      }
+    },
     ...mapState('tab', ['activeTabId'])
   },
   watch: {
@@ -58,13 +73,19 @@ export default {
     }
   },
   methods: {
-    ...mapActions('tab', ['closeApp'])
+    ...mapActions('tab', ['sortTabs', 'closeApp'])
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.app-list-item {
+.app-tab-list {
+  .v-sheet {
+    color: inherit;
+    &.sortable-ghost {
+      opacity: 0;
+    }
+  }
   ::v-deep .v-list-group__header {
     &:not(:hover) .v-list-item__action:not(:first-child) {
       display: none;

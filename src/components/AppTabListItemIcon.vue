@@ -1,5 +1,5 @@
 <template>
-  <v-hover v-slot:default="{ hover }" class="tab-list-item-icon">
+  <v-hover v-slot:default="{ hover }" class="app-tab-list-item-icon">
     <v-list-item-action v-if="hover && !noAction" class="my-0">
       <v-btn
         icon
@@ -61,6 +61,13 @@ export default {
       error: false
     }
   },
+  watch: {
+    loading(newValue, prevValue) {
+      if (newValue && !prevValue) {
+        this.error = false
+      }
+    }
+  },
   methods: {
     ...mapActions('tab', ['unpinApp'])
   }
@@ -68,7 +75,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tab-list-item-icon.v-list-item__icon {
+.app-tab-list-item-icon.v-list-item__icon {
   padding: 0 6px;
 }
 </style>

@@ -1,13 +1,13 @@
 <template>
   <v-list-item
-    class="tab-list-item"
+    class="app-tab-list-item"
     :class="{ 'sub-group': subGroup }"
     :title="title"
     :input-value="active"
     @click="activateTab({ id: tab.id })"
     @contextmenu.stop="onContextMenu"
   >
-    <tab-list-item-icon
+    <app-tab-list-item-icon
       class="mr-2"
       :url="tab.favicon"
       :host="tab.host"
@@ -34,11 +34,11 @@
 <script>
 import { remote } from 'electron'
 import { mapActions, mapGetters } from 'vuex'
-import TabListItemIcon from '~/components/TabListItemIcon'
+import AppTabListItemIcon from '~/components/AppTabListItemIcon'
 
 export default {
   components: {
-    TabListItemIcon
+    AppTabListItemIcon
   },
   props: {
     tab: {
@@ -68,13 +68,6 @@ export default {
       return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
     },
     ...mapGetters('tab', ['isActiveTab', 'isPinnedTab'])
-  },
-  watch: {
-    tab(newValue, prevValue) {
-      if (newValue.loading && !prevValue.loading) {
-        this.error = false
-      }
-    }
   },
   methods: {
     onContextMenu() {
@@ -120,7 +113,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tab-list-item {
+.app-tab-list-item {
   &.sub-group {
     padding-left: 32px;
   }
