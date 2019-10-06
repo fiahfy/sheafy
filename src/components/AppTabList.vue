@@ -8,7 +8,7 @@
           :url="app.favicon"
           :host="app.host"
         />
-        <v-list-item-content>
+        <v-list-item-content @contextmenu="onContextMenu">
           <v-list-item-title v-text="app.host" />
         </v-list-item-content>
         <v-chip class="caption ml-3 px-2" v-text="app.tabs.length" />
@@ -73,7 +73,20 @@ export default {
     }
   },
   methods: {
-    ...mapActions('tab', ['sortTabs', 'closeApp'])
+    onContextMenu() {
+      this.$contextMenu.show([
+        {
+          label: 'Unpin App',
+          click: () => this.unpinApp({ host: this.app.host })
+        },
+        { type: 'separator' },
+        {
+          label: 'Close App',
+          click: () => this.closeApp({ host: this.app.host })
+        }
+      ])
+    },
+    ...mapActions('tab', ['sortTabs', 'unpinApp', 'closeApp'])
   }
 }
 </script>

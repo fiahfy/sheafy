@@ -17,7 +17,7 @@
           </v-btn>
         </template>
         <v-card>
-          <v-card-title class="headline" v-text="'Close all temporary apps?'" />
+          <v-card-title v-text="'Close all temporary apps?'" />
           <v-card-actions>
             <div class="flex-grow-1"></div>
             <v-btn text @click="onClickCancel">Cancel</v-btn>
@@ -35,7 +35,7 @@
         v-else
         class="d-flex justify-center caption py-3 grey--text text--darken-1"
       >
-        <div>No Temporary Apps</div>
+        <div>No Apps</div>
       </div>
     </div>
   </div>

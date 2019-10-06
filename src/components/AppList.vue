@@ -1,12 +1,7 @@
 <template>
   <div class="app-list">
-    <draggable v-model="model" animation="150" handle=".draggable">
-      <v-sheet
-        v-for="app in model"
-        :key="app.host"
-        :class="{ draggable: app.host }"
-        tile
-      >
+    <draggable v-model="model" animation="150">
+      <v-sheet v-for="app in model" :key="app.host" tile>
         <app-tab-list :app="app" />
       </v-sheet>
     </draggable>
