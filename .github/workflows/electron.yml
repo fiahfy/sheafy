@@ -12,7 +12,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        # os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [macOS-latest]
 
     steps:
       - run: git config --global core.autocrlf false
@@ -23,7 +24,8 @@ jobs:
       - run: yarn
       - run: yarn test
       - run: yarn build
-      - run: sed -i 's/\^\[\\w/\^\[.\\w/g' node_modules/builder-util/out/util.js
+      # TODO: https://github.com/electron-userland/electron-builder/issues/4176
+      - run: sed -i '' 's/\^\[\\w/\^\[.\\w/g' node_modules/builder-util/out/util.js
         shell: bash
       - run: yarn release
         env:
