@@ -23,6 +23,8 @@ jobs:
       - run: yarn
       - run: yarn test
       - run: yarn build
+      # TODO: https://github.com/electron-userland/electron-builder/issues/4176
+      - run: sed -i '' 's/\^\[\\w/\^\[.\\w/g' node_modules/builder-util/out/util.js
       - run: yarn release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
