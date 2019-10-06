@@ -1,10 +1,11 @@
 <template>
   <webview
-    v-if="src"
+    v-if="mounted"
     class="webview"
     :class="{ 'd-none': !active }"
     :src="src"
     :preload="preload"
+    allowpopups
   />
 </template>
 
@@ -22,10 +23,14 @@ export default {
   data() {
     return {
       src: '',
+      needFocus: false,
       destroyed: false
     }
   },
   computed: {
+    mounted() {
+      return this.src && !this.tab.replaced
+    },
     preload() {
       return `file://${remote.app.getAppPath()}/preload.js`
     },
@@ -40,7 +45,7 @@ export default {
   watch: {
     active(value) {
       if (value) {
-        if (!this.src) {
+        if (!this.mounted) {
           this.load()
         }
         this.$nextTick(() => {
@@ -50,7 +55,7 @@ export default {
     }
   },
   mounted() {
-    if (this.active || !this.tab.firstLoaded) {
+    if (this.active || !this.tab.loaded) {
       this.load()
     }
   },
@@ -60,6 +65,9 @@ export default {
   methods: {
     load() {
       this.src = this.tab.url
+      this.needFocus = true
+      this.updateTab({ id: this.tab.id, replaced: false })
+
       this.$nextTick(() => {
         this.$eventBus.$on('undo', () => {
           if (this.handling) {
@@ -88,11 +96,13 @@ export default {
         })
         this.$eventBus.$on('reload', () => {
           if (this.handling) {
+            this.needFocus = true
             this.$el.reload()
           }
         })
         this.$eventBus.$on('forceReload', () => {
           if (this.handling) {
+            this.needFocus = true
             this.$el.reloadIgnoringCache()
           }
         })
@@ -139,6 +149,7 @@ export default {
         })
         this.$el.addEventListener('load-commit', ({ url, isMainFrame }) => {
           if (isMainFrame) {
+            const urlChanged = url !== this.tab.url
             const home = url === 'https://www.google.com/?sheafy'
             this.updateTab({
               id: this.tab.id,
@@ -150,7 +161,8 @@ export default {
             if (home) {
               // TODO:
               document.querySelector('[name=query]').focus()
-            } else {
+            } else if (urlChanged || this.needFocus) {
+              this.needFocus = false
               // TODO: https://github.com/electron/electron/issues/14474
               this.$el.blur()
               this.$el.focus()
@@ -169,7 +181,7 @@ export default {
           this.$el.stopFindInPage('clearSelection')
         })
         this.$el.addEventListener('did-stop-loading', () => {
-          this.updateTab({ id: this.tab.id, loading: false, firstLoaded: true })
+          this.updateTab({ id: this.tab.id, loading: false, loaded: true })
         })
         this.$el.addEventListener('found-in-page', ({ result }) => {
           this.updateTab({

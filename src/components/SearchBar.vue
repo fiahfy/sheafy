@@ -20,7 +20,7 @@
       class="ml-1"
       title="Close"
       :disabled="!searchText"
-      @click="onUpClick"
+      @click="onClickUp"
     >
       <v-icon size="20">mdi-chevron-up</v-icon>
     </v-btn>
@@ -31,7 +31,7 @@
       class="ml-1"
       title="Close"
       :disabled="!searchText"
-      @click="onDownClick"
+      @click="onClickDown"
     >
       <v-icon size="20">mdi-chevron-down</v-icon>
     </v-btn>
@@ -41,7 +41,7 @@
       height="36"
       class="ml-1"
       title="Close"
-      @click="onCloseClick"
+      @click="onClickClose"
     >
       <v-icon size="20">mdi-close</v-icon>
     </v-btn>
@@ -98,7 +98,7 @@ export default {
       this.$eventBus.$emit('stopFindInPage')
       this.updateTab({ id: this.activeTab.id, searching: false })
     },
-    onUpClick() {
+    onClickUp() {
       if (this.searchText) {
         this.$eventBus.$emit('findInPage', this.searchText, {
           forward: false,
@@ -106,7 +106,7 @@ export default {
         })
       }
     },
-    onDownClick() {
+    onClickDown() {
       if (this.searchText) {
         this.$eventBus.$emit('findInPage', this.searchText, {
           forward: true,
@@ -114,7 +114,7 @@ export default {
         })
       }
     },
-    onCloseClick() {
+    onClickClose() {
       this.$eventBus.$emit('stopFindInPage')
       this.updateTab({ id: this.activeTab.id, searching: false })
     },

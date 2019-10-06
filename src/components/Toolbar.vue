@@ -9,7 +9,7 @@
     extension-height="1"
   >
     <v-btn
-      v-long-press="onBackContextMenu"
+      v-long-press="onContextMenuBack"
       icon
       width="36"
       height="36"
@@ -17,12 +17,12 @@
       title="Go Back"
       :disabled="!activeTab || !activeTab.canGoBack"
       @click="goBack"
-      @contextmenu.stop="onBackContextMenu"
+      @contextmenu.stop="onContextMenuBack"
     >
       <v-icon size="20">mdi-arrow-left</v-icon>
     </v-btn>
     <v-btn
-      v-long-press="onForwardContextMenu"
+      v-long-press="onContextMenuForward"
       icon
       width="36"
       height="36"
@@ -30,7 +30,7 @@
       title="Go Forward"
       :disabled="!activeTab || !activeTab.canGoForward"
       @click="goForward"
-      @contextmenu.stop="onForwardContextMenu"
+      @contextmenu.stop="onContextMenuForward"
     >
       <v-icon size="20">mdi-arrow-right</v-icon>
     </v-btn>
@@ -64,7 +64,7 @@
       name="query"
       @focus="onFocus"
       @keypress.enter="onKeyPressEnter"
-      @contextmenu.stop="onTextFieldContextMenu"
+      @contextmenu.stop="onContextMenuTextField"
     />
     <v-divider slot="extension" />
   </v-app-bar>
@@ -122,13 +122,13 @@ export default {
     stop() {
       this.$eventBus.$emit('stop')
     },
-    onBackContextMenu() {
+    onContextMenuBack() {
       this.$eventBus.$emit('requestBackHistories')
     },
-    onForwardContextMenu() {
+    onContextMenuForward() {
       this.$eventBus.$emit('requestForwardHistories')
     },
-    onTextFieldContextMenu() {
+    onContextMenuTextField() {
       this.$contextMenu.show([
         { role: 'cut' },
         { role: 'copy' },

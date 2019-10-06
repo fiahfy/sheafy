@@ -1,33 +1,21 @@
 <template>
   <v-list-item
-    class="tab-list-item"
-    :title="tab.title"
+    class="app-tab-list-item"
+    :class="{ 'sub-group': subGroup }"
+    :title="title"
     :input-value="active"
     @click="activateTab({ id: tab.id })"
     @contextmenu.stop="onContextMenu"
   >
-    <v-list-item-icon class="mr-4 px-1 align-self-center">
-      <v-progress-circular
-        v-if="tab.loading"
-        indeterminate
-        size="16"
-        width="2"
-        color="primary"
-      />
-      <template v-else>
-        <v-icon v-if="error" small color="grey darken-1">mdi-earth</v-icon>
-        <v-img
-          v-else
-          :src="tab.favicon"
-          height="16"
-          width="16"
-          contain
-          @error="error = true"
-        />
-      </template>
-    </v-list-item-icon>
+    <app-tab-list-item-icon
+      class="mr-2"
+      :url="tab.favicon"
+      :host="tab.host"
+      :loading="tab.loading"
+      :no-action="subGroup || temporary"
+    />
     <v-list-item-content>
-      <v-list-item-title v-text="tab.title" />
+      <v-list-item-title v-text="title" />
     </v-list-item-content>
     <v-chip
       v-if="tab.badge"
@@ -36,7 +24,7 @@
       v-text="badge"
     />
     <v-list-item-action class="my-0">
-      <v-btn icon small @click.stop="closeTab({ id: tab.id })">
+      <v-btn icon small title="Close" @click.stop="closeTab({ id: tab.id })">
         <v-icon small>mdi-close</v-icon>
       </v-btn>
     </v-list-item-action>
@@ -46,17 +34,24 @@
 <script>
 import { remote } from 'electron'
 import { mapActions, mapGetters } from 'vuex'
+import AppTabListItemIcon from '~/components/AppTabListItemIcon'
 
 export default {
+  components: {
+    AppTabListItemIcon
+  },
   props: {
     tab: {
       type: Object,
       required: true
-    }
-  },
-  data() {
-    return {
-      error: false
+    },
+    subGroup: {
+      type: Boolean,
+      default: false
+    },
+    temporary: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -66,17 +61,13 @@ export default {
     pinned() {
       return this.isPinnedTab(this.tab)
     },
+    title() {
+      return this.subGroup || this.temporary ? this.tab.title : this.tab.host
+    },
     badge() {
       return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
     },
     ...mapGetters('tab', ['isActiveTab', 'isPinnedTab'])
-  },
-  watch: {
-    tab(newValue, prevValue) {
-      if (newValue.loading && !prevValue.loading) {
-        this.error = false
-      }
-    }
   },
   methods: {
     onContextMenu() {
@@ -96,11 +87,11 @@ export default {
           click: () => remote.shell.openExternal(this.tab.url)
         },
         {
-          label: this.pinned ? 'Unpin Host' : 'Pin Host',
+          label: this.pinned ? 'Unpin App' : 'Pin App',
           click: () =>
             this.pinned
-              ? this.unpinHost({ host: this.tab.host })
-              : this.pinHost({ host: this.tab.host })
+              ? this.unpinApp({ host: this.tab.host })
+              : this.pinApp({ host: this.tab.host })
         },
         { type: 'separator' },
         {
@@ -114,14 +105,18 @@ export default {
       'duplicateTab',
       'closeTab',
       'activateTab',
-      'pinHost'
+      'pinApp',
+      'unpinApp'
     ])
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.tab-list-item {
+.app-tab-list-item {
+  &.sub-group {
+    padding-left: 32px;
+  }
   &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
     opacity: 0;
   }
