@@ -13,7 +13,7 @@
         v-for="tab in tabs"
         :key="tab.id"
         :tab="tab"
-        class="flex-grow-1 fill-height"
+        class="fill-height"
       />
       <search-bar />
     </div>
