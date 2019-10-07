@@ -61,7 +61,6 @@ export default {
       this.webview.src = this.tab.url
       this.webview.preload = this.preload
       this.webview.style.display = 'flex'
-      this.webview.allowpopups = true
       this.$el.parentElement.append(this.webview)
 
       this.needFocus = true
@@ -192,6 +191,7 @@ export default {
         })
         this.webview.addEventListener('new-window', ({ disposition, url }) => {
           switch (disposition) {
+            case 'new-window':
             case 'foreground-tab':
               this.newTab({
                 url,
