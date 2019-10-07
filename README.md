@@ -1,12 +1,13 @@
 # Sheafy
 
-[![Build Status](https://travis-ci.com/fiahfy/sheafy.svg?branch=master)](https://travis-ci.com/fiahfy/sheafy)
+![badge](https://github.com/fiahfy/sheafy/workflows/Electron%20CI/badge.svg)
 
-> Vertial and Grouped Tabs Browser based on Electron.
+> Web Applications Categorized Browser based on Electron.
 
 ## Features
 
-- Vertical Tabs
+- Categorize Web Application Tabs
+- Vertical Tab bars
 
 ## Screenshots
 
