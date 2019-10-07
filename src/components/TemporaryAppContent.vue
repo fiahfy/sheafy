@@ -55,7 +55,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('tab', ['activeTab', 'temporaryTabs'])
+    ...mapGetters('tab', ['activeTab', 'temporaryTabs', 'getUrlWithQuery'])
   },
   watch: {
     activeTab(oldValue, newValue) {
@@ -90,7 +90,7 @@ export default {
       if (effectAllowed === 'move') {
         return
       }
-      const url = e.dataTransfer.getData('text')
+      const url = this.getUrlWithQuery(e.dataTransfer.getData('text'))
       if (url) {
         this.newTab({ url })
       }
