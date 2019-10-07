@@ -1,16 +1,14 @@
 const { remote, ipcRenderer } = require('electron')
 const { Menu } = remote
 
-let storeEvent
-
-const show = (menus = []) => {
+const show = (menus = [], e = null) => {
   let template = []
 
   if (menus.length) {
     template = menus.concat([{ type: 'separator' }])
   }
 
-  const { clientX: x, clientY: y } = window.event ? window.event : storeEvent
+  const { clientX: x, clientY: y } = e || window.event
   template = template.concat([
     {
       label: 'Inspect Element',
@@ -22,46 +20,6 @@ const show = (menus = []) => {
     async: true
   })
 }
-
-ipcRenderer.on('showContextMenu', (e, { canGoBack, canGoForward }) => {
-  const selection = window.getSelection().toString()
-  if (selection) {
-    show([
-      {
-        label: `Look Up “${selection}”`,
-        click: () => ipcRenderer.sendToHost('lookUp')
-      },
-      { type: 'separator' },
-      { role: 'copy' },
-      {
-        label: `Search Google for “${selection}”`,
-        click: () => ipcRenderer.sendToHost('search', selection)
-      }
-    ])
-  } else {
-    show([
-      {
-        label: 'Back',
-        click: () => history.back(),
-        enabled: canGoBack
-      },
-      {
-        label: 'Forward',
-        click: () => history.forward(),
-        enabled: canGoForward
-      },
-      {
-        label: 'Reload',
-        click: () => location.reload()
-      }
-    ])
-  }
-})
-
-window.addEventListener('contextmenu', (e) => {
-  storeEvent = e
-  ipcRenderer.sendToHost('requestContextMenu')
-})
 
 const onContextMenu = (e, target) => {
   target = target || e.target
@@ -112,10 +70,51 @@ const onContextMenu = (e, target) => {
         click: () => ipcRenderer.sendToHost('search', target.textContent)
       }
     ])
+  } else if (!target.parentElement) {
+    e.stopPropagation()
+    ipcRenderer.once('showContextMenu', (_, { canGoBack, canGoForward }) => {
+      const selection = window.getSelection().toString()
+      if (selection) {
+        show(
+          [
+            {
+              label: `Look Up “${selection}”`,
+              click: () => ipcRenderer.sendToHost('lookUp')
+            },
+            { type: 'separator' },
+            { role: 'copy' },
+            {
+              label: `Search Google for “${selection}”`,
+              click: () => ipcRenderer.sendToHost('search', selection)
+            }
+          ],
+          e
+        )
+      } else {
+        show(
+          [
+            {
+              label: 'Back',
+              click: () => history.back(),
+              enabled: canGoBack
+            },
+            {
+              label: 'Forward',
+              click: () => history.forward(),
+              enabled: canGoForward
+            },
+            {
+              label: 'Reload',
+              click: () => location.reload()
+            }
+          ],
+          e
+        )
+      }
+    })
+    ipcRenderer.sendToHost('requestContextMenu')
   } else {
-    if (target.parentElement) {
-      onContextMenu(e, target.parentElement)
-    }
+    onContextMenu(e, target.parentElement)
   }
 }
 
@@ -127,10 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
   })
   document.addEventListener('drop', (e) => {
     e.preventDefault()
-    const effectAllowed = e.dataTransfer.effectAllowed
-    if (effectAllowed === 'move') {
-      return
-    }
     const url = e.dataTransfer.getData('text')
     if (url) {
       location.href = url

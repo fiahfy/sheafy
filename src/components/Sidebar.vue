@@ -11,7 +11,11 @@
         <app-content class="fill-height" />
       </div>
       <div ref="resizer" class="py-1 resizer"><v-divider /></div>
-      <div ref="bottom" class="content content--bottom" :style="{ height }">
+      <div
+        ref="bottom"
+        class="content content--bottom"
+        :style="{ height: `${bottom}px` }"
+      >
         <temporary-app-content class="fill-height" />
       </div>
     </div>
@@ -48,7 +52,7 @@ export default {
         this.setSideBarWidth({ sideBarWidth: value })
       }
     },
-    height: {
+    bottom: {
       get() {
         return this.sideBarBottom
       },
@@ -98,7 +102,7 @@ export default {
         }
         this.$emit('update:resizing', false)
         this.$el.style.transition = ''
-        this.width = this.$el.style.width
+        this.width = Number(this.$el.style.width.slice(0, -2))
         document.body.style.cursor = ''
         document.removeEventListener('mousemove', resize, false)
       })
@@ -123,7 +127,7 @@ export default {
           return
         }
         this.verticalResizing = false
-        this.height = this.$refs.bottom.style.height
+        this.bottom = Number(this.$refs.bottom.style.height.slice(0, -2))
         document.body.style.cursor = ''
         document.removeEventListener('mousemove', resize, false)
       })

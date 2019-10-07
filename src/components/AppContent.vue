@@ -28,7 +28,7 @@ export default {
     AppList
   },
   computed: {
-    ...mapGetters('tab', ['activeTab', 'apps'])
+    ...mapGetters('tab', ['activeTab', 'apps', 'getUrlWithQuery'])
   },
   watch: {
     activeTab(oldValue, newValue) {
@@ -63,7 +63,7 @@ export default {
       if (effectAllowed === 'move') {
         return
       }
-      const url = e.dataTransfer.getData('text')
+      const url = this.getUrlWithQuery(e.dataTransfer.getData('text'))
       if (url) {
         const tab = await this.newTab({ url })
         this.pinApp({ host: tab.host })

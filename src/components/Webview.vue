@@ -1,12 +1,5 @@
 <template>
-  <webview
-    v-if="mounted"
-    class="webview"
-    :class="{ 'd-none': !active }"
-    :src="src"
-    :preload="preload"
-    allowpopups
-  />
+  <div class="webview d-none" />
 </template>
 
 <script>
@@ -23,34 +16,28 @@ export default {
   data() {
     return {
       src: '',
-      needFocus: false,
-      destroyed: false
+      needFocus: false
     }
   },
   computed: {
-    mounted() {
-      return this.src && !this.tab.replaced
-    },
     preload() {
       return `file://${remote.app.getAppPath()}/preload.js`
     },
     active() {
       return this.isActiveTab(this.tab)
     },
-    handling() {
-      return this.active && !this.destroyed
-    },
     ...mapGetters('tab', ['isActiveTab', 'getUrlWithQuery'])
   },
   watch: {
     active(value) {
       if (value) {
-        if (!this.mounted) {
-          this.load()
-        }
+        this.load()
         this.$nextTick(() => {
-          this.$el.focus()
+          this.webview.style.display = 'flex'
+          this.webview.focus()
         })
+      } else {
+        this.webview.style.display = 'none'
       }
     }
   },
@@ -60,68 +47,77 @@ export default {
     }
   },
   destroyed() {
-    this.destroyed = true
+    this.webview.remove()
   },
   methods: {
     load() {
-      this.src = this.tab.url
-      this.needFocus = true
-      this.updateTab({ id: this.tab.id, replaced: false })
+      if (this.webview) {
+        return
+      }
 
+      this.webview = document.createElement('webview')
+      this.webview.classList.add('fill-height')
+      this.webview.id = this.tab.id
+      this.webview.src = this.tab.url
+      this.webview.preload = this.preload
+      this.webview.style.display = 'flex'
+      this.$el.parentElement.append(this.webview)
+
+      this.needFocus = true
       this.$nextTick(() => {
         this.$eventBus.$on('undo', () => {
-          if (this.handling) {
-            this.$el.undo()
+          if (this.active) {
+            this.webview.undo()
           }
         })
         this.$eventBus.$on('redo', () => {
-          if (this.handling) {
-            this.$el.redo()
+          if (this.active) {
+            this.webview.redo()
           }
         })
         this.$eventBus.$on('goBack', () => {
-          if (this.handling) {
-            this.$el.goBack()
+          if (this.active) {
+            this.webview.goBack()
           }
         })
         this.$eventBus.$on('goForward', () => {
-          if (this.handling) {
-            this.$el.goForward()
+          if (this.active) {
+            this.webview.goForward()
           }
         })
         this.$eventBus.$on('goToOffset', (offset) => {
-          if (this.handling) {
-            this.$el.goToOffset(offset)
+          if (this.active) {
+            this.webview.goToOffset(offset)
           }
         })
         this.$eventBus.$on('reload', () => {
-          if (this.handling) {
+          if (this.active) {
             this.needFocus = true
-            this.$el.reload()
+            this.webview.reload()
           }
         })
         this.$eventBus.$on('forceReload', () => {
-          if (this.handling) {
+          if (this.active) {
             this.needFocus = true
-            this.$el.reloadIgnoringCache()
+            this.webview.reloadIgnoringCache()
           }
         })
         this.$eventBus.$on('stop', () => {
-          if (this.handling) {
-            this.$el.stop()
+          if (this.active) {
+            this.webview.stop()
           }
         })
         this.$eventBus.$on('load', () => {
-          if (this.handling) {
+          if (this.active) {
             const url = this.getUrlWithQuery(this.tab.query)
             if (url) {
-              this.$el.loadURL(url)
+              this.webview.loadURL(url)
             }
           }
         })
         this.$eventBus.$on('requestBackHistories', () => {
-          if (this.handling) {
-            const contents = this.$el.getWebContents()
+          if (this.active) {
+            const contents = this.webview.getWebContents()
             const histories = contents.history
               .slice(0, contents.getActiveIndex())
               .reverse()
@@ -129,8 +125,8 @@ export default {
           }
         })
         this.$eventBus.$on('requestForwardHistories', () => {
-          if (this.handling) {
-            const contents = this.$el.getWebContents()
+          if (this.active) {
+            const contents = this.webview.getWebContents()
             const histories = contents.history.slice(
               contents.getActiveIndex() + 1
             )
@@ -138,16 +134,16 @@ export default {
           }
         })
         this.$eventBus.$on('findInPage', (text, { forward, findNext }) => {
-          if (this.handling) {
-            this.$el.findInPage(text, { forward, findNext })
+          if (this.active) {
+            this.webview.findInPage(text, { forward, findNext })
           }
         })
         this.$eventBus.$on('stopFindInPage', () => {
-          if (this.handling) {
-            this.$el.stopFindInPage('clearSelection')
+          if (this.active) {
+            this.webview.stopFindInPage('clearSelection')
           }
         })
-        this.$el.addEventListener('load-commit', ({ url, isMainFrame }) => {
+        this.webview.addEventListener('load-commit', ({ url, isMainFrame }) => {
           if (isMainFrame) {
             const urlChanged = url !== this.tab.url
             const home = url === 'https://www.google.com/?sheafy'
@@ -155,8 +151,8 @@ export default {
               id: this.tab.id,
               url,
               query: home ? '' : url,
-              canGoBack: this.$el.canGoBack(),
-              canGoForward: this.$el.canGoForward()
+              canGoBack: this.webview.canGoBack(),
+              canGoForward: this.webview.canGoForward()
             })
             if (home) {
               // TODO:
@@ -164,34 +160,38 @@ export default {
             } else if (urlChanged || this.needFocus) {
               this.needFocus = false
               // TODO: https://github.com/electron/electron/issues/14474
-              this.$el.blur()
-              this.$el.focus()
+              this.webview.blur()
+              this.webview.focus()
             }
           }
         })
-        this.$el.addEventListener('page-title-updated', ({ title }) => {
+        this.webview.addEventListener('page-title-updated', ({ title }) => {
           this.updateTab({ id: this.tab.id, title })
         })
-        this.$el.addEventListener('page-favicon-updated', ({ favicons }) => {
-          const favicon = favicons[0]
-          this.updateTab({ id: this.tab.id, favicon })
-        })
-        this.$el.addEventListener('did-start-loading', () => {
+        this.webview.addEventListener(
+          'page-favicon-updated',
+          ({ favicons }) => {
+            const favicon = favicons[0]
+            this.updateTab({ id: this.tab.id, favicon })
+          }
+        )
+        this.webview.addEventListener('did-start-loading', () => {
           this.updateTab({ id: this.tab.id, loading: true, searching: false })
-          this.$el.stopFindInPage('clearSelection')
+          this.webview.stopFindInPage('clearSelection')
         })
-        this.$el.addEventListener('did-stop-loading', () => {
+        this.webview.addEventListener('did-stop-loading', () => {
           this.updateTab({ id: this.tab.id, loading: false, loaded: true })
         })
-        this.$el.addEventListener('found-in-page', ({ result }) => {
+        this.webview.addEventListener('found-in-page', ({ result }) => {
           this.updateTab({
             id: this.tab.id,
             searchActiveMatchOrdinal: result.activeMatchOrdinal,
             searchMatches: result.matches
           })
         })
-        this.$el.addEventListener('new-window', ({ disposition, url }) => {
+        this.webview.addEventListener('new-window', ({ disposition, url }) => {
           switch (disposition) {
+            case 'new-window':
             case 'foreground-tab':
               this.newTab({
                 url,
@@ -206,26 +206,26 @@ export default {
               break
           }
         })
-        this.$el.addEventListener('ipc-message', ({ channel, args }) => {
+        this.webview.addEventListener('ipc-message', ({ channel, args }) => {
           switch (channel) {
             case 'inspectElement': {
-              const rect = this.$el.getBoundingClientRect()
+              const rect = this.webview.getBoundingClientRect()
               let [x, y] = args
               x += rect.left
               y += rect.top
-              this.$el.inspectElement(x, y)
+              this.webview.inspectElement(x, y)
               break
             }
             case 'undo': {
-              this.$el.undo()
+              this.webview.undo()
               break
             }
             case 'redo': {
-              this.$el.redo()
+              this.webview.redo()
               break
             }
             case 'lookUp': {
-              this.$el.showDefinitionForSelection()
+              this.webview.showDefinitionForSelection()
               break
             }
             case 'newTab': {
@@ -249,9 +249,9 @@ export default {
               break
             }
             case 'requestContextMenu': {
-              this.$el.send('showContextMenu', {
-                canGoBack: this.$el.canGoBack(),
-                canGoForward: this.$el.canGoForward()
+              this.webview.send('showContextMenu', {
+                canGoBack: this.webview.canGoBack(),
+                canGoForward: this.webview.canGoForward()
               })
               break
             }
@@ -259,12 +259,7 @@ export default {
         })
       })
     },
-    ...mapActions('tab', [
-      'newTab',
-      'newTabInBackground',
-      'updateTab',
-      'activateTab'
-    ])
+    ...mapActions('tab', ['newTab', 'updateTab', 'activateTab'])
   }
 }
 </script>
