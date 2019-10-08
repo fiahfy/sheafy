@@ -15,6 +15,7 @@
         :tab="tab"
         class="fill-height"
       />
+      <shortcut-bar class="d-none" />
       <search-bar />
     </div>
   </v-container>
@@ -23,6 +24,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import SearchBar from '~/components/SearchBar'
+import ShortcutBar from '~/components/ShortcutBar'
 import Sidebar from '~/components/Sidebar'
 import Toolbar from '~/components/Toolbar'
 import Webview from '~/components/Webview'
@@ -30,6 +32,7 @@ import Webview from '~/components/Webview'
 export default {
   components: {
     SearchBar,
+    ShortcutBar,
     Sidebar,
     Toolbar,
     Webview
@@ -53,13 +56,21 @@ export default {
 
 <style lang="scss" scoped>
 .index {
-  &.resizing .webview {
+  &.resizing ::v-deep webview {
     pointer-events: none;
   }
   .search-bar {
     position: absolute;
     top: 0;
     right: 0;
+    width: 480px;
+  }
+  .shortcut-bar {
+    position: absolute;
+    top: 0;
+    left: calc((100% - 512px) / 2);
+    right: 0;
+    width: 512px;
   }
 }
 </style>

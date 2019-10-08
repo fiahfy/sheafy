@@ -122,9 +122,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.search-bar {
-  width: 480px;
-}
-</style>
