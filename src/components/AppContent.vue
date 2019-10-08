@@ -76,7 +76,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .app-content > div {
   position: relative;
   flex-basis: 0;
