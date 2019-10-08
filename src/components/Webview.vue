@@ -26,19 +26,20 @@ export default {
     active() {
       return this.isActiveTab(this.tab)
     },
+    display() {
+      return this.active ? 'flex' : 'none'
+    },
     ...mapGetters('tab', ['isActiveTab', 'getUrlWithQuery'])
   },
   watch: {
     active(value) {
       if (value) {
         this.load()
-        this.$nextTick(() => {
-          this.webview.style.display = 'flex'
-          this.webview.focus()
-        })
-      } else {
-        this.webview.style.display = 'none'
       }
+      this.$nextTick(() => {
+        this.webview.style.display = this.display
+        value ? this.webview.focus() : this.webview.blur()
+      })
     }
   },
   mounted() {
@@ -60,7 +61,7 @@ export default {
       this.webview.id = this.tab.id
       this.webview.src = this.tab.url
       this.webview.preload = this.preload
-      this.webview.style.display = 'flex'
+      this.webview.style.display = this.display
       this.$el.parentElement.append(this.webview)
 
       this.needFocus = true

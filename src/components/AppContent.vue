@@ -36,7 +36,9 @@ export default {
         return
       }
       this.$nextTick(() => {
-        const tab = this.$el.querySelector('.tab-list-item.v-list-item--active')
+        const tab = this.$el.querySelector(
+          '.app-tab-list-item.v-list-item--active'
+        )
         if (!tab) {
           return
         }
@@ -74,7 +76,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .app-content > div {
   position: relative;
   flex-basis: 0;
