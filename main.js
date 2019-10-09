@@ -31,6 +31,11 @@ const createTemplate = () => {
           accelerator: 'CmdOrCtrl+L',
           click: () => send('openLocation')
         },
+        {
+          label: 'Go to Tab...',
+          accelerator: 'CmdOrCtrl+P',
+          click: () => send('goToTab')
+        },
         { type: 'separator' },
         {
           label: 'Close Tab',

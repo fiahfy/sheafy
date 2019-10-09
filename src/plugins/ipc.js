@@ -20,6 +20,12 @@ export default ({ store }) => {
   ipcRenderer.on('openLocation', () => {
     document.querySelector('input[name=query]').focus()
   })
+  ipcRenderer.on('goToTab', () => {
+    store.commit('tab/setShortcutBar', { shortcutBar: true })
+    const el = document.querySelector('input[name=shortcut]')
+    el && el.focus()
+    el && el.select()
+  })
   ipcRenderer.on('goBack', () => {
     store.$eventBus.$emit('goBack')
   })

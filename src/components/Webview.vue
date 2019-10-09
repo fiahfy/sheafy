@@ -4,7 +4,7 @@
 
 <script>
 import { remote } from 'electron'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
   props: {
@@ -166,6 +166,13 @@ export default {
             }
           }
         })
+        this.webview.addEventListener(
+          'did-fail-load',
+          ({ errorCode, errorDescription, validatedURL, isMainFrame }) => {
+            // TODO: handle load failure
+            console.log(errorCode, errorDescription, validatedURL, isMainFrame)
+          }
+        )
         this.webview.addEventListener('page-title-updated', ({ title }) => {
           this.updateTab({ id: this.tab.id, title })
         })
@@ -244,6 +251,13 @@ export default {
               this.activateTab({ id: this.tab.id })
               break
             }
+            case 'keydown': {
+              const [e] = args
+              if (e.keyCode === 27) {
+                this.setShortcutBar({ shortcutBar: false })
+              }
+              break
+            }
             case 'openDefaultBrowser': {
               const [url] = args
               remote.shell.openExternal(url)
@@ -258,8 +272,12 @@ export default {
             }
           }
         })
+        this.webview.addEventListener('update-target-url', ({ url }) => {
+          this.$eventBus.$emit('updateTargetUrl', url)
+        })
       })
     },
+    ...mapMutations('tab', ['setShortcutBar']),
     ...mapActions('tab', ['newTab', 'updateTab', 'activateTab'])
   }
 }

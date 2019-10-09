@@ -15,8 +15,9 @@
         :tab="tab"
         class="fill-height"
       />
-      <shortcut-bar class="d-none" />
+      <shortcut-bar />
       <search-bar />
+      <status-bar />
     </div>
   </v-container>
 </template>
@@ -26,6 +27,7 @@ import { mapActions, mapState } from 'vuex'
 import SearchBar from '~/components/SearchBar'
 import ShortcutBar from '~/components/ShortcutBar'
 import Sidebar from '~/components/Sidebar'
+import StatusBar from '~/components/StatusBar'
 import Toolbar from '~/components/Toolbar'
 import Webview from '~/components/Webview'
 
@@ -34,6 +36,7 @@ export default {
     SearchBar,
     ShortcutBar,
     Sidebar,
+    StatusBar,
     Toolbar,
     Webview
   },
@@ -63,14 +66,24 @@ export default {
     position: absolute;
     top: 0;
     right: 0;
-    width: 480px;
+    width: 384px;
+    max-width: 100%;
   }
   .shortcut-bar {
     position: absolute;
     top: 0;
-    left: calc((100% - 512px) / 2);
+    left: 0;
     right: 0;
     width: 512px;
+    max-width: 100%;
+    margin: 0 auto;
+    z-index: 1;
+  }
+  .status-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    max-width: 100%;
   }
 }
 </style>

@@ -13,7 +13,7 @@
         v-else
         class="d-flex justify-center caption py-3 grey--text text--darken-1"
       >
-        <div>No Apps</div>
+        <div>No apps</div>
       </div>
     </div>
   </div>
