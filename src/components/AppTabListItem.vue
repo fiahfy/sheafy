@@ -12,7 +12,8 @@
       :url="tab.favicon"
       :host="tab.host"
       :loading="tab.loading"
-      :no-action="subGroup || temporary"
+      :pin-action="temporary"
+      :unpin-action="!subGroup && !temporary"
     />
     <v-list-item-content>
       <v-list-item-title v-text="title" />

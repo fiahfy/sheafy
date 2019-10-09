@@ -7,6 +7,7 @@
           class="mr-2"
           :url="app.favicon"
           :host="app.host"
+          unpin-action
         />
         <v-list-item-content @contextmenu="onContextMenu">
           <v-list-item-title v-text="app.host" />

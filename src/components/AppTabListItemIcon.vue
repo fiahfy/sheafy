@@ -1,13 +1,12 @@
 <template>
   <v-hover v-slot:default="{ hover }" class="app-tab-list-item-icon">
-    <v-list-item-action v-if="hover && !noAction" class="my-0">
-      <v-btn
-        icon
-        small
-        title="Unpin"
-        :disabled="!host"
-        @click.stop="unpinApp({ host })"
-      >
+    <v-list-item-action v-if="hover && pinAction" class="my-0">
+      <v-btn icon small title="Pin" @click.stop="pinApp({ host })">
+        <v-icon small>mdi-pin</v-icon>
+      </v-btn>
+    </v-list-item-action>
+    <v-list-item-action v-else-if="hover && unpinAction" class="my-0">
+      <v-btn icon small title="Unpin" @click.stop="unpinApp({ host })">
         <v-icon small>mdi-pin-off</v-icon>
       </v-btn>
     </v-list-item-action>
@@ -51,7 +50,11 @@ export default {
       type: Boolean,
       default: false
     },
-    noAction: {
+    pinAction: {
+      type: Boolean,
+      default: false
+    },
+    unpinAction: {
       type: Boolean,
       default: false
     }
@@ -69,7 +72,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('tab', ['unpinApp'])
+    ...mapActions('tab', ['pinApp', 'unpinApp'])
   }
 }
 </script>
