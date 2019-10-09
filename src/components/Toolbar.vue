@@ -47,12 +47,14 @@
     </v-btn>
     <v-btn
       v-else
+      v-long-press="onContextMenuReload"
       icon
       width="36"
       height="36"
       class="mr-1"
       title="Reload"
       @click="reload"
+      @contextmenu.stop="onContextMenuReload"
     >
       <v-icon size="20">mdi-refresh</v-icon>
     </v-btn>
@@ -127,6 +129,15 @@ export default {
     },
     onContextMenuForward() {
       this.$eventBus.$emit('requestForwardHistories')
+    },
+    onContextMenuReload() {
+      this.$contextMenu.show([
+        { label: 'Reload', click: () => this.$eventBus.$emit('reload') },
+        {
+          label: 'Force Reload',
+          click: () => this.$eventBus.$emit('forceReload')
+        }
+      ])
     },
     onContextMenuTextField() {
       this.$contextMenu.show([
