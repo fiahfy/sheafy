@@ -166,6 +166,13 @@ export default {
             }
           }
         })
+        this.webview.addEventListener(
+          'did-fail-load',
+          ({ errorCode, errorDescription, validatedURL, isMainFrame }) => {
+            // TODO: handle load failure
+            console.log(errorCode, errorDescription, validatedURL, isMainFrame)
+          }
+        )
         this.webview.addEventListener('page-title-updated', ({ title }) => {
           this.updateTab({ id: this.tab.id, title })
         })
@@ -264,6 +271,9 @@ export default {
               break
             }
           }
+        })
+        this.webview.addEventListener('update-target-url', ({ url }) => {
+          this.$eventBus.$emit('updateTargetUrl', url)
         })
       })
     },
