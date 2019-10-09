@@ -23,7 +23,8 @@ const convertTab = (tab) => {
 export const state = () => ({
   activeTabId: null,
   tabs: [],
-  hosts: []
+  hosts: [],
+  shortcutBar: false
 })
 
 export const getters = {
@@ -283,5 +284,8 @@ export const mutations = {
   },
   setHosts(state, { hosts }) {
     state.hosts = hosts
+  },
+  setShortcutBar(state, { shortcutBar }) {
+    state.shortcutBar = shortcutBar
   }
 }

@@ -120,6 +120,9 @@ const onContextMenu = (e, target) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('contextmenu', onContextMenu)
+  document.addEventListener('keydown', (e) => {
+    ipcRenderer.sendToHost('keydown', { keyCode: e.keyCode })
+  })
   document.addEventListener('dragover', (e) => {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'link'

@@ -9,15 +9,24 @@
 
 <script>
 import TitleBar from '~/components/TitleBar'
+import { mapMutations } from 'vuex'
 
 export default {
   components: {
     TitleBar
   },
+  mounted() {
+    document.addEventListener('keydown', (e) => {
+      if (e.keyCode === 27) {
+        this.setShortcutBar({ shortcutBar: false })
+      }
+    })
+  },
   methods: {
     onContextMenu() {
       this.$contextMenu.show()
-    }
+    },
+    ...mapMutations('tab', ['setShortcutBar'])
   }
 }
 </script>

@@ -15,7 +15,7 @@
         :tab="tab"
         class="fill-height"
       />
-      <shortcut-bar class="d-none" />
+      <shortcut-bar />
       <search-bar />
     </div>
   </v-container>
@@ -63,14 +63,18 @@ export default {
     position: absolute;
     top: 0;
     right: 0;
-    width: 480px;
+    width: 384px;
+    max-width: 100%;
   }
   .shortcut-bar {
     position: absolute;
     top: 0;
-    left: calc((100% - 512px) / 2);
+    left: 0;
     right: 0;
     width: 512px;
+    max-width: 100%;
+    margin: 0 auto;
+    z-index: 1;
   }
 }
 </style>

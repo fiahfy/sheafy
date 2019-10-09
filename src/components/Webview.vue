@@ -4,7 +4,7 @@
 
 <script>
 import { remote } from 'electron'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
   props: {
@@ -244,6 +244,13 @@ export default {
               this.activateTab({ id: this.tab.id })
               break
             }
+            case 'keydown': {
+              const [e] = args
+              if (e.keyCode === 27) {
+                this.setShortcutBar({ shortcutBar: false })
+              }
+              break
+            }
             case 'openDefaultBrowser': {
               const [url] = args
               remote.shell.openExternal(url)
@@ -260,6 +267,7 @@ export default {
         })
       })
     },
+    ...mapMutations('tab', ['setShortcutBar']),
     ...mapActions('tab', ['newTab', 'updateTab', 'activateTab'])
   }
 }
