@@ -1,32 +1,44 @@
 <template>
-  <div class="side-bar d-flex" :style="{ width: `${width}px` }">
-    <div class="pane flex-grow-1">
-      <component :is="component" class="fill-height" />
-    </div>
-    <div ref="resizer" class="resizer">
-      <v-divider vertical />
-    </div>
-  </div>
+  <v-navigation-drawer
+    class="activity-bar"
+    permanent
+    app
+    clipped
+    mini-variant
+    mini-variant-width="48"
+  >
+    <v-list dense class="py-0">
+      <v-list-item
+        v-for="item in items"
+        :key="item.title"
+        class="py-1"
+        :title="item.title"
+      >
+        <v-list-item-icon>
+          <v-icon v-text="item.icon" />
+        </v-list-item-icon>
+
+        <v-list-item-content>
+          <v-list-item-title v-text="item.title" />
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
+  </v-navigation-drawer>
 </template>
 
 <script>
 import { mapMutations, mapState } from 'vuex'
-import AppContent from '~/components/AppContent'
 
 export default {
-  components: {
-    AppContent
-  },
-  props: {
-    resizing: {
-      type: Boolean,
-      required: true
+  data() {
+    return {
+      items: [
+        { title: 'Apps', icon: 'mdi-tab' },
+        { title: 'Settings', icon: 'mdi-settings' }
+      ]
     }
   },
   computed: {
-    component() {
-      return AppContent
-    },
     width: {
       get() {
         return this.sideBarWidth
@@ -42,6 +54,10 @@ export default {
   },
   methods: {
     setupResizeHandler() {
+      const resizer = document.createElement('div')
+      const border = this.$el.querySelector('.v-navigation-drawer__border')
+      border.append(resizer)
+
       const direction = this.$el.classList.contains(
         'v-navigation-drawer--right'
       )
@@ -60,8 +76,9 @@ export default {
         this.$el.style.width = width + 'px'
       }
 
-      this.$refs.resizer.addEventListener('mousedown', () => {
+      resizer.addEventListener('mousedown', () => {
         this.$emit('update:resizing', true)
+        this.$el.style.transition = 'initial'
         document.addEventListener('mousemove', resize, false)
       })
 
@@ -70,6 +87,7 @@ export default {
           return
         }
         this.$emit('update:resizing', false)
+        this.$el.style.transition = ''
         this.width = Number(this.$el.style.width.slice(0, -2))
         document.body.style.cursor = ''
         document.removeEventListener('mousemove', resize, false)
@@ -81,18 +99,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.side-bar {
-  position: relative;
-  .pane {
-    min-width: 0;
-  }
-  .resizer {
-    position: absolute;
-    right: -5px;
-    height: 100%;
-    padding: 0 5px;
-    z-index: 5;
-    cursor: ew-resize;
-  }
-}
+// .activity-bar .v-list-item:last-child {
+//   position: absolute;
+//   bottom: 0;
+//   width: 100%;
+// }
 </style>

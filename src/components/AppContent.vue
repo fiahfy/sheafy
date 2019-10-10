@@ -13,7 +13,7 @@
         <v-icon size="20">mdi-tab-plus</v-icon>
       </v-btn>
     </v-toolbar>
-    <div ref="container" class="flex-grow-1 overflow-y-auto py-1">
+    <div ref="container" class="flex-grow-1 overflow-y-auto">
       <app-list v-if="apps.length" :apps="apps" />
       <div
         v-else

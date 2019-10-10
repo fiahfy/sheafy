@@ -2,7 +2,7 @@
   <v-app @contextmenu.native="onContextMenu">
     <title-bar />
     <v-content class="fill-height">
-      <router-view />
+      <router-view class="fill-height" />
     </v-content>
   </v-app>
 </template>

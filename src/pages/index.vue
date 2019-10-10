@@ -1,29 +1,22 @@
 <template>
-  <v-container
-    class="index"
-    fill-height
-    fluid
-    pa-0
-    :class="{ resizing: resizing }"
-  >
-    <sidebar :resizing.sync="resizing" />
+  <v-container class="index" fluid pa-0 :class="{ resizing: resizing }">
+    <activity-bar />
     <toolbar />
-    <div class="flex-grow-1 fill-height">
-      <webview
-        v-for="tab in tabs"
-        :key="tab.id"
-        :tab="tab"
-        class="fill-height"
-      />
-      <shortcut-bar />
-      <search-bar />
-      <status-bar />
+    <div class="d-flex flex-grow-1 fill-height">
+      <sidebar :resizing.sync="resizing" />
+      <div class="flex-grow-1">
+        <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
+        <shortcut-bar />
+        <search-bar />
+        <status-bar />
+      </div>
     </div>
   </v-container>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import ActivityBar from '~/components/ActivityBar'
 import SearchBar from '~/components/SearchBar'
 import ShortcutBar from '~/components/ShortcutBar'
 import Sidebar from '~/components/Sidebar'
@@ -33,6 +26,7 @@ import Webview from '~/components/Webview'
 
 export default {
   components: {
+    ActivityBar,
     SearchBar,
     ShortcutBar,
     Sidebar,
