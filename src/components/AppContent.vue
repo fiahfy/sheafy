@@ -5,7 +5,9 @@
     @drop.prevent="onDrop"
   >
     <v-toolbar tile dense flat class="flex-grow-0">
-      <span class="subtitle-2 text-uppercase">apps</span>
+      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+        apps
+      </span>
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-auto">
       <app-list v-if="apps.length" :apps="apps" />

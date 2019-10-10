@@ -5,7 +5,9 @@
     @drop.prevent="onDrop"
   >
     <v-toolbar tile dense flat class="flex-grow-0">
-      <span class="subtitle-2 text-uppercase">temporary apps</span>
+      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+        temporary apps
+      </span>
       <v-spacer />
       <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
         <v-icon size="20">mdi-tab-plus</v-icon>
@@ -17,7 +19,7 @@
           </v-btn>
         </template>
         <v-card>
-          <v-card-title v-text="'Close all temporary apps?'" />
+          <v-card-title>Close all temporary apps?</v-card-title>
           <v-card-actions>
             <div class="flex-grow-1"></div>
             <v-btn text @click="onClickCancel">Cancel</v-btn>

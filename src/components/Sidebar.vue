@@ -84,7 +84,7 @@ export default {
           direction === 'right'
             ? document.body.scrollWidth - e.clientX
             : e.clientX
-        if (width < 128 || width > window.innerWidth - 128) {
+        if (width < 256 || width > window.innerWidth - 256) {
           return
         }
         this.$el.style.width = width + 'px'
@@ -111,7 +111,7 @@ export default {
       const resize = (e) => {
         document.body.style.cursor = 'ns-resize'
         const height = this.$el.offsetHeight - e.clientY + 61 - 4
-        if (height < 128 || height > this.$el.offsetHeight - 128) {
+        if (height < 256 || height > this.$el.offsetHeight - 256) {
           return
         }
         this.$refs.bottom.style.height = height + 'px'
