@@ -1,60 +1,34 @@
 <template>
-  <v-hover v-slot:default="{ hover }" class="app-tab-list-item-icon">
-    <v-list-item-action v-if="hover && pinAction" class="my-0">
-      <v-btn icon small title="Pin" @click.stop="pinApp({ host })">
-        <v-icon small>mdi-pin</v-icon>
-      </v-btn>
-    </v-list-item-action>
-    <v-list-item-action v-else-if="hover && unpinAction" class="my-0">
-      <v-btn icon small title="Unpin" @click.stop="unpinApp({ host })">
-        <v-icon small>mdi-pin-off</v-icon>
-      </v-btn>
-    </v-list-item-action>
-    <v-list-item-icon v-else class="align-self-center">
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        size="16"
-        width="2"
-        color="primary"
+  <v-list-item-icon class="app-tab-list-item-icon align-self-center">
+    <v-progress-circular
+      v-if="loading"
+      indeterminate
+      size="16"
+      width="2"
+      color="primary"
+    />
+    <template v-else>
+      <v-icon v-if="error" small color="grey darken-1">mdi-earth</v-icon>
+      <v-img
+        v-else
+        :src="url"
+        height="16"
+        width="16"
+        contain
+        @error="error = true"
       />
-      <template v-else>
-        <v-icon v-if="error" small color="grey darken-1">mdi-earth</v-icon>
-        <v-img
-          v-else
-          :src="url"
-          height="16"
-          width="16"
-          contain
-          @error="error = true"
-        />
-      </template>
-    </v-list-item-icon>
-  </v-hover>
+    </template>
+  </v-list-item-icon>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-
 export default {
   props: {
     url: {
       type: String,
       required: true
     },
-    host: {
-      type: String,
-      default: null
-    },
     loading: {
-      type: Boolean,
-      default: false
-    },
-    pinAction: {
-      type: Boolean,
-      default: false
-    },
-    unpinAction: {
       type: Boolean,
       default: false
     }
@@ -70,9 +44,6 @@ export default {
         this.error = false
       }
     }
-  },
-  methods: {
-    ...mapActions('tab', ['pinApp', 'unpinApp'])
   }
 }
 </script>

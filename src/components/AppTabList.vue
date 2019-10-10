@@ -7,7 +7,6 @@
           class="mr-2"
           :url="app.favicon"
           :host="app.host"
-          unpin-action
         />
         <v-list-item-content @contextmenu="onContextMenu">
           <v-list-item-title v-text="app.host" />
@@ -34,7 +33,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import AppTabListItem from '~/components/AppTabListItem'
 import AppTabListItemIcon from '~/components/AppTabListItemIcon'
 
@@ -64,11 +63,11 @@ export default {
         this.sortTabs({ ids })
       }
     },
-    ...mapState('tab', ['activeTabId'])
+    ...mapGetters('tab', ['activeTab'])
   },
   watch: {
-    activeTabId(value) {
-      if (this.app.tabs.find((tab) => tab.id === value)) {
+    activeTab(value) {
+      if (this.app.host === value.host) {
         this.expand = true
       }
     }
@@ -77,17 +76,12 @@ export default {
     onContextMenu() {
       this.$contextMenu.show([
         {
-          label: 'Unpin App',
-          click: () => this.unpinApp({ host: this.app.host })
-        },
-        { type: 'separator' },
-        {
           label: 'Close App',
           click: () => this.closeApp({ host: this.app.host })
         }
       ])
     },
-    ...mapActions('tab', ['sortTabs', 'unpinApp', 'closeApp'])
+    ...mapActions('tab', ['sortTabs', 'closeApp'])
   }
 }
 </script>

@@ -12,8 +12,6 @@
       :url="tab.favicon"
       :host="tab.host"
       :loading="tab.loading"
-      :pin-action="temporary"
-      :unpin-action="!subGroup && !temporary"
     />
     <v-list-item-content>
       <v-list-item-title v-text="title" />
@@ -49,26 +47,19 @@ export default {
     subGroup: {
       type: Boolean,
       default: false
-    },
-    temporary: {
-      type: Boolean,
-      default: false
     }
   },
   computed: {
     active() {
-      return this.isActiveTab(this.tab)
-    },
-    pinned() {
-      return this.isPinnedTab(this.tab)
+      return this.isActiveTab({ id: this.tab.id })
     },
     title() {
-      return this.subGroup || this.temporary ? this.tab.title : this.tab.host
+      return this.subGroup ? this.tab.title : this.tab.host
     },
     badge() {
       return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
     },
-    ...mapGetters('tab', ['isActiveTab', 'isPinnedTab'])
+    ...mapGetters('tab', ['isActiveTab'])
   },
   methods: {
     onContextMenu() {
@@ -87,13 +78,6 @@ export default {
           label: 'Open Current Page in a Default Browser',
           click: () => remote.shell.openExternal(this.tab.url)
         },
-        {
-          label: this.pinned ? 'Unpin App' : 'Pin App',
-          click: () =>
-            this.pinned
-              ? this.unpinApp({ host: this.tab.host })
-              : this.pinApp({ host: this.tab.host })
-        },
         { type: 'separator' },
         {
           label: 'Close Tab',
@@ -101,14 +85,7 @@ export default {
         }
       ])
     },
-    ...mapActions('tab', [
-      'newTab',
-      'duplicateTab',
-      'closeTab',
-      'activateTab',
-      'pinApp',
-      'unpinApp'
-    ])
+    ...mapActions('tab', ['newTab', 'duplicateTab', 'closeTab', 'activateTab'])
   }
 }
 </script>

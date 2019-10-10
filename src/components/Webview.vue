@@ -24,7 +24,7 @@ export default {
       return `file://${remote.app.getAppPath()}/preload.js`
     },
     active() {
-      return this.isActiveTab(this.tab)
+      return this.isActiveTab({ id: this.tab.id })
     },
     display() {
       return this.active ? 'flex' : 'none'
@@ -48,7 +48,7 @@ export default {
     }
   },
   destroyed() {
-    this.webview.remove()
+    this.webview && this.webview.remove()
   },
   methods: {
     load() {

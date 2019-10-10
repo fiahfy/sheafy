@@ -6,10 +6,7 @@ const getHost = (url) => {
 
 const getBadge = (title) => {
   const match = title.match(/\(([\d,]+)\)\s*/)
-  if (!match) {
-    return 0
-  }
-  return Number(match[1].replace(',', ''))
+  return match ? Number(match[1].replace(',', '')) : 0
 }
 
 const convertTab = (tab) => {
@@ -31,30 +28,41 @@ export const getters = {
   activeTab(state) {
     return state.tabs.find((tab) => tab.id === state.activeTabId)
   },
-  isActiveTab(state) {
-    return (tab) => tab.id === state.activeTabId
-  },
-  isPinnedTab(state) {
-    return (tab) => state.hosts.includes(tab.host)
-  },
   apps(state) {
-    return state.hosts
-      .slice()
-      .map((host) => {
-        const tabs = state.tabs.filter((tab) => tab.host === host)
-        if (tabs.length) {
+    return Object.values(
+      state.tabs.slice().reduce((carry, tab) => {
+        if (carry[tab.host]) {
           return {
-            host,
-            tabs,
-            favicon: tabs[0].favicon
+            ...carry,
+            [tab.host]: {
+              ...carry[tab.host],
+              tabs: [...carry[tab.host].tabs, tab]
+            }
           }
         }
-        return null
-      })
-      .filter((app) => !!app)
+        return {
+          ...carry,
+          [tab.host]: {
+            host: tab.host,
+            favicon: tab.favicon,
+            tabs: [tab]
+          }
+        }
+      }, {})
+    ).sort((a, b) => {
+      const aIndex =
+        state.hosts.indexOf(a.host) > -1
+          ? state.hosts.indexOf(a.host)
+          : Infinity
+      const bIndex =
+        state.hosts.indexOf(b.host) > -1
+          ? state.hosts.indexOf(b.host)
+          : Infinity
+      return aIndex > bIndex ? 1 : -1
+    })
   },
-  temporaryTabs(state) {
-    return state.tabs.slice().filter((tab) => !state.hosts.includes(tab.host))
+  isActiveTab(state) {
+    return ({ id }) => id === state.activeTabId
   },
   getUrlWithQuery() {
     return (query) => {
@@ -119,7 +127,6 @@ export const actions = {
     if (activate) {
       commit('setActiveTabId', { activeTabId: id })
     }
-    return tab
   },
   newTabIfEmpty({ dispatch, state }) {
     if (!state.tabs.length) {
@@ -163,55 +170,12 @@ export const actions = {
           const activeTabId = app.tabs[index - 1].id
           commit('setActiveTabId', { activeTabId })
         } else {
-          const tab = getters.temporaryTabs[0]
-          if (tab) {
-            const activeTabId = tab.id
-            commit('setActiveTabId', { activeTabId })
-          } else {
-            commit('setActiveTabId', { activeTabId: null })
-          }
-        }
-      } else {
-        const index = getters.temporaryTabs.findIndex((tab) => tab.id === id)
-        if (index < getters.temporaryTabs.length - 1) {
-          const activeTabId = getters.temporaryTabs[index + 1].id
-          commit('setActiveTabId', { activeTabId })
-        } else if (index > 0) {
-          const activeTabId = getters.temporaryTabs[index - 1].id
-          commit('setActiveTabId', { activeTabId })
-        } else {
-          const app = getters.apps[getters.apps.length - 1]
-          if (app) {
-            const activeTabId = app.tabs[app.tabs.length - 1].id
-            commit('setActiveTabId', { activeTabId })
-          } else {
-            commit('setActiveTabId', { activeTabId: null })
-          }
+          commit('setActiveTabId', { activeTabId: null })
         }
       }
     }
 
     const tabs = state.tabs.filter((tab) => tab.id !== id)
-    commit('setTabs', { tabs })
-    if (!tabs.length) {
-      remote.getCurrentWindow().close()
-    }
-  },
-  closeTemporaryTabs({ commit, getters, state }) {
-    const active = state.tabs
-      .filter((tab) => !state.hosts.includes(tab.host))
-      .map((tab) => tab.id)
-      .includes(state.activeTabId)
-    if (active) {
-      const app = getters.apps[getters.apps.length - 1]
-      if (app) {
-        const activeTabId = app.tabs[app.tabs.length - 1].id
-        commit('setActiveTabId', { activeTabId })
-      } else {
-        commit('setActiveTabId', { activeTabId: null })
-      }
-    }
-    const tabs = state.tabs.filter((tab) => state.hosts.includes(tab.host))
     commit('setTabs', { tabs })
     if (!tabs.length) {
       remote.getCurrentWindow().close()
@@ -228,17 +192,6 @@ export const actions = {
     ]
     commit('setTabs', { tabs })
   },
-  pinApp({ commit, state }, { host }) {
-    if (state.hosts.includes(host)) {
-      return
-    }
-    const hosts = [...state.hosts, host]
-    commit('setHosts', { hosts })
-  },
-  unpinApp({ commit, state }, { host }) {
-    const hosts = state.hosts.filter((value) => value !== host)
-    commit('setHosts', { hosts })
-  },
   closeApp({ commit, getters, state }, { host }) {
     const app = getters.apps.find((app) => app.host === host)
     const tabIds = app.tabs.map((tab) => tab.id)
@@ -254,13 +207,7 @@ export const actions = {
             .id
         commit('setActiveTabId', { activeTabId })
       } else {
-        const tab = getters.temporaryTabs[0]
-        if (tab) {
-          const activeTabId = tab.id
-          commit('setActiveTabId', { activeTabId })
-        } else {
-          commit('setActiveTabId', { activeTabId: null })
-        }
+        commit('setActiveTabId', { activeTabId: null })
       }
     }
 
@@ -271,7 +218,7 @@ export const actions = {
     }
   },
   sortApps({ commit }, { hosts }) {
-    commit('setHosts', { hosts: hosts.filter((host) => !!host) })
+    commit('setHosts', { hosts })
   }
 }
 
