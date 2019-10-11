@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 export default {
   data() {
     return {
@@ -43,7 +43,7 @@ export default {
         this.$nextTick(() => {
           this.$el.querySelector('input').addEventListener('keydown', (e) => {
             if (e.keyCode === 27) {
-              this.setShortcutBar({ shortcutBar: false })
+              this.hideShortcutBar()
             }
           })
         })
@@ -52,15 +52,10 @@ export default {
   },
   methods: {
     onChange(value) {
-      console.log(value)
       this.activateTab({ id: value })
-      this.setShortcutBar({ shortcutBar: false })
+      this.hideShortcutBar()
     },
-    onKeyPressEsc(e) {
-      console.log(e)
-    },
-    ...mapMutations('tab', ['setShortcutBar']),
-    ...mapActions('tab', ['activateTab'])
+    ...mapActions('tab', ['activateTab', 'hideShortcutBar'])
   }
 }
 </script>

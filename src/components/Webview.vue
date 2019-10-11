@@ -4,7 +4,7 @@
 
 <script>
 import { remote } from 'electron'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   props: {
@@ -254,7 +254,7 @@ export default {
             case 'keydown': {
               const [e] = args
               if (e.keyCode === 27) {
-                this.setShortcutBar({ shortcutBar: false })
+                this.hideShortcutBar()
               }
               break
             }
@@ -277,8 +277,12 @@ export default {
         })
       })
     },
-    ...mapMutations('tab', ['setShortcutBar']),
-    ...mapActions('tab', ['newTab', 'updateTab', 'activateTab'])
+    ...mapActions('tab', [
+      'newTab',
+      'updateTab',
+      'activateTab',
+      'hideShortcutBar'
+    ])
   }
 }
 </script>

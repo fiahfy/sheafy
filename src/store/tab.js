@@ -219,6 +219,12 @@ export const actions = {
   },
   sortApps({ commit }, { hosts }) {
     commit('setHosts', { hosts })
+  },
+  showShortcutBar({ commit }) {
+    commit('setShortcutBar', { shortcutBar: true })
+  },
+  hideShortcutBar({ commit }) {
+    commit('setShortcutBar', { shortcutBar: false })
   }
 }
 

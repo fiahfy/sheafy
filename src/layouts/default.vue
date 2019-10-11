@@ -9,7 +9,7 @@
 
 <script>
 import TitleBar from '~/components/TitleBar'
-import { mapMutations } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
   components: {
@@ -18,7 +18,7 @@ export default {
   mounted() {
     document.addEventListener('keydown', (e) => {
       if (e.keyCode === 27) {
-        this.setShortcutBar({ shortcutBar: false })
+        this.hideShortcutBar()
       }
     })
   },
@@ -26,7 +26,7 @@ export default {
     onContextMenu() {
       this.$contextMenu.show()
     },
-    ...mapMutations('tab', ['setShortcutBar'])
+    ...mapActions('tab', ['hideShortcutBar'])
   }
 }
 </script>

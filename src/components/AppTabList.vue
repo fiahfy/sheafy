@@ -1,5 +1,5 @@
 <template>
-  <v-list class="app-tab-list primary--text py-1" dense>
+  <v-list class="app-tab-list primary--text py-0" dense>
     <app-tab-list-item v-if="app.tabs.length < 2" :tab="app.tabs[0]" />
     <v-list-group v-else v-model="expand">
       <template v-slot:activator>

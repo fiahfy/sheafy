@@ -4,7 +4,7 @@
     <toolbar />
     <div class="d-flex flex-grow-1 fill-height">
       <sidebar :resizing.sync="resizing" />
-      <div class="flex-grow-1">
+      <div class="wrapper flex-grow-1">
         <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
         <shortcut-bar />
         <search-bar />
@@ -55,6 +55,9 @@ export default {
 .index {
   &.resizing ::v-deep webview {
     pointer-events: none;
+  }
+  .wrapper {
+    position: relative;
   }
   .search-bar {
     position: absolute;
