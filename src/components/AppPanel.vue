@@ -1,6 +1,6 @@
 <template>
   <div
-    class="app-panel d-flex flex-column"
+    class="app-panel flex-column"
     @dragover.prevent="onDragOver"
     @drop.prevent="onDrop"
   >

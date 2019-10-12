@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-panel d-flex flex-column">
+  <div class="settings-panel flex-column">
     <v-toolbar tile dense flat class="flex-grow-0">
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         settings
@@ -21,13 +21,15 @@
 
 <script>
 export default {
-  computed: {
-    sideBarLocations() {
-      return [
+  data() {
+    return {
+      sideBarLocations: [
         { text: 'Left', value: 'left' },
         { text: 'Right', value: 'right' }
       ]
-    },
+    }
+  },
+  computed: {
     darkTheme: {
       get() {
         return this.$store.state.settings.darkTheme

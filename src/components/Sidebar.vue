@@ -1,7 +1,14 @@
 <template>
   <div class="side-bar d-flex" :style="{ width: `${width}px` }">
     <div class="pane flex-grow-1">
-      <component :is="component" class="fill-height" />
+      <template v-for="panel in panels">
+        <component
+          :is="panel.component"
+          :key="panel.id"
+          class="fill-height"
+          :class="panel.id === panelId ? 'd-flex' : 'd-none'"
+        />
+      </template>
     </div>
     <div ref="resizer" class="resizer" :class="classes">
       <v-divider vertical />
@@ -15,19 +22,21 @@ import AppPanel from '~/components/AppPanel'
 import SettingsPanel from '~/components/SettingsPanel'
 
 export default {
-  components: {
-    AppPanel
-  },
   props: {
     resizing: {
       type: Boolean,
       required: true
     }
   },
+  data() {
+    return {
+      panels: [
+        { id: 'apps', component: AppPanel },
+        { id: 'settings', component: SettingsPanel }
+      ]
+    }
+  },
   computed: {
-    component() {
-      return this.panelId === 'settings' ? SettingsPanel : AppPanel
-    },
     classes() {
       return this.sideBarLocation === 'right' ? 'resizer--right' : ''
     },
