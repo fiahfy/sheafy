@@ -9,6 +9,11 @@
     <div ref="container" class="flex-grow-1 overflow-y-auto">
       <div class="pa-5">
         <v-checkbox v-model="darkTheme" class="mt-0" label="Dark Theme" />
+        <v-select
+          v-model="sideBarLocation"
+          :items="sideBarLocations"
+          label="Side Bar Location"
+        />
       </div>
     </div>
   </div>
@@ -17,12 +22,28 @@
 <script>
 export default {
   computed: {
+    sideBarLocations() {
+      return [
+        { text: 'Left', value: 'left' },
+        { text: 'Right', value: 'right' }
+      ]
+    },
     darkTheme: {
       get() {
         return this.$store.state.settings.darkTheme
       },
       set(value) {
         this.$store.commit('settings/setDarkTheme', { darkTheme: value })
+      }
+    },
+    sideBarLocation: {
+      get() {
+        return this.$store.state.settings.sideBarLocation
+      },
+      set(value) {
+        this.$store.commit('settings/setSideBarLocation', {
+          sideBarLocation: value
+        })
       }
     }
   },

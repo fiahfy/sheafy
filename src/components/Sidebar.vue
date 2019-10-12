@@ -3,7 +3,7 @@
     <div class="pane flex-grow-1">
       <component :is="component" class="fill-height" />
     </div>
-    <div ref="resizer" class="resizer">
+    <div ref="resizer" class="resizer" :class="classes">
       <v-divider vertical />
     </div>
   </div>
@@ -28,6 +28,9 @@ export default {
     component() {
       return this.panelId === 'settings' ? SettingsPanel : AppPanel
     },
+    classes() {
+      return this.sideBarLocation === 'right' ? 'resizer--right' : ''
+    },
     width: {
       get() {
         return this.sideBarWidth
@@ -37,23 +40,19 @@ export default {
       }
     },
     ...mapState(['panelId']),
-    ...mapState('settings', ['sideBarWidth'])
+    ...mapState('settings', ['sideBarLocation', 'sideBarWidth'])
   },
   mounted() {
     this.setupResizeHandler()
   },
   methods: {
     setupResizeHandler() {
-      const direction = this.$el.classList.contains(
-        'v-navigation-drawer--right'
-      )
-        ? 'right'
-        : 'left'
-
       const resize = (e) => {
         document.body.style.cursor = 'ew-resize'
-        const x = e.clientX - this.$el.getBoundingClientRect().left
-        const width = direction === 'right' ? document.body.scrollWidth - x : x
+        const width =
+          this.sideBarLocation === 'right'
+            ? -e.clientX + this.$el.getBoundingClientRect().right
+            : e.clientX - this.$el.getBoundingClientRect().left
         if (width < 256 || width > window.innerWidth - 256) {
           return
         }
@@ -93,6 +92,10 @@ export default {
     padding: 0 5px;
     z-index: 5;
     cursor: ew-resize;
+    &.resizer--right {
+      left: -5px;
+      right: unset;
+    }
   }
 }
 </style>

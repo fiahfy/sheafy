@@ -2,14 +2,14 @@
   <v-container class="index" fluid pa-0 :class="{ resizing: resizing }">
     <activity-bar />
     <toolbar />
-    <div class="d-flex flex-grow-1 fill-height">
-      <sidebar :resizing.sync="resizing" />
+    <div class="d-flex flex-grow-1 fill-height" :class="classes">
       <div class="wrapper flex-grow-1 white">
         <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
         <shortcut-bar />
         <search-bar />
         <status-bar />
       </div>
+      <sidebar :resizing.sync="resizing" />
     </div>
   </v-container>
 </template>
@@ -40,6 +40,10 @@ export default {
     }
   },
   computed: {
+    classes() {
+      return this.sideBarLocation === 'right' ? 'flex-row' : 'flex-row-reverse'
+    },
+    ...mapState('settings', ['sideBarLocation']),
     ...mapState('tab', ['tabs'])
   },
   created() {

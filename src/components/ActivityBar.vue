@@ -6,6 +6,7 @@
     clipped
     mini-variant
     mini-variant-width="48"
+    :right="right"
   >
     <v-list dense class="py-0 primary--text">
       <v-list-item
@@ -41,16 +42,11 @@ export default {
     }
   },
   computed: {
-    width: {
-      get() {
-        return this.sideBarWidth
-      },
-      set(value) {
-        this.setSideBarWidth({ sideBarWidth: value })
-      }
+    right() {
+      return this.sideBarLocation === 'right'
     },
     ...mapState(['panelId']),
-    ...mapState('settings', ['sideBarWidth'])
+    ...mapState('settings', ['sideBarLocation'])
   },
   methods: {
     isActive({ id }) {
@@ -59,8 +55,7 @@ export default {
     onClick({ id }) {
       this.setPanelId({ panelId: id })
     },
-    ...mapMutations(['setPanelId']),
-    ...mapMutations('settings', ['setSideBarWidth'])
+    ...mapMutations(['setPanelId'])
   }
 }
 </script>

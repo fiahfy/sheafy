@@ -3,6 +3,7 @@
     class="toolbar"
     app
     clipped-left
+    clipped-right
     flat
     dense
     height="44"
