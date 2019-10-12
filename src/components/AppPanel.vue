@@ -14,13 +14,7 @@
       </v-btn>
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-auto">
-      <app-list v-if="apps.length" :apps="apps" />
-      <div
-        v-else
-        class="d-flex justify-center caption py-3 grey--text text--darken-1"
-      >
-        <div>No apps</div>
-      </div>
+      <app-list :apps="apps" />
     </div>
   </div>
 </template>
