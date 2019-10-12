@@ -151,7 +151,6 @@ export default {
             this.updateTab({
               id: this.tab.id,
               url,
-              query: home ? '' : url,
               canGoBack: this.webview.canGoBack(),
               canGoForward: this.webview.canGoForward()
             })
@@ -159,6 +158,7 @@ export default {
               // TODO: selector name
               document.querySelector('[name=query]').focus()
             } else if (urlChanged || this.needFocus) {
+              this.updateTab({ id: this.tab.id, query: url })
               this.needFocus = false
               // TODO: https://github.com/electron/electron/issues/14474
               this.webview.blur()
