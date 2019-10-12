@@ -11,7 +11,7 @@
         <v-list-item-content @contextmenu="onContextMenu">
           <v-list-item-title v-text="app.host" />
         </v-list-item-content>
-        <v-chip class="caption ml-3 px-2" v-text="app.tabs.length" />
+        <badge v-if="app.tabs.length" class="ml-3" :num="app.tabs.length" />
         <v-list-item-action class="my-0 ml-4">
           <v-btn
             icon
@@ -36,11 +36,13 @@
 import { mapActions, mapGetters } from 'vuex'
 import AppTabListItem from '~/components/AppTabListItem'
 import AppTabListItemIcon from '~/components/AppTabListItemIcon'
+import Badge from '~/components/Badge'
 
 export default {
   components: {
     AppTabListItem,
-    AppTabListItemIcon
+    AppTabListItemIcon,
+    Badge
   },
   props: {
     app: {
@@ -71,6 +73,14 @@ export default {
         this.expand = true
       }
     }
+  },
+  mounted() {
+    this.$eventBus.$on('expandApps', () => {
+      this.expand = true
+    })
+    this.$eventBus.$on('collapseApps', () => {
+      this.expand = false
+    })
   },
   methods: {
     onContextMenu() {
@@ -105,11 +115,6 @@ export default {
       margin-left: 16px;
       padding: 0 2px;
       min-width: unset;
-    }
-    .v-chip {
-      pointer-events: none;
-      height: 18px;
-      padding: 0 6px !important;
     }
   }
 }

@@ -16,12 +16,7 @@
     <v-list-item-content>
       <v-list-item-title v-text="title" />
     </v-list-item-content>
-    <v-chip
-      v-if="tab.badge"
-      class="caption ml-3 px-2"
-      color="error"
-      v-text="badge"
-    />
+    <badge v-if="tab.badge" class="ml-3" :num="badge" color="error" />
     <v-list-item-action class="my-0">
       <v-btn icon small title="Close" @click.stop="closeTab({ id: tab.id })">
         <v-icon small>mdi-close</v-icon>
@@ -34,10 +29,12 @@
 import { remote } from 'electron'
 import { mapActions, mapGetters } from 'vuex'
 import AppTabListItemIcon from '~/components/AppTabListItemIcon'
+import Badge from '~/components/Badge'
 
 export default {
   components: {
-    AppTabListItemIcon
+    AppTabListItemIcon,
+    Badge
   },
   props: {
     tab: {
@@ -97,11 +94,6 @@ export default {
   }
   &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
     opacity: 0;
-  }
-  .v-chip {
-    pointer-events: none;
-    height: 18px;
-    padding: 0 6px !important;
   }
 }
 </style>

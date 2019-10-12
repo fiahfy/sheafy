@@ -8,9 +8,28 @@
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         apps
       </span>
+      <badge class="ml-3" :num="apps.length" />
       <v-spacer />
       <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
         <v-icon size="20">mdi-tab-plus</v-icon>
+      </v-btn>
+      <v-btn
+        icon
+        width="36"
+        height="36"
+        title="Expand Apps"
+        @click="onClickExpand"
+      >
+        <v-icon size="20">mdi-expand-all</v-icon>
+      </v-btn>
+      <v-btn
+        icon
+        width="36"
+        height="36"
+        title="Collapse Apps"
+        @click="onClickCollapse"
+      >
+        <v-icon size="20">mdi-collapse-all</v-icon>
       </v-btn>
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-auto">
@@ -22,10 +41,12 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import AppList from '~/components/AppList'
+import Badge from '~/components/Badge'
 
 export default {
   components: {
-    AppList
+    AppList,
+    Badge
   },
   computed: {
     ...mapGetters('tab', ['activeTab', 'apps', 'getUrlWithQuery'])
@@ -69,6 +90,12 @@ export default {
       if (url) {
         this.newTab({ url })
       }
+    },
+    onClickExpand() {
+      this.$eventBus.$emit('expandApps')
+    },
+    onClickCollapse() {
+      this.$eventBus.$emit('collapseApps')
     },
     ...mapActions('tab', ['newTab'])
   }
