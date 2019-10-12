@@ -4,7 +4,7 @@
     <toolbar />
     <div class="d-flex flex-grow-1 fill-height">
       <sidebar :resizing.sync="resizing" />
-      <div class="wrapper flex-grow-1">
+      <div class="wrapper flex-grow-1 white">
         <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
         <shortcut-bar />
         <search-bar />

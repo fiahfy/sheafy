@@ -17,7 +17,11 @@ import { mapGetters } from 'vuex'
 
 export default {
   computed: {
-    ...mapGetters(['title', 'titleBar'])
+    title() {
+      return this.activeTab ? this.activeTab.title : ''
+    },
+    ...mapGetters(['titleBar']),
+    ...mapGetters('tab', ['activeTab'])
   },
   methods: {
     // TODO: https://github.com/electron/electron/issues/16385

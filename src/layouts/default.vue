@@ -9,11 +9,14 @@
 
 <script>
 import TitleBar from '~/components/TitleBar'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   components: {
     TitleBar
+  },
+  computed: {
+    ...mapState('settings', ['darkTheme'])
   },
   mounted() {
     document.addEventListener('keydown', (e) => {
@@ -21,6 +24,7 @@ export default {
         this.hideShortcutBar()
       }
     })
+    this.$vuetify.theme.dark = this.darkTheme
   },
   methods: {
     onContextMenu() {

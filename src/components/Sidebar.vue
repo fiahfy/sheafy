@@ -11,11 +11,12 @@
 
 <script>
 import { mapMutations, mapState } from 'vuex'
-import AppContent from '~/components/AppContent'
+import AppPanel from '~/components/AppPanel'
+import SettingsPanel from '~/components/SettingsPanel'
 
 export default {
   components: {
-    AppContent
+    AppPanel
   },
   props: {
     resizing: {
@@ -25,7 +26,7 @@ export default {
   },
   computed: {
     component() {
-      return AppContent
+      return this.panelId === 'settings' ? SettingsPanel : AppPanel
     },
     width: {
       get() {
@@ -35,6 +36,7 @@ export default {
         this.setSideBarWidth({ sideBarWidth: value })
       }
     },
+    ...mapState(['panelId']),
     ...mapState('settings', ['sideBarWidth'])
   },
   mounted() {
@@ -50,10 +52,8 @@ export default {
 
       const resize = (e) => {
         document.body.style.cursor = 'ew-resize'
-        const width =
-          direction === 'right'
-            ? document.body.scrollWidth - e.clientX
-            : e.clientX
+        const x = e.clientX - this.$el.getBoundingClientRect().left
+        const width = direction === 'right' ? document.body.scrollWidth - x : x
         if (width < 256 || width > window.innerWidth - 256) {
           return
         }

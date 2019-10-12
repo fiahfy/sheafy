@@ -1,6 +1,6 @@
 <template>
   <div
-    class="app-content d-flex flex-column"
+    class="app-panel d-flex flex-column"
     @dragover.prevent="onDragOver"
     @drop.prevent="onDrop"
   >
@@ -82,8 +82,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.app-content > div {
+.app-panel > div {
   position: relative;
-  flex-basis: 0;
 }
 </style>
