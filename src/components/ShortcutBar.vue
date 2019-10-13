@@ -8,10 +8,12 @@
     item-text="title"
     item-value="id"
     autofocus
+    auto-select-first
     hide-details
     no-data-text="No results found"
     :items="tabs"
     :filter="filter"
+    :menu-props="menuProps"
     @change="onChange"
   />
 </template>
@@ -21,7 +23,7 @@ import { mapActions, mapState } from 'vuex'
 export default {
   data() {
     return {
-      selected: null
+      width: 0
     }
   },
   computed: {
@@ -35,6 +37,28 @@ export default {
         )
       }
     },
+    menuProps() {
+      console.log({
+        closeOnClick: false,
+        closeOnContentClick: false,
+        openOnClick: false,
+        maxHeight: 300,
+        offsetY: true,
+        offsetOverflow: true,
+        transition: false,
+        maxWidth: this.width
+      })
+      return {
+        closeOnClick: false,
+        closeOnContentClick: false,
+        openOnClick: false,
+        maxHeight: 300,
+        offsetY: true,
+        offsetOverflow: true,
+        transition: false,
+        maxWidth: this.width
+      }
+    },
     ...mapState('tab', ['tabs', 'shortcutBar'])
   },
   watch: {
@@ -46,9 +70,13 @@ export default {
               this.hideShortcutBar()
             }
           })
+          this.width = this.$el.offsetWidth
         })
       }
     }
+  },
+  mounted() {
+    this.width = this.$el.offsetWidth
   },
   methods: {
     onChange(value) {
