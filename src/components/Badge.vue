@@ -22,5 +22,6 @@ export default {
   pointer-events: none;
   height: 18px;
   padding: 0 6px !important;
+  user-select: none;
 }
 </style>
