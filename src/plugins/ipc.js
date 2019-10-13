@@ -21,7 +21,7 @@ export default ({ store }) => {
     document.querySelector('input[name=query]').focus()
   })
   ipcRenderer.on('goToTab', () => {
-    store.dispatch('tab/showShortcutBar')
+    store.dispatch('showShortcutBar')
     const el = document.querySelector('input[name=shortcut]')
     el && el.focus()
     el && el.select()

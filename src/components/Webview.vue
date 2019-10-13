@@ -308,12 +308,8 @@ export default {
         }, 0)
       })
     },
-    ...mapActions('tab', [
-      'newTab',
-      'updateTab',
-      'activateTab',
-      'hideShortcutBar'
-    ])
+    ...mapActions(['hideShortcutBar']),
+    ...mapActions('tab', ['newTab', 'updateTab', 'activateTab'])
   }
 }
 </script>

@@ -20,8 +20,7 @@ const convertTab = (tab) => {
 export const state = () => ({
   activeTabId: null,
   tabs: [],
-  hosts: [],
-  shortcutBar: false
+  hosts: []
 })
 
 export const getters = {
@@ -219,12 +218,6 @@ export const actions = {
   },
   sortApps({ commit }, { hosts }) {
     commit('setHosts', { hosts })
-  },
-  showShortcutBar({ commit }) {
-    commit('setShortcutBar', { shortcutBar: true })
-  },
-  hideShortcutBar({ commit }) {
-    commit('setShortcutBar', { shortcutBar: false })
   }
 }
 
@@ -237,8 +230,5 @@ export const mutations = {
   },
   setHosts(state, { hosts }) {
     state.hosts = hosts
-  },
-  setShortcutBar(state, { shortcutBar }) {
-    state.shortcutBar = shortcutBar
   }
 }

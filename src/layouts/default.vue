@@ -30,7 +30,7 @@ export default {
     onContextMenu() {
       this.$contextMenu.show()
     },
-    ...mapActions('tab', ['hideShortcutBar'])
+    ...mapActions(['hideShortcutBar'])
   }
 }
 </script>

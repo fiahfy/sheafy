@@ -2,7 +2,8 @@ import createPersistedState from 'vuex-persistedstate'
 
 export const state = () => ({
   fullScreen: false,
-  panelId: null
+  panelId: null,
+  shortcutBar: false
 })
 
 export const getters = {
@@ -11,7 +12,14 @@ export const getters = {
   }
 }
 
-export const actions = {}
+export const actions = {
+  showShortcutBar({ commit }) {
+    commit('setShortcutBar', { shortcutBar: true })
+  },
+  hideShortcutBar({ commit }) {
+    commit('setShortcutBar', { shortcutBar: false })
+  }
+}
 
 export const mutations = {
   setFullScreen(state, { fullScreen }) {
@@ -19,6 +27,9 @@ export const mutations = {
   },
   setPanelId(state, { panelId }) {
     state.panelId = panelId
+  },
+  setShortcutBar(state, { shortcutBar }) {
+    state.shortcutBar = shortcutBar
   }
 }
 

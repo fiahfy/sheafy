@@ -59,7 +59,8 @@ export default {
         maxWidth: this.width
       }
     },
-    ...mapState('tab', ['tabs', 'shortcutBar'])
+    ...mapState(['shortcutBar']),
+    ...mapState('tab', ['tabs'])
   },
   watch: {
     shortcutBar(value) {
@@ -83,7 +84,8 @@ export default {
       this.activateTab({ id: value })
       this.hideShortcutBar()
     },
-    ...mapActions('tab', ['activateTab', 'hideShortcutBar'])
+    ...mapActions(['hideShortcutBar']),
+    ...mapActions('tab', ['activateTab'])
   }
 }
 </script>
