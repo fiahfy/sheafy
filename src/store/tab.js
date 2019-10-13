@@ -81,8 +81,7 @@ export const actions = {
   newTab({ commit, state }, { options, ...params } = {}) {
     const { activate = true, position = 'last', baseId = state.activeTabId } =
       options || {}
-    // TODO: Generate random unique id
-    const id = Math.max.apply(null, [0, ...state.tabs.map((tab) => tab.id)]) + 1
+    const id = state.tabs.reduce((carry, tab) => Math.max(carry, tab.id), 0) + 1
     const url = 'https://www.google.com/?sheafy'
     const tab = convertTab({
       id,

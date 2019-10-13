@@ -58,7 +58,6 @@ export default {
 
       this.webview = document.createElement('webview')
       this.webview.classList.add('fill-height')
-      this.webview.id = this.tab.id
       this.webview.src = this.tab.url
       this.webview.preload = this.preload
       this.webview.style.display = this.display
