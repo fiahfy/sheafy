@@ -1,7 +1,7 @@
 <template>
   <v-container class="index" fluid pa-0 :class="{ resizing: resizing }">
-    <activity-bar />
-    <toolbar />
+    <activity-bar v-if="!fullScreen" />
+    <toolbar v-if="!fullScreen" />
     <div class="d-flex flex-grow-1 fill-height" :class="classes">
       <div class="wrapper flex-grow-1 white">
         <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
@@ -9,7 +9,7 @@
         <search-bar />
         <status-bar />
       </div>
-      <sidebar :resizing.sync="resizing" />
+      <sidebar v-if="!fullScreen" :resizing.sync="resizing" />
     </div>
   </v-container>
 </template>
@@ -43,6 +43,7 @@ export default {
     classes() {
       return this.sideBarLocation === 'right' ? 'flex-row' : 'flex-row-reverse'
     },
+    ...mapState(['fullScreen']),
     ...mapState('settings', ['sideBarLocation']),
     ...mapState('tab', ['tabs'])
   },
