@@ -13,14 +13,17 @@
 
 <script>
 import { remote } from 'electron'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   computed: {
     title() {
       return this.activeTab ? this.activeTab.title : ''
     },
-    ...mapGetters(['titleBar']),
+    titleBar() {
+      return process.platform === 'darwin' && !this.fullScreen
+    },
+    ...mapState(['fullScreen']),
     ...mapGetters('tab', ['activeTab'])
   },
   methods: {

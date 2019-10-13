@@ -6,11 +6,7 @@ export const state = () => ({
   shortcutBar: false
 })
 
-export const getters = {
-  titleBar(state) {
-    return process.platform === 'darwin' && !state.fullScreen
-  }
-}
+export const getters = {}
 
 export const actions = {
   showShortcutBar({ commit }) {

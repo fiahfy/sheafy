@@ -7,6 +7,16 @@ export default ({ store }) => {
   ipcRenderer.on('leaveFullScreen', () => {
     store.commit('setFullScreen', { fullScreen: false })
   })
+  ipcRenderer.on('swipe', (e, direction) => {
+    switch (direction) {
+      case 'left':
+        store.$eventBus.$emit('goForward')
+        break
+      case 'right':
+        store.$eventBus.$emit('goBack')
+        break
+    }
+  })
   ipcRenderer.on('newTab', () => {
     store.dispatch('tab/newTab')
   })

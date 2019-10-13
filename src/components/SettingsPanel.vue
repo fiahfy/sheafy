@@ -14,6 +14,13 @@
           :items="sideBarLocations"
           label="Side Bar Location"
         />
+        <v-checkbox
+          v-if="darwin"
+          v-model="swipeToNavigate"
+          class="mt-0"
+          label="Swipe to Navigate"
+          messages="Navigate between pages using 3-finger swipe horizontally."
+        />
       </div>
     </div>
   </div>
@@ -30,6 +37,9 @@ export default {
     }
   },
   computed: {
+    darwin() {
+      return process.platform === 'darwin'
+    },
     darkTheme: {
       get() {
         return this.$store.state.settings.darkTheme
@@ -45,6 +55,16 @@ export default {
       set(value) {
         this.$store.commit('settings/setSideBarLocation', {
           sideBarLocation: value
+        })
+      }
+    },
+    swipeToNavigate: {
+      get() {
+        return this.$store.state.settings.swipeToNavigate
+      },
+      set(value) {
+        this.$store.commit('settings/setSwipeToNavigate', {
+          swipeToNavigate: value
         })
       }
     }

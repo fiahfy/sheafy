@@ -244,6 +244,7 @@ const createWindow = async () => {
   mainWindow.on('closed', () => (mainWindow = null))
   mainWindow.on('enter-full-screen', () => send('enterFullScreen'))
   mainWindow.on('leave-full-screen', () => send('leaveFullScreen'))
+  mainWindow.on('swipe', (e, direction) => send('swipe', direction))
 }
 
 app.on('ready', createWindow)
