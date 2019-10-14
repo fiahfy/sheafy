@@ -185,8 +185,8 @@ const createTemplate = () => {
 
 const createWindow = async () => {
   const windowState = windowStateKeeper({
-    defaultWidth: 820,
-    defaultHeight: 600
+    defaultWidth: 1024,
+    defaultHeight: 768
   })
 
   const options = {
