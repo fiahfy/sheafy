@@ -2,12 +2,14 @@
 
 ![badge](https://github.com/fiahfy/sheafy/workflows/Electron%20CI/badge.svg)
 
-> Web Applications Categorized Browser based on Electron.
+> Browser Application that organizes Web Applications.  
+> This Application is based on [Nuxt.js](https://nuxtjs.org/) and [Electron](https://electronjs.org/).
 
 ## Features
 
-- Categorize Web Application Tabs
+- Manage Tabs by Web Application
 - Vertical Tab bars
+- Provides Shortcuts to Tabs
 
 ## Installation
 
