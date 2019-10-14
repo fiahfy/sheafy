@@ -77,6 +77,12 @@ const createTemplate = () => {
       label: 'View',
       submenu: [
         {
+          label: 'Apps',
+          accelerator: 'CmdOrCtrl+Shift+E',
+          click: () => send('showApps')
+        },
+        { type: 'separator' },
+        {
           label: 'Reload',
           accelerator: 'CmdOrCtrl+R',
           click: () => send('reload')

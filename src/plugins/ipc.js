@@ -55,6 +55,12 @@ export default ({ store }) => {
     el && el.focus()
     el && el.select()
   })
+  ipcRenderer.on('showSettings', () => {
+    store.commit('setPanelId', { panelId: 'settings' })
+  })
+  ipcRenderer.on('showApps', () => {
+    store.commit('setPanelId', { panelId: 'apps' })
+  })
   // TODO: https://github.com/electron/electron/issues/15728
   ipcRenderer.on('undo', () => {
     if (document.activeElement.tagName.toLocaleLowerCase() === 'webview') {
