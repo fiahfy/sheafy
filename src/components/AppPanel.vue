@@ -1,20 +1,39 @@
 <template>
   <div
-    class="app-content d-flex flex-column"
+    class="app-panel flex-column"
     @dragover.prevent="onDragOver"
     @drop.prevent="onDrop"
   >
     <v-toolbar tile dense flat class="flex-grow-0">
-      <span class="subtitle-2 text-uppercase">apps</span>
+      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+        apps
+      </span>
+      <badge class="ml-3" :num="apps.length" />
+      <v-spacer />
+      <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
+        <v-icon size="20">mdi-tab-plus</v-icon>
+      </v-btn>
+      <v-btn
+        icon
+        width="36"
+        height="36"
+        title="Expand Apps"
+        @click="onClickExpand"
+      >
+        <v-icon size="20">mdi-expand-all</v-icon>
+      </v-btn>
+      <v-btn
+        icon
+        width="36"
+        height="36"
+        title="Collapse Apps"
+        @click="onClickCollapse"
+      >
+        <v-icon size="20">mdi-collapse-all</v-icon>
+      </v-btn>
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-auto">
-      <app-list v-if="apps.length" :apps="apps" />
-      <div
-        v-else
-        class="d-flex justify-center caption py-3 grey--text text--darken-1"
-      >
-        <div>No apps</div>
-      </div>
+      <app-list :apps="apps" />
     </div>
   </div>
 </template>
@@ -22,10 +41,12 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import AppList from '~/components/AppList'
+import Badge from '~/components/Badge'
 
 export default {
   components: {
-    AppList
+    AppList,
+    Badge
   },
   computed: {
     ...mapGetters('tab', ['activeTab', 'apps', 'getUrlWithQuery'])
@@ -59,7 +80,7 @@ export default {
     onDragOver(e) {
       e.dataTransfer.dropEffect = 'link'
     },
-    async onDrop(e) {
+    onDrop(e) {
       const effectAllowed = e.dataTransfer.effectAllowed
       // Prevent for sorting tabs
       if (effectAllowed === 'move') {
@@ -67,18 +88,22 @@ export default {
       }
       const url = this.getUrlWithQuery(e.dataTransfer.getData('text'))
       if (url) {
-        const tab = await this.newTab({ url })
-        this.pinApp({ host: tab.host })
+        this.newTab({ url })
       }
     },
-    ...mapActions('tab', ['newTab', 'pinApp'])
+    onClickExpand() {
+      this.$eventBus.$emit('expandApps')
+    },
+    onClickCollapse() {
+      this.$eventBus.$emit('collapseApps')
+    },
+    ...mapActions('tab', ['newTab'])
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.app-content > div {
+.app-panel > div {
   position: relative;
-  flex-basis: 0;
 }
 </style>

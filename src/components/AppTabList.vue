@@ -1,5 +1,5 @@
 <template>
-  <v-list class="app-tab-list primary--text py-1" dense>
+  <v-list class="app-tab-list primary--text py-0" dense>
     <app-tab-list-item v-if="app.tabs.length < 2" :tab="app.tabs[0]" />
     <v-list-group v-else v-model="expand">
       <template v-slot:activator>
@@ -7,12 +7,11 @@
           class="mr-2"
           :url="app.favicon"
           :host="app.host"
-          unpin-action
         />
         <v-list-item-content @contextmenu="onContextMenu">
           <v-list-item-title v-text="app.host" />
         </v-list-item-content>
-        <v-chip class="caption ml-3 px-2" v-text="app.tabs.length" />
+        <badge v-if="app.tabs.length" class="ml-3" :num="app.tabs.length" />
         <v-list-item-action class="my-0 ml-4">
           <v-btn
             icon
@@ -34,14 +33,16 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import AppTabListItem from '~/components/AppTabListItem'
 import AppTabListItemIcon from '~/components/AppTabListItemIcon'
+import Badge from '~/components/Badge'
 
 export default {
   components: {
     AppTabListItem,
-    AppTabListItemIcon
+    AppTabListItemIcon,
+    Badge
   },
   props: {
     app: {
@@ -64,30 +65,33 @@ export default {
         this.sortTabs({ ids })
       }
     },
-    ...mapState('tab', ['activeTabId'])
+    ...mapGetters('tab', ['activeTab'])
   },
   watch: {
-    activeTabId(value) {
-      if (this.app.tabs.find((tab) => tab.id === value)) {
+    activeTab(value) {
+      if (this.app.host === value.host) {
         this.expand = true
       }
     }
   },
+  mounted() {
+    this.$eventBus.$on('expandApps', () => {
+      this.expand = true
+    })
+    this.$eventBus.$on('collapseApps', () => {
+      this.expand = false
+    })
+  },
   methods: {
     onContextMenu() {
       this.$contextMenu.show([
-        {
-          label: 'Unpin App',
-          click: () => this.unpinApp({ host: this.app.host })
-        },
-        { type: 'separator' },
         {
           label: 'Close App',
           click: () => this.closeApp({ host: this.app.host })
         }
       ])
     },
-    ...mapActions('tab', ['sortTabs', 'unpinApp', 'closeApp'])
+    ...mapActions('tab', ['sortTabs', 'closeApp'])
   }
 }
 </script>
@@ -111,11 +115,6 @@ export default {
       margin-left: 16px;
       padding: 0 2px;
       min-width: unset;
-    }
-    .v-chip {
-      pointer-events: none;
-      height: 18px;
-      padding: 0 6px !important;
     }
   }
 }

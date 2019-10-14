@@ -77,6 +77,12 @@ const createTemplate = () => {
       label: 'View',
       submenu: [
         {
+          label: 'Apps',
+          accelerator: 'CmdOrCtrl+Shift+E',
+          click: () => send('showApps')
+        },
+        { type: 'separator' },
+        {
           label: 'Reload',
           accelerator: 'CmdOrCtrl+R',
           click: () => send('reload')
@@ -179,8 +185,8 @@ const createTemplate = () => {
 
 const createWindow = async () => {
   const windowState = windowStateKeeper({
-    defaultWidth: 820,
-    defaultHeight: 600
+    defaultWidth: 1024,
+    defaultHeight: 768
   })
 
   const options = {
@@ -244,6 +250,7 @@ const createWindow = async () => {
   mainWindow.on('closed', () => (mainWindow = null))
   mainWindow.on('enter-full-screen', () => send('enterFullScreen'))
   mainWindow.on('leave-full-screen', () => send('leaveFullScreen'))
+  mainWindow.on('swipe', (e, direction) => send('swipe', direction))
 }
 
 app.on('ready', createWindow)

@@ -8,20 +8,22 @@
     item-text="title"
     item-value="id"
     autofocus
+    auto-select-first
     hide-details
     no-data-text="No results found"
     :items="tabs"
     :filter="filter"
+    :menu-props="menuProps"
     @change="onChange"
   />
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 export default {
   data() {
     return {
-      selected: null
+      width: 0
     }
   },
   computed: {
@@ -35,7 +37,20 @@ export default {
         )
       }
     },
-    ...mapState('tab', ['tabs', 'shortcutBar'])
+    menuProps() {
+      return {
+        closeOnClick: false,
+        closeOnContentClick: false,
+        openOnClick: false,
+        maxHeight: 300,
+        offsetY: true,
+        offsetOverflow: true,
+        transition: false,
+        maxWidth: this.width
+      }
+    },
+    ...mapState(['shortcutBar']),
+    ...mapState('tab', ['tabs'])
   },
   watch: {
     shortcutBar(value) {
@@ -43,23 +58,23 @@ export default {
         this.$nextTick(() => {
           this.$el.querySelector('input').addEventListener('keydown', (e) => {
             if (e.keyCode === 27) {
-              this.setShortcutBar({ shortcutBar: false })
+              this.hideShortcutBar()
             }
           })
+          this.width = this.$el.offsetWidth
         })
       }
     }
   },
+  mounted() {
+    this.width = this.$el.offsetWidth
+  },
   methods: {
     onChange(value) {
-      console.log(value)
       this.activateTab({ id: value })
-      this.setShortcutBar({ shortcutBar: false })
+      this.hideShortcutBar()
     },
-    onKeyPressEsc(e) {
-      console.log(e)
-    },
-    ...mapMutations('tab', ['setShortcutBar']),
+    ...mapActions(['hideShortcutBar']),
     ...mapActions('tab', ['activateTab'])
   }
 }

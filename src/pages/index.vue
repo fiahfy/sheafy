@@ -1,29 +1,22 @@
 <template>
-  <v-container
-    class="index"
-    fill-height
-    fluid
-    pa-0
-    :class="{ resizing: resizing }"
-  >
-    <sidebar :resizing.sync="resizing" />
-    <toolbar />
-    <div class="flex-grow-1 fill-height">
-      <webview
-        v-for="tab in tabs"
-        :key="tab.id"
-        :tab="tab"
-        class="fill-height"
-      />
-      <shortcut-bar />
-      <search-bar />
-      <status-bar />
+  <v-container class="index" fluid pa-0 :class="{ resizing: resizing }">
+    <activity-bar v-if="!fullScreen" />
+    <toolbar v-if="!fullScreen" />
+    <div class="d-flex flex-grow-1 fill-height" :class="classes">
+      <div class="wrapper flex-grow-1 white">
+        <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
+        <shortcut-bar />
+        <search-bar />
+        <status-bar />
+      </div>
+      <sidebar v-if="!fullScreen" :resizing.sync="resizing" />
     </div>
   </v-container>
 </template>
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import ActivityBar from '~/components/ActivityBar'
 import SearchBar from '~/components/SearchBar'
 import ShortcutBar from '~/components/ShortcutBar'
 import Sidebar from '~/components/Sidebar'
@@ -33,6 +26,7 @@ import Webview from '~/components/Webview'
 
 export default {
   components: {
+    ActivityBar,
     SearchBar,
     ShortcutBar,
     Sidebar,
@@ -46,6 +40,11 @@ export default {
     }
   },
   computed: {
+    classes() {
+      return this.sideBarLocation === 'right' ? 'flex-row' : 'flex-row-reverse'
+    },
+    ...mapState(['fullScreen']),
+    ...mapState('settings', ['sideBarLocation']),
     ...mapState('tab', ['tabs'])
   },
   created() {
@@ -61,6 +60,9 @@ export default {
 .index {
   &.resizing ::v-deep webview {
     pointer-events: none;
+  }
+  .wrapper {
+    position: relative;
   }
   .search-bar {
     position: absolute;

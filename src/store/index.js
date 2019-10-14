@@ -1,34 +1,32 @@
 import createPersistedState from 'vuex-persistedstate'
-import Package from '~~/package.json'
 
 export const state = () => ({
-  title: Package.productName,
-  fullScreen: false
+  fullScreen: false,
+  panelId: null,
+  shortcutBar: false
 })
 
-export const getters = {
-  title(state, getters) {
-    const tab = getters['tab/activeTab']
-    return tab ? tab.title : ''
+export const getters = {}
+
+export const actions = {
+  showShortcutBar({ commit }) {
+    commit('setShortcutBar', { shortcutBar: true })
   },
-  titleBar(state) {
-    return process.platform === 'darwin' && !state.fullScreen
+  hideShortcutBar({ commit }) {
+    commit('setShortcutBar', { shortcutBar: false })
   }
 }
-
-export const actions = {}
 
 export const mutations = {
-  setTitle(state, { title }) {
-    state.title = title
-  },
   setFullScreen(state, { fullScreen }) {
     state.fullScreen = fullScreen
+  },
+  setPanelId(state, { panelId }) {
+    state.panelId = panelId
+  },
+  setShortcutBar(state, { shortcutBar }) {
+    state.shortcutBar = shortcutBar
   }
 }
 
-export const plugins = [
-  createPersistedState({
-    paths: ['settings', 'tab']
-  })
-]
+export const plugins = [createPersistedState()]

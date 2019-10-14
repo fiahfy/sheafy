@@ -3,6 +3,7 @@
     class="toolbar"
     app
     clipped-left
+    clipped-right
     flat
     dense
     height="44"
@@ -64,7 +65,8 @@
       hide-details
       class="ml-1 body-2"
       name="query"
-      @focus="onFocus"
+      @mousedown="onMouseDown"
+      @mouseup="onMouseUp"
       @keypress.enter="onKeyPressEnter"
       @contextmenu.stop="onContextMenuTextField"
     />
@@ -146,8 +148,13 @@ export default {
         { role: 'paste' }
       ])
     },
-    onFocus(e) {
-      e.target.select()
+    onMouseDown() {
+      window.getSelection().empty()
+    },
+    onMouseUp(e) {
+      if (!window.getSelection().toString()) {
+        e.target.select()
+      }
     },
     onKeyPressEnter(e) {
       e.target.blur()

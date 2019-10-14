@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('drop', (e) => {
     e.preventDefault()
     const url = e.dataTransfer.getData('text')
-    if (url) {
+    if (url.match(/^https?:\/\//)) {
       location.href = url
     }
   })

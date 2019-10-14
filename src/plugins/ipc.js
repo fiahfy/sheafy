@@ -7,6 +7,16 @@ export default ({ store }) => {
   ipcRenderer.on('leaveFullScreen', () => {
     store.commit('setFullScreen', { fullScreen: false })
   })
+  ipcRenderer.on('swipe', (e, direction) => {
+    switch (direction) {
+      case 'left':
+        store.$eventBus.$emit('goForward')
+        break
+      case 'right':
+        store.$eventBus.$emit('goBack')
+        break
+    }
+  })
   ipcRenderer.on('newTab', () => {
     store.dispatch('tab/newTab')
   })
@@ -21,7 +31,7 @@ export default ({ store }) => {
     document.querySelector('input[name=query]').focus()
   })
   ipcRenderer.on('goToTab', () => {
-    store.commit('tab/setShortcutBar', { shortcutBar: true })
+    store.dispatch('showShortcutBar')
     const el = document.querySelector('input[name=shortcut]')
     el && el.focus()
     el && el.select()
@@ -44,6 +54,12 @@ export default ({ store }) => {
     const el = document.querySelector('input[name=search-text]')
     el && el.focus()
     el && el.select()
+  })
+  ipcRenderer.on('showSettings', () => {
+    store.commit('setPanelId', { panelId: 'settings' })
+  })
+  ipcRenderer.on('showApps', () => {
+    store.commit('setPanelId', { panelId: 'apps' })
   })
   // TODO: https://github.com/electron/electron/issues/15728
   ipcRenderer.on('undo', () => {

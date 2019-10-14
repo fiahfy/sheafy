@@ -6,3 +6,10 @@ html, body, #__nuxt, #__layout, #app {
 html {
   overflow-y: hidden;
 }
+.v-toolbar {
+  // Prevent background color transition if dark theme is toggled
+  transition: none;
+}
+.user-select-none {
+  user-select: none;
+}

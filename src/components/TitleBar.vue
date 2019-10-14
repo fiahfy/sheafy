@@ -1,18 +1,30 @@
 <template>
-  <v-system-bar v-if="titleBar" class="title-bar caption px-0" app height="16">
+  <v-system-bar
+    v-if="titleBar"
+    class="title-bar caption px-0 align-start user-select-none"
+    app
+    height="16"
+  >
     <v-sheet tile class="flex-grow-1" @dblclick="onDoubleClick">
-      <div>{{ title }}</div>
+      <div class="text-truncate text-center" v-text="title" />
     </v-sheet>
   </v-system-bar>
 </template>
 
 <script>
 import { remote } from 'electron'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   computed: {
-    ...mapGetters(['title', 'titleBar'])
+    title() {
+      return this.activeTab ? this.activeTab.title : ''
+    },
+    titleBar() {
+      return process.platform === 'darwin' && !this.fullScreen
+    },
+    ...mapState(['fullScreen']),
+    ...mapGetters('tab', ['activeTab'])
   },
   methods: {
     // TODO: https://github.com/electron/electron/issues/16385
@@ -38,9 +50,7 @@ export default {
 
 <style lang="scss" scoped>
 .title-bar {
-  user-select: none;
   z-index: 9999;
-  align-items: start;
   .v-sheet {
     position: relative;
     height: 20px;
@@ -49,10 +59,6 @@ export default {
     -webkit-app-region: drag;
     > div {
       margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-align: center;
     }
   }
 }

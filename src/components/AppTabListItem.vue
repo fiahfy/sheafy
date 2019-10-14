@@ -12,18 +12,11 @@
       :url="tab.favicon"
       :host="tab.host"
       :loading="tab.loading"
-      :pin-action="temporary"
-      :unpin-action="!subGroup && !temporary"
     />
     <v-list-item-content>
       <v-list-item-title v-text="title" />
     </v-list-item-content>
-    <v-chip
-      v-if="tab.badge"
-      class="caption ml-3 px-2"
-      color="error"
-      v-text="badge"
-    />
+    <badge v-if="tab.badge" class="ml-3" :num="badge" color="error" />
     <v-list-item-action class="my-0">
       <v-btn icon small title="Close" @click.stop="closeTab({ id: tab.id })">
         <v-icon small>mdi-close</v-icon>
@@ -36,10 +29,12 @@
 import { remote } from 'electron'
 import { mapActions, mapGetters } from 'vuex'
 import AppTabListItemIcon from '~/components/AppTabListItemIcon'
+import Badge from '~/components/Badge'
 
 export default {
   components: {
-    AppTabListItemIcon
+    AppTabListItemIcon,
+    Badge
   },
   props: {
     tab: {
@@ -49,26 +44,19 @@ export default {
     subGroup: {
       type: Boolean,
       default: false
-    },
-    temporary: {
-      type: Boolean,
-      default: false
     }
   },
   computed: {
     active() {
-      return this.isActiveTab(this.tab)
-    },
-    pinned() {
-      return this.isPinnedTab(this.tab)
+      return this.isActiveTab({ id: this.tab.id })
     },
     title() {
-      return this.subGroup || this.temporary ? this.tab.title : this.tab.host
+      return this.subGroup ? this.tab.title : this.tab.host
     },
     badge() {
       return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
     },
-    ...mapGetters('tab', ['isActiveTab', 'isPinnedTab'])
+    ...mapGetters('tab', ['isActiveTab'])
   },
   methods: {
     onContextMenu() {
@@ -87,13 +75,6 @@ export default {
           label: 'Open Current Page in a Default Browser',
           click: () => remote.shell.openExternal(this.tab.url)
         },
-        {
-          label: this.pinned ? 'Unpin App' : 'Pin App',
-          click: () =>
-            this.pinned
-              ? this.unpinApp({ host: this.tab.host })
-              : this.pinApp({ host: this.tab.host })
-        },
         { type: 'separator' },
         {
           label: 'Close Tab',
@@ -101,14 +82,7 @@ export default {
         }
       ])
     },
-    ...mapActions('tab', [
-      'newTab',
-      'duplicateTab',
-      'closeTab',
-      'activateTab',
-      'pinApp',
-      'unpinApp'
-    ])
+    ...mapActions('tab', ['newTab', 'duplicateTab', 'closeTab', 'activateTab'])
   }
 }
 </script>
@@ -120,11 +94,6 @@ export default {
   }
   &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
     opacity: 0;
-  }
-  .v-chip {
-    pointer-events: none;
-    height: 18px;
-    padding: 0 6px !important;
   }
 }
 </style>

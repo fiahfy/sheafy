@@ -4,7 +4,7 @@
 
 <script>
 import { remote } from 'electron'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   props: {
@@ -24,7 +24,7 @@ export default {
       return `file://${remote.app.getAppPath()}/preload.js`
     },
     active() {
-      return this.isActiveTab(this.tab)
+      return this.isActiveTab({ id: this.tab.id })
     },
     display() {
       return this.active ? 'flex' : 'none'
@@ -48,7 +48,7 @@ export default {
     }
   },
   destroyed() {
-    this.webview.remove()
+    this.webview && this.webview.remove()
   },
   methods: {
     load() {
@@ -58,7 +58,6 @@ export default {
 
       this.webview = document.createElement('webview')
       this.webview.classList.add('fill-height')
-      this.webview.id = this.tab.id
       this.webview.src = this.tab.url
       this.webview.preload = this.preload
       this.webview.style.display = this.display
@@ -151,14 +150,14 @@ export default {
             this.updateTab({
               id: this.tab.id,
               url,
-              query: home ? '' : url,
               canGoBack: this.webview.canGoBack(),
               canGoForward: this.webview.canGoForward()
             })
             if (home) {
-              // TODO:
+              // TODO: selector name
               document.querySelector('[name=query]').focus()
             } else if (urlChanged || this.needFocus) {
+              this.updateTab({ id: this.tab.id, query: url })
               this.needFocus = false
               // TODO: https://github.com/electron/electron/issues/14474
               this.webview.blur()
@@ -169,7 +168,7 @@ export default {
         this.webview.addEventListener(
           'did-fail-load',
           ({ errorCode, errorDescription, validatedURL, isMainFrame }) => {
-            // TODO: handle load failure
+            // TODO: Handle load failure
             console.log(errorCode, errorDescription, validatedURL, isMainFrame)
           }
         )
@@ -254,7 +253,7 @@ export default {
             case 'keydown': {
               const [e] = args
               if (e.keyCode === 27) {
-                this.setShortcutBar({ shortcutBar: false })
+                this.hideShortcutBar()
               }
               break
             }
@@ -275,9 +274,40 @@ export default {
         this.webview.addEventListener('update-target-url', ({ url }) => {
           this.$eventBus.$emit('updateTargetUrl', url)
         })
+        this.webview.addEventListener('update-target-url', ({ url }) => {
+          this.$eventBus.$emit('updateTargetUrl', url)
+        })
+        // loadUrl() is not working if do not use setTimeout()
+        setTimeout(() => {
+          // TODO: Show download progress
+          // const contents = this.webview.getWebContents()
+          // contents.session.on('will-download', (event, item, webContents) => {
+          //   console.log(item)
+          //   // Set the save path, making Electron not to prompt a save dialog.
+          //   item.savePath = '/Users/fiahfy/Downloads/save.pdf'
+          //   item.on('updated', (event, state) => {
+          //     if (state === 'interrupted') {
+          //       console.log('Download is interrupted but can be resumed')
+          //     } else if (state === 'progressing') {
+          //       if (item.isPaused()) {
+          //         console.log('Download is paused')
+          //       } else {
+          //         console.log(`Received bytes: ${item.getReceivedBytes()}`)
+          //       }
+          //     }
+          //   })
+          //   item.once('done', (event, state) => {
+          //     if (state === 'completed') {
+          //       console.log('Download successfully')
+          //     } else {
+          //       console.log(`Download failed: ${state}`)
+          //     }
+          //   })
+          // })
+        }, 0)
       })
     },
-    ...mapMutations('tab', ['setShortcutBar']),
+    ...mapActions(['hideShortcutBar']),
     ...mapActions('tab', ['newTab', 'updateTab', 'activateTab'])
   }
 }
