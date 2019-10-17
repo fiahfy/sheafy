@@ -92,26 +92,12 @@ export default {
     ...mapGetters('tab', ['activeTab'])
   },
   mounted() {
-    this.$eventBus.$on('showBackHistories', (histories) => {
-      this.$contextMenu.show(
-        histories.map((history, index) => {
-          return {
-            label: history,
-            click: () => this.$eventBus.$emit('goToOffset', -index - 1)
-          }
-        })
-      )
-    })
-    this.$eventBus.$on('showForwardHistories', (histories) => {
-      this.$contextMenu.show(
-        histories.map((history, index) => {
-          return {
-            label: history,
-            click: () => this.$eventBus.$emit('goToOffset', index + 1)
-          }
-        })
-      )
-    })
+    this.$eventBus.$on('showBackHistories', this.showBackHistories)
+    this.$eventBus.$on('showForwardHistories', this.showForwardHistories)
+  },
+  destroyed() {
+    this.$eventBus.$off('showBackHistories', this.showBackHistories)
+    this.$eventBus.$off('showForwardHistories', this.showForwardHistories)
   },
   methods: {
     goBack() {
@@ -125,6 +111,26 @@ export default {
     },
     stop() {
       this.$eventBus.$emit('stop')
+    },
+    showBackHistories(histories) {
+      this.$contextMenu.show(
+        histories.map((history, index) => {
+          return {
+            label: history,
+            click: () => this.$eventBus.$emit('goToOffset', -index - 1)
+          }
+        })
+      )
+    },
+    showForwardHistories(histories) {
+      this.$contextMenu.show(
+        histories.map((history, index) => {
+          return {
+            label: history,
+            click: () => this.$eventBus.$emit('goToOffset', index + 1)
+          }
+        })
+      )
     },
     onContextMenuBack() {
       this.$eventBus.$emit('requestBackHistories')
