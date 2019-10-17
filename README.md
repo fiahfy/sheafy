@@ -13,8 +13,8 @@
 
 ## Installation
 
-1. Download the file for your platform from [releases page](https://github.com/fiahfy/sheafy/releases).
-2. Open `.dmg` for OS X or run `.exe` for Windows.
+Download the app from [release page](https://github.com/fiahfy/sheafy/releases) and install it.  
+:warning: For macOS, this app is not signed, so a warning will be displayed at startup.
 
 ## Screenshots
 
