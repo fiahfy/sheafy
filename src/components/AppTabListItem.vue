@@ -64,7 +64,7 @@ export default {
         {
           label: 'New Tab',
           click: () =>
-            this.newTab({ options: { baseId: this.tab.id, position: 'next' } })
+            this.newTab({ options: { srcId: this.tab.id, position: 'next' } })
         },
         { type: 'separator' },
         {

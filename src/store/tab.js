@@ -79,7 +79,7 @@ export const getters = {
 
 export const actions = {
   newTab({ commit, state }, { options, ...params } = {}) {
-    const { activate = true, position = 'last', baseId = state.activeTabId } =
+    const { activate = true, position = 'last', srcId = state.activeTabId } =
       options || {}
     const id = state.tabs.reduce((carry, tab) => Math.max(carry, tab.id), 0) + 1
     const url = 'https://www.google.com/?sheafy'
@@ -102,14 +102,18 @@ export const actions = {
       ...params
     })
 
-    const baseIndex =
-      state.tabs.findIndex((tab) => tab.id === baseId) || state.tabs.length - 1
-
     let index
     switch (position) {
-      case 'next':
-        index = baseIndex + 1
+      case 'next': {
+        const srcIndex = state.tabs.findIndex((tab) => tab.id === srcId)
+        // new tab at last when host is different from host in src tab
+        if (srcIndex === -1 || tab.host !== state.tabs[srcIndex].host) {
+          index = state.tabs.length
+        } else {
+          index = srcIndex + 1
+        }
         break
+      }
       case 'last':
       default:
         index = state.tabs.length
@@ -138,16 +142,24 @@ export const actions = {
     }
     dispatch('newTab', {
       url: tab.url,
-      options: { baseId: tab.id, position: 'next' }
+      options: { srcId: tab.id, position: 'next' }
     })
   },
   updateTab({ commit, state }, { id, ...params }) {
-    const tabs = state.tabs.map((tab) => {
+    let hostChanged = false
+    let tabs = state.tabs.map((tab) => {
       if (tab.id !== id) {
         return tab
       }
-      return convertTab({ ...tab, ...params })
+      const newTab = convertTab({ ...tab, ...params })
+      hostChanged = tab.host !== newTab.host
+      return newTab
     })
+    // move tab to last when host is changed
+    if (hostChanged) {
+      const index = tabs.findIndex((tab) => tab.id === id)
+      tabs = [...tabs.slice(0, index), ...tabs.slice(index + 1), tabs[index]]
+    }
     commit('setTabs', { tabs })
   },
   closeTab({ commit, dispatch, getters, state }, { id }) {
