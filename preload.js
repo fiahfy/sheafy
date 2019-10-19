@@ -143,6 +143,21 @@ window.focus = ((focus) => {
   }
 })(window.focus)
 
+window.open = ((open) => {
+  return (url, ...args) => {
+    // Prevent custom window.open on like Google Calendar
+    if (
+      !url &&
+      window.event &&
+      window.event.target &&
+      window.event.target.href
+    ) {
+      url = window.event.target.href
+    }
+    return open.apply(window, [url, ...args])
+  }
+})(window.open)
+
 Notification.requestPermission = ((requestPermission) => {
   return (...args) => {
     // TODO: Handle requestPermission
