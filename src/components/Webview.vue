@@ -72,6 +72,8 @@ export default {
       this.webview.classList.add('fill-height')
       this.webview.src = this.tab.url
       this.webview.preload = this.preload
+      this.webview.allowpopups = true
+      this.webview.webpreferences = 'nativeWindowOpen=yes'
       this.webview.style.display = this.display
       this.$el.parentElement.append(this.webview)
 
@@ -150,6 +152,8 @@ export default {
         this.webview.addEventListener('new-window', ({ disposition, url }) => {
           switch (disposition) {
             case 'new-window':
+              // open new window from main process
+              break
             case 'foreground-tab':
               this.newTab({
                 url,
