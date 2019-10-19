@@ -13,3 +13,37 @@ html {
 .user-select-none {
   user-select: none;
 }
+.pointer-events-none {
+  pointer-events: none;
+}
+.overflow-y-scroll {
+  overflow-y: scroll;
+}
+.scrollbar {
+  &::-webkit-scrollbar {
+    width: 14px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #eee;
+    &:hover {
+      background-color: #ddd;
+    }
+    &:active {
+      background-color: #ccc;
+    }
+  }
+}
+// dark theme
+.v-application.theme--dark {
+  .scrollbar {
+    &::-webkit-scrollbar-thumb {
+      background-color: #424242;
+      &:hover {
+        background-color: #505050;
+      }
+      &:active {
+        background-color: #616161;
+      }
+    }
+  }
+}

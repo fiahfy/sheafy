@@ -1,5 +1,9 @@
 <template>
-  <v-chip class="badge caption px-2" :color="color" v-text="num" />
+  <v-chip
+    class="badge caption px-2 user-select-none pointer-events-none"
+    :color="color"
+    v-text="num"
+  />
 </template>
 
 <script>
@@ -19,9 +23,7 @@ export default {
 
 <style lang="scss" scoped>
 .v-chip {
-  pointer-events: none;
   height: 18px;
   padding: 0 6px !important;
-  user-select: none;
 }
 </style>
