@@ -1,6 +1,8 @@
 const { remote, ipcRenderer } = require('electron')
 const { Menu } = remote
 
+let contextmenuFired = false
+
 const show = (menus = [], e = null) => {
   let template = []
 
@@ -72,6 +74,11 @@ const onContextMenu = (e, target) => {
     ])
   } else if (!target.parentElement) {
     e.stopPropagation()
+    const result = contextmenuFired
+    contextmenuFired = false
+    if (result) {
+      return
+    }
     ipcRenderer.once('showContextMenu', (_, { canGoBack, canGoForward }) => {
       const selection = window.getSelection().toString()
       if (selection) {
@@ -118,10 +125,12 @@ const onContextMenu = (e, target) => {
   }
 }
 
+// event listener
+
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('contextmenu', onContextMenu)
   document.addEventListener('keydown', (e) => {
-    ipcRenderer.sendToHost('keydown', { keyCode: e.keyCode })
+    ipcRenderer.sendToHost('keydown', { key: e.key })
   })
   document.addEventListener('dragover', (e) => {
     e.preventDefault()
@@ -136,15 +145,17 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 })
 
-window.focus = ((focus) => {
-  return (...args) => {
+// method override
+
+window.focus = ((func) => {
+  return function(...args) {
     ipcRenderer.sendToHost('focus')
-    return focus.apply(window, args)
+    return func.apply(this, args)
   }
 })(window.focus)
 
-window.open = ((open) => {
-  return (url, ...args) => {
+window.open = ((func) => {
+  return function(url, ...args) {
     // Prevent custom window.open on like Google Calendar
     if (
       !url &&
@@ -154,14 +165,51 @@ window.open = ((open) => {
     ) {
       url = window.event.target.href
     }
-    return open.apply(window, [url, ...args])
+    return func.apply(this, [url, ...args])
   }
 })(window.open)
 
-Notification.requestPermission = ((requestPermission) => {
-  return (...args) => {
+document.addEventListener = ((func) => {
+  return function(type, listener, ...args) {
+    return func.apply(this, [
+      type,
+      (e) => {
+        // prevent event for global shortcuts
+        if (
+          type === 'keydown' &&
+          ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) &&
+          e.key === 'p'
+        ) {
+          e.stopPropagation()
+          return
+        }
+        listener && listener(e)
+      },
+      ...args
+    ])
+  }
+})(document.addEventListener)
+
+Notification.requestPermission = ((func) => {
+  return function(...args) {
     // TODO: Handle requestPermission
     console.log('requestPermission')
-    return requestPermission.apply(Notification, args)
+    return func.apply(this, args)
   }
 })(Notification.requestPermission)
+
+HTMLElement.prototype.addEventListener = ((func) => {
+  return function(type, listener, ...args) {
+    return func.apply(this, [
+      type,
+      (e) => {
+        // detect contextmenu listener on web application fired
+        if (type === 'contextmenu') {
+          contextmenuFired = true
+        }
+        listener && listener(e)
+      },
+      ...args
+    ])
+  }
+})(HTMLElement.prototype.addEventListener)
