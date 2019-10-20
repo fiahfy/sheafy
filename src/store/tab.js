@@ -18,14 +18,16 @@ const convertTab = (tab) => {
 }
 
 export const state = () => ({
-  activeTabId: null,
   tabs: [],
-  hosts: []
+  hosts: [],
+  activeId: null,
+  parentId: null,
+  childIds: []
 })
 
 export const getters = {
   activeTab(state) {
-    return state.tabs.find((tab) => tab.id === state.activeTabId)
+    return state.tabs.find((tab) => tab.id === state.activeId)
   },
   apps(state) {
     return Object.values(
@@ -61,7 +63,7 @@ export const getters = {
     })
   },
   isActiveTab(state) {
-    return ({ id }) => id === state.activeTabId
+    return ({ id }) => id === state.activeId
   },
   getUrlWithQuery() {
     return (query) => {
@@ -79,7 +81,7 @@ export const getters = {
 
 export const actions = {
   newTab({ commit, state }, { options, ...params } = {}) {
-    const { activate = true, position = 'last', baseId = state.activeTabId } =
+    const { activate = true, position = 'last', srcId = state.activeId } =
       options || {}
     const id = state.tabs.reduce((carry, tab) => Math.max(carry, tab.id), 0) + 1
     const url = 'https://www.google.com/?sheafy'
@@ -102,14 +104,18 @@ export const actions = {
       ...params
     })
 
-    const baseIndex =
-      state.tabs.findIndex((tab) => tab.id === baseId) || state.tabs.length - 1
-
     let index
     switch (position) {
-      case 'next':
-        index = baseIndex + 1
+      case 'next': {
+        const srcIndex = state.tabs.findIndex((tab) => tab.id === srcId)
+        // new tab at last when host is different from host in src tab
+        if (srcIndex === -1 || tab.host !== state.tabs[srcIndex].host) {
+          index = state.tabs.length
+        } else {
+          index = srcIndex + 1
+        }
         break
+      }
       case 'last':
       default:
         index = state.tabs.length
@@ -122,8 +128,17 @@ export const actions = {
       ...state.tabs.slice(index)
     ]
     commit('setTabs', { tabs })
+
+    const parentId = state.activeId
+    let childIds = [tab.id]
+    if (parentId === state.parentId) {
+      childIds = [...state.childIds.slice(), ...childIds]
+    }
+    commit('setParentId', { parentId })
+    commit('setChildIds', { childIds })
+
     if (activate) {
-      commit('setActiveTabId', { activeTabId: id })
+      commit('setActiveId', { activeId: id })
     }
   },
   newTabIfEmpty({ dispatch, state }) {
@@ -138,37 +153,56 @@ export const actions = {
     }
     dispatch('newTab', {
       url: tab.url,
-      options: { baseId: tab.id, position: 'next' }
+      options: { srcId: tab.id, position: 'next' }
     })
   },
   updateTab({ commit, state }, { id, ...params }) {
-    const tabs = state.tabs.map((tab) => {
+    let hostChanged = false
+    let tabs = state.tabs.map((tab) => {
       if (tab.id !== id) {
         return tab
       }
-      return convertTab({ ...tab, ...params })
+      const newTab = convertTab({ ...tab, ...params })
+      hostChanged = tab.host !== newTab.host
+      return newTab
     })
+    // move tab to last when host is changed
+    if (hostChanged) {
+      const index = tabs.findIndex((tab) => tab.id === id)
+      tabs = [...tabs.slice(0, index), ...tabs.slice(index + 1), tabs[index]]
+    }
     commit('setTabs', { tabs })
   },
   closeTab({ commit, dispatch, getters, state }, { id }) {
-    if (id === state.activeTabId) {
-      const app = getters.apps.find(
-        (app) => !!app.tabs.find((tab) => tab.id === id)
-      )
-      if (app) {
-        if (app.tabs.length <= 1) {
-          dispatch('closeApp', { host: app.host })
-          return
+    if (id === state.activeId) {
+      if (state.childIds.includes(id)) {
+        const childIds = state.childIds.filter((childId) => childId !== id)
+        commit('setChildIds', { childIds })
+        commit('setActiveId', { activeId: state.parentId })
+      } else {
+        if (id === state.parentId) {
+          commit('setParentId', { parentId: null })
+          commit('setChildIds', { childIds: [] })
         }
-        const index = app.tabs.findIndex((tab) => tab.id === id)
-        if (index < app.tabs.length - 1) {
-          const activeTabId = app.tabs[index + 1].id
-          commit('setActiveTabId', { activeTabId })
-        } else if (index > 0) {
-          const activeTabId = app.tabs[index - 1].id
-          commit('setActiveTabId', { activeTabId })
-        } else {
-          commit('setActiveTabId', { activeTabId: null })
+
+        const app = getters.apps.find(
+          (app) => !!app.tabs.find((tab) => tab.id === id)
+        )
+        if (app) {
+          if (app.tabs.length <= 1) {
+            dispatch('closeApp', { host: app.host })
+            return
+          }
+          const index = app.tabs.findIndex((tab) => tab.id === id)
+          if (index < app.tabs.length - 1) {
+            const activeId = app.tabs[index + 1].id
+            commit('setActiveId', { activeId })
+          } else if (index > 0) {
+            const activeId = app.tabs[index - 1].id
+            commit('setActiveId', { activeId })
+          } else {
+            commit('setActiveId', { activeId: null })
+          }
         }
       }
     }
@@ -179,8 +213,12 @@ export const actions = {
       remote.getCurrentWindow().close()
     }
   },
-  activateTab({ commit }, { id }) {
-    commit('setActiveTabId', { activeTabId: id })
+  activateTab({ commit, state }, { id }) {
+    if (state.parentId !== id && !state.childIds.includes(id)) {
+      commit('setParentId', { parentId: null })
+      commit('setChildIds', { childIds: [] })
+    }
+    commit('setActiveId', { activeId: id })
   },
   sortTabs({ commit, state }, { ids }) {
     const sortedTabs = ids.map((id) => state.tabs.find((tab) => tab.id === id))
@@ -193,19 +231,22 @@ export const actions = {
   closeApp({ commit, getters, state }, { host }) {
     const app = getters.apps.find((app) => app.host === host)
     const tabIds = app.tabs.map((tab) => tab.id)
-    const active = tabIds.includes(state.activeTabId)
+    const active = tabIds.includes(state.activeId)
     if (active) {
+      commit('setParentId', { parentId: null })
+      commit('setChildIds', { childIds: [] })
+
       const index = getters.apps.findIndex((app) => app.host === host)
       if (index < getters.apps.length - 1) {
-        const activeTabId = getters.apps[index + 1].tabs[0].id
-        commit('setActiveTabId', { activeTabId })
+        const activeId = getters.apps[index + 1].tabs[0].id
+        commit('setActiveId', { activeId })
       } else if (index > 0) {
-        const activeTabId =
+        const activeId =
           getters.apps[index - 1].tabs[getters.apps[index - 1].tabs.length - 1]
             .id
-        commit('setActiveTabId', { activeTabId })
+        commit('setActiveId', { activeId })
       } else {
-        commit('setActiveTabId', { activeTabId: null })
+        commit('setActiveId', { activeId: null })
       }
     }
 
@@ -221,13 +262,19 @@ export const actions = {
 }
 
 export const mutations = {
-  setActiveTabId(state, { activeTabId }) {
-    state.activeTabId = activeTabId
-  },
   setTabs(state, { tabs }) {
     state.tabs = tabs
   },
   setHosts(state, { hosts }) {
     state.hosts = hosts
+  },
+  setActiveId(state, { activeId }) {
+    state.activeId = activeId
+  },
+  setParentId(state, { parentId }) {
+    state.parentId = parentId
+  },
+  setChildIds(state, { childIds }) {
+    state.childIds = childIds
   }
 }

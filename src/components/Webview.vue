@@ -34,7 +34,7 @@ export default {
   watch: {
     active(value) {
       if (value) {
-        this.load()
+        this.init()
       }
       this.$nextTick(() => {
         this.webview.style.display = this.display
@@ -44,14 +44,26 @@ export default {
   },
   mounted() {
     if (this.active || !this.tab.loaded) {
-      this.load()
+      this.init()
     }
   },
   destroyed() {
+    this.$eventBus.$off('undo', this.undo)
+    this.$eventBus.$off('redo', this.redo)
+    this.$eventBus.$off('goBack', this.goBack)
+    this.$eventBus.$off('goForward', this.goForward)
+    this.$eventBus.$off('goToOffset', this.goToOffset)
+    this.$eventBus.$off('reload', this.reload)
+    this.$eventBus.$off('forceReload', this.forceReload)
+    this.$eventBus.$off('load', this.load)
+    this.$eventBus.$off('findInPage', this.findInPage)
+    this.$eventBus.$off('stopFindInPage', this.stopFindInPage)
+    this.$eventBus.$off('requestBackHistories', this.requestBackHistories)
+    this.$eventBus.$off('requestForwardHistories', this.requestForwardHistories)
     this.webview && this.webview.remove()
   },
   methods: {
-    load() {
+    init() {
       if (this.webview) {
         return
       }
@@ -60,89 +72,30 @@ export default {
       this.webview.classList.add('fill-height')
       this.webview.src = this.tab.url
       this.webview.preload = this.preload
+      this.webview.allowpopups = true
+      this.webview.webpreferences = 'nativeWindowOpen=yes'
       this.webview.style.display = this.display
       this.$el.parentElement.append(this.webview)
 
       this.needFocus = true
+
       this.$nextTick(() => {
-        this.$eventBus.$on('undo', () => {
-          if (this.active) {
-            this.webview.undo()
-          }
-        })
-        this.$eventBus.$on('redo', () => {
-          if (this.active) {
-            this.webview.redo()
-          }
-        })
-        this.$eventBus.$on('goBack', () => {
-          if (this.active) {
-            this.webview.goBack()
-          }
-        })
-        this.$eventBus.$on('goForward', () => {
-          if (this.active) {
-            this.webview.goForward()
-          }
-        })
-        this.$eventBus.$on('goToOffset', (offset) => {
-          if (this.active) {
-            this.webview.goToOffset(offset)
-          }
-        })
-        this.$eventBus.$on('reload', () => {
-          if (this.active) {
-            this.needFocus = true
-            this.webview.reload()
-          }
-        })
-        this.$eventBus.$on('forceReload', () => {
-          if (this.active) {
-            this.needFocus = true
-            this.webview.reloadIgnoringCache()
-          }
-        })
-        this.$eventBus.$on('stop', () => {
-          if (this.active) {
-            this.webview.stop()
-          }
-        })
-        this.$eventBus.$on('load', () => {
-          if (this.active) {
-            const url = this.getUrlWithQuery(this.tab.query)
-            if (url) {
-              this.webview.loadURL(url)
-            }
-          }
-        })
-        this.$eventBus.$on('requestBackHistories', () => {
-          if (this.active) {
-            const contents = this.webview.getWebContents()
-            const histories = contents.history
-              .slice(0, contents.getActiveIndex())
-              .reverse()
-            this.$eventBus.$emit('showBackHistories', histories)
-          }
-        })
-        this.$eventBus.$on('requestForwardHistories', () => {
-          if (this.active) {
-            const contents = this.webview.getWebContents()
-            const histories = contents.history.slice(
-              contents.getActiveIndex() + 1
-            )
-            this.$eventBus.$emit('showForwardHistories', histories)
-          }
-        })
-        this.$eventBus.$on('findInPage', (text, { forward, findNext }) => {
-          if (this.active) {
-            this.webview.findInPage(text, { forward, findNext })
-          }
-        })
-        this.$eventBus.$on('stopFindInPage', () => {
-          if (this.active) {
-            this.webview.stopFindInPage('clearSelection')
-          }
-        })
+        this.$eventBus.$on('undo', this.undo)
+        this.$eventBus.$on('redo', this.redo)
+        this.$eventBus.$on('goBack', this.goBack)
+        this.$eventBus.$on('goForward', this.goForward)
+        this.$eventBus.$on('goToOffset', this.goToOffset)
+        this.$eventBus.$on('reload', this.reload)
+        this.$eventBus.$on('forceReload', this.forceReload)
+        this.$eventBus.$on('load', this.load)
+        this.$eventBus.$on('findInPage', this.findInPage)
+        this.$eventBus.$on('stopFindInPage', this.stopFindInPage)
+        this.$eventBus.$on('requestBackHistories', this.requestBackHistories)
+        this.$eventBus.$on(
+          'requestForwardHistories',
+          this.requestForwardHistories
+        )
+
         this.webview.addEventListener('load-commit', ({ url, isMainFrame }) => {
           if (isMainFrame) {
             const urlChanged = url !== this.tab.url
@@ -199,6 +152,8 @@ export default {
         this.webview.addEventListener('new-window', ({ disposition, url }) => {
           switch (disposition) {
             case 'new-window':
+              // open new window from main process
+              break
             case 'foreground-tab':
               this.newTab({
                 url,
@@ -252,7 +207,7 @@ export default {
             }
             case 'keydown': {
               const [e] = args
-              if (e.keyCode === 27) {
+              if (e.key === 'Escape') {
                 this.hideShortcutBar()
               }
               break
@@ -306,6 +261,77 @@ export default {
           // })
         }, 0)
       })
+    },
+    undo() {
+      if (this.active) {
+        this.webview.undo()
+      }
+    },
+    redo() {
+      if (this.active) {
+        this.webview.redo()
+      }
+    },
+    goBack() {
+      if (this.active) {
+        this.webview.goBack()
+      }
+    },
+    goForward() {
+      if (this.active) {
+        this.webview.goForward()
+      }
+    },
+    goToOffset(offset) {
+      if (this.active) {
+        this.webview.goToOffset(offset)
+      }
+    },
+    reload() {
+      if (this.active) {
+        this.needFocus = true
+        this.webview.reload()
+      }
+    },
+    forceReload() {
+      if (this.active) {
+        this.needFocus = true
+        this.webview.reloadIgnoringCache()
+      }
+    },
+    load() {
+      if (this.active) {
+        const url = this.getUrlWithQuery(this.tab.query)
+        if (url) {
+          this.webview.loadURL(url)
+        }
+      }
+    },
+    findInPage(text, { forward, findNext }) {
+      if (this.active) {
+        this.webview.findInPage(text, { forward, findNext })
+      }
+    },
+    stopFindInPage() {
+      if (this.active) {
+        this.webview.stopFindInPage('clearSelection')
+      }
+    },
+    requestBackHistories() {
+      if (this.active) {
+        const contents = this.webview.getWebContents()
+        const histories = contents.history
+          .slice(0, contents.getActiveIndex())
+          .reverse()
+        this.$eventBus.$emit('showBackHistories', histories)
+      }
+    },
+    requestForwardHistories() {
+      if (this.active) {
+        const contents = this.webview.getWebContents()
+        const histories = contents.history.slice(contents.getActiveIndex() + 1)
+        this.$eventBus.$emit('showForwardHistories', histories)
+      }
     },
     ...mapActions(['hideShortcutBar']),
     ...mapActions('tab', ['newTab', 'updateTab', 'activateTab'])

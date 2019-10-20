@@ -32,7 +32,7 @@
         <v-icon size="20">mdi-collapse-all</v-icon>
       </v-btn>
     </v-toolbar>
-    <div ref="container" class="flex-grow-1 overflow-y-auto">
+    <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">
       <app-list :apps="apps" />
     </div>
   </div>
@@ -57,6 +57,13 @@ export default {
         return
       }
       this.$nextTick(() => {
+        // Disabled transform for vuedraggable
+        this.$el.querySelectorAll('.app-tab-list').forEach((el) => {
+          el.parentElement.style.transform = 'none'
+          el.querySelectorAll('.app-tab-list-item').forEach((el) => {
+            el.parentElement.style.transform = 'none'
+          })
+        })
         const tab = this.$el.querySelector(
           '.app-tab-list-item.v-list-item--active'
         )

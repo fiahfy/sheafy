@@ -15,9 +15,15 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('updateTargetUrl', (url) => {
+    this.$eventBus.$on('updateTargetUrl', this.updateTargetUrl)
+  },
+  destroyed() {
+    this.$eventBus.$off('updateTargetUrl', this.updateTargetUrl)
+  },
+  methods: {
+    updateTargetUrl(url) {
       this.url = url
-    })
+    }
   }
 }
 </script>

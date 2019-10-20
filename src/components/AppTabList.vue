@@ -75,14 +75,20 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('expandApps', () => {
-      this.expand = true
-    })
-    this.$eventBus.$on('collapseApps', () => {
-      this.expand = false
-    })
+    this.$eventBus.$on('expandApps', this.expandApps)
+    this.$eventBus.$on('collapseApps', this.collapseApps)
+  },
+  destroyed() {
+    this.$eventBus.$off('expandApps', this.expandApps)
+    this.$eventBus.$off('collapseApps', this.collapseApps)
   },
   methods: {
+    expandApps() {
+      this.expand = true
+    },
+    collapseApps() {
+      this.expand = false
+    },
     onContextMenu() {
       this.$contextMenu.show([
         {

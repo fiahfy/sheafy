@@ -256,3 +256,11 @@ const createWindow = async () => {
 app.on('ready', createWindow)
 app.on('activate', () => mainWindow === null && createWindow())
 app.on('window-all-closed', () => process.platform !== 'darwin' && app.quit())
+// @see https://stackoverflow.com/questions/48298364/choose-which-popups-should-be-allowed-from-webview-in-electron-app
+app.on('web-contents-created', (e, contents) => {
+  if (contents.getType() === 'webview') {
+    contents.on('new-window', (e, url, windowName, disposition) => {
+      disposition !== 'new-window' && e.preventDefault()
+    })
+  }
+})

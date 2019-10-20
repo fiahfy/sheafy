@@ -25,7 +25,7 @@ export default ({ store }) => {
     store.dispatch('tab/duplicateTab', { id: tab.id })
   })
   ipcRenderer.on('closeTab', () => {
-    store.dispatch('tab/closeTab', { id: store.state.tab.activeTabId })
+    store.dispatch('tab/closeTab', { id: store.state.tab.activeId })
   })
   ipcRenderer.on('openLocation', () => {
     document.querySelector('input[name=query]').focus()
@@ -49,7 +49,7 @@ export default ({ store }) => {
     store.$eventBus.$emit('forceReload')
   })
   ipcRenderer.on('search', () => {
-    const id = store.state.tab.activeTabId
+    const id = store.state.tab.activeId
     store.dispatch('tab/updateTab', { id, searching: true })
     const el = document.querySelector('input[name=search-text]')
     el && el.focus()

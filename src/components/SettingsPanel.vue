@@ -6,7 +6,7 @@
       </span>
       <v-spacer />
     </v-toolbar>
-    <div class="flex-grow-1 overflow-y-auto">
+    <div class="flex-grow-1 overflow-y-scroll scrollbar">
       <div class="pa-5">
         <v-checkbox v-model="darkTheme" class="mt-0" label="Dark Theme" />
         <v-select

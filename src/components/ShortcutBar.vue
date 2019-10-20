@@ -57,7 +57,7 @@ export default {
       if (value) {
         this.$nextTick(() => {
           this.$el.querySelector('input').addEventListener('keydown', (e) => {
-            if (e.keyCode === 27) {
+            if (e.key === 'Escape') {
               this.hideShortcutBar()
             }
           })
