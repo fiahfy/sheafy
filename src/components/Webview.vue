@@ -207,7 +207,7 @@ export default {
             }
             case 'keydown': {
               const [e] = args
-              if (e.keyCode === 27) {
+              if (e.key === 'Escape') {
                 this.hideShortcutBar()
               }
               break
