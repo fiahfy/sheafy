@@ -169,27 +169,6 @@ window.open = ((func) => {
   }
 })(window.open)
 
-document.addEventListener = ((func) => {
-  return function(type, listener, ...args) {
-    return func.apply(this, [
-      type,
-      (e) => {
-        // prevent event for global shortcuts
-        if (
-          type === 'keydown' &&
-          ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) &&
-          e.key === 'p'
-        ) {
-          e.stopPropagation()
-          return
-        }
-        listener && listener(e)
-      },
-      ...args
-    ])
-  }
-})(document.addEventListener)
-
 Notification.requestPermission = ((func) => {
   return function(...args) {
     // TODO: Handle requestPermission
@@ -198,18 +177,71 @@ Notification.requestPermission = ((func) => {
   }
 })(Notification.requestPermission)
 
+// override event listener
+
+function hashCode(type, func) {
+  if (!func) {
+    return 0
+  }
+  return Array.from(type + func.toString()).reduce(
+    (s, c) => (Math.imul(31, s) + c.charCodeAt(0)) | 0,
+    0
+  )
+}
+
+const listeners = {}
+
+document.addEventListener = ((func) => {
+  return function(type, listener, ...args) {
+    const code = hashCode(type, listener)
+    const newListener = function(e) {
+      // prevent event for global shortcuts
+      if (
+        type === 'keydown' &&
+        ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) &&
+        e.key === 'p'
+      ) {
+        e.stopPropagation()
+        return
+      }
+      return listener && listener.apply(this, [e])
+    }
+    listeners[code] = newListener
+    return func.apply(this, [type, newListener, ...args])
+  }
+})(document.addEventListener)
+
+document.removeEventListener = ((func) => {
+  return function(type, listener, ...args) {
+    const code = hashCode(type, listener)
+    const newListener = listeners[code]
+    delete listeners[code]
+    return func.apply(this, [type, newListener, ...args])
+  }
+})(document.removeEventListener)
+
+const elementListeners = {}
+
 HTMLElement.prototype.addEventListener = ((func) => {
   return function(type, listener, ...args) {
-    return func.apply(this, [
-      type,
-      (e) => {
-        // detect contextmenu listener on web application fired
-        if (type === 'contextmenu') {
-          contextmenuFired = true
-        }
-        listener && listener(e)
-      },
-      ...args
-    ])
+    const code = hashCode(type, listener)
+    const newListener = function(e) {
+      // detect contextmenu listener on web application fired
+      if (type === 'contextmenu') {
+        contextmenuFired = true
+      }
+      return listener && listener.apply(this, [e])
+    }
+    elementListeners[code] = newListener
+    return func.apply(this, [type, newListener, ...args])
   }
 })(HTMLElement.prototype.addEventListener)
+
+HTMLElement.prototype.removeEventListener = ((func) => {
+  return function(type, listener, ...args) {
+    const code = hashCode(type, listener)
+    const newListener = elementListeners[code]
+    delete elementListeners[code]
+    return func.apply(this, [type, newListener, ...args])
+  }
+})(HTMLElement.prototype.removeEventListener)
