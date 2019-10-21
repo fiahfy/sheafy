@@ -6,6 +6,10 @@
 import { remote } from 'electron'
 import { mapActions, mapGetters } from 'vuex'
 
+const urlWithoutHash = (url) => {
+  return url ? url.split('#')[0] : ''
+}
+
 export default {
   props: {
     tab: {
@@ -98,7 +102,8 @@ export default {
 
         this.webview.addEventListener('load-commit', ({ url, isMainFrame }) => {
           if (isMainFrame) {
-            const urlChanged = url !== this.tab.url
+            const urlChanged =
+              urlWithoutHash(url) !== urlWithoutHash(this.tab.url)
             const home = url === 'https://www.google.com/?sheafy'
             this.updateTab({
               id: this.tab.id,
