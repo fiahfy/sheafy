@@ -78,6 +78,11 @@
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
+  data() {
+    return {
+      focusIn: false
+    }
+  },
   computed: {
     query: {
       get() {
@@ -154,13 +159,18 @@ export default {
         { role: 'paste' }
       ])
     },
-    onMouseDown() {
+    onMouseDown(e) {
+      if (e.target === document.activeElement) {
+        return
+      }
       window.getSelection().empty()
+      this.focusIn = true
     },
     onMouseUp(e) {
-      if (!window.getSelection().toString()) {
+      if (this.focusIn && !window.getSelection().toString()) {
         e.target.select()
       }
+      this.focusIn = false
     },
     onKeyPressEnter(e) {
       e.target.blur()
