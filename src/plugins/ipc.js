@@ -76,4 +76,7 @@ export default ({ store }) => {
       document.execCommand('redo')
     }
   })
+  ipcRenderer.on('updateDownload', (e, download) => {
+    store.dispatch('download/updateDownload', { ...download })
+  })
 }

@@ -19,6 +19,7 @@
 <script>
 import { mapMutations, mapState } from 'vuex'
 import AppPanel from '~/components/AppPanel'
+import DownloadPanel from '~/components/DownloadPanel'
 import SettingsPanel from '~/components/SettingsPanel'
 
 export default {
@@ -31,7 +32,8 @@ export default {
   data() {
     return {
       panels: [
-        { id: 'apps', component: AppPanel },
+        { id: 'app', component: AppPanel },
+        { id: 'download', component: DownloadPanel },
         { id: 'settings', component: SettingsPanel }
       ]
     }

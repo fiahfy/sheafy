@@ -1,4 +1,6 @@
 const http = require('http')
+const path = require('path')
+const nanoid = require('nanoid')
 const { app, shell, BrowserWindow, Menu } = require('electron')
 const windowStateKeeper = require('electron-window-state')
 
@@ -80,6 +82,11 @@ const createTemplate = () => {
           label: 'Apps',
           accelerator: 'CmdOrCtrl+Shift+E',
           click: () => send('showApps')
+        },
+        {
+          label: 'Downloads',
+          accelerator: 'CmdOrCtrl+Shift+D',
+          click: () => send('showDownloads')
         },
         { type: 'separator' },
         {
@@ -205,8 +212,6 @@ const createWindow = async () => {
     }
   }
 
-  const path = ''
-
   mainWindow = new BrowserWindow(options)
 
   if (dev) {
@@ -223,7 +228,7 @@ const createWindow = async () => {
     console.log(`Added Extension: ${name}`) // eslint-disable-line no-console
 
     // Wait for nuxt to build
-    const url = `http://localhost:${port}/${path}`
+    const url = `http://localhost:${port}`
     const pollServer = () => {
       http
         .get(url, (res) => {
@@ -238,7 +243,7 @@ const createWindow = async () => {
     }
     pollServer()
   } else {
-    mainWindow.loadURL(`file://${__dirname}/app/index.html${path}`)
+    mainWindow.loadURL(`file://${__dirname}/app/index.html`)
   }
 
   windowState.manage(mainWindow)
@@ -251,6 +256,40 @@ const createWindow = async () => {
   mainWindow.on('enter-full-screen', () => send('enterFullScreen'))
   mainWindow.on('leave-full-screen', () => send('leaveFullScreen'))
   mainWindow.on('swipe', (e, direction) => send('swipe', direction))
+
+  let downloadItems = {}
+  mainWindow.webContents.session.on('will-download', (e, item) => {
+    const id = nanoid()
+    downloadItems = {
+      ...downloadItems,
+      [id]: item
+    }
+    const download = {
+      id,
+      url: item.getURL(),
+      filename: item.getFilename(),
+      totalBytes: item.getTotalBytes()
+    }
+    send('updateDownload', download)
+    item.setSavePath(path.join(app.getPath('downloads'), download.filename))
+    item.on('updated', (e, state) => {
+      const download = {
+        id,
+        status: state,
+        receivedBytes: item.getReceivedBytes()
+      }
+      send('updateDownload', download)
+    })
+    item.once('done', (e, state) => {
+      const download = {
+        id,
+        status: state,
+        receivedBytes: item.getReceivedBytes()
+      }
+      send('updateDownload', download)
+      delete downloadItems[id]
+    })
+  })
 }
 
 app.on('ready', createWindow)

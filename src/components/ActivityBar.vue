@@ -36,7 +36,8 @@ export default {
   data() {
     return {
       items: [
-        { id: 'apps', title: 'Apps', icon: 'mdi-tab' },
+        { id: 'app', title: 'Apps', icon: 'mdi-tab' },
+        { id: 'download', title: 'Downloads', icon: 'mdi-download' },
         { id: 'settings', title: 'Settings', icon: 'mdi-settings' }
       ]
     }
