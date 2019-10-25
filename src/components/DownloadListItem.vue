@@ -1,7 +1,7 @@
 <template>
   <v-list-item class="download-list-item" @click="onClickItem">
-    <v-list-item-avatar>
-      <v-icon>mdi-file-outline</v-icon>
+    <v-list-item-avatar class="my-0 mr-3">
+      <v-icon v-text="icon" />
     </v-list-item-avatar>
 
     <v-list-item-content>
@@ -14,29 +14,66 @@
       </v-list-item-subtitle>
     </v-list-item-content>
 
-    <v-list-item-action class="flex-row align-center">
-      <v-btn v-if="canPause" icon class="ml-1" @click.stop="onClickPause">
-        <v-icon title="Pause">mdi-pause-circle</v-icon>
+    <v-list-item-action class="flex-row align-center my-0">
+      <v-btn
+        v-if="canPause"
+        icon
+        small
+        title="Pause"
+        class="ml-2"
+        @click.stop="onClickPause"
+      >
+        <v-icon small>mdi-pause</v-icon>
       </v-btn>
-      <v-btn v-if="canResume" icon class="ml-1" @click.stop="onClickResume">
-        <v-icon title="Resume">mdi-play-circle</v-icon>
+      <v-btn
+        v-if="canResume"
+        icon
+        small
+        title="Resume"
+        class="ml-2"
+        @click.stop="onClickResume"
+      >
+        <v-icon small>mdi-play</v-icon>
       </v-btn>
-      <v-btn v-if="canCancel" icon class="ml-1" @click.stop="onClickCancel">
-        <v-icon title="Cancel">mdi-cancel</v-icon>
+      <v-btn
+        v-if="canCancel"
+        icon
+        small
+        title="Cancel"
+        class="ml-2"
+        @click.stop="onClickCancel"
+      >
+        <v-icon small>mdi-cancel</v-icon>
       </v-btn>
       <v-btn
         v-if="canShowInFolder"
         icon
-        class="ml-1"
+        small
+        title="Show in Folder"
+        class="ml-2"
         @click.stop="onClickShowInFolder"
       >
-        <v-icon title="Show in Folder">mdi-folder</v-icon>
+        <v-icon small>mdi-folder-outline</v-icon>
       </v-btn>
-      <v-btn v-if="canRetry" icon class="ml-1" @click.stop="onClickRetry">
-        <v-icon title="Retry">mdi-file-download</v-icon>
+      <v-btn
+        v-if="canRetry"
+        icon
+        small
+        title="Retry"
+        class="ml-2"
+        @click.stop="onClickRetry"
+      >
+        <v-icon small>mdi-refresh</v-icon>
       </v-btn>
-      <v-btn v-if="canDelete" icon class="ml-1" @click.stop="onClickDelete">
-        <v-icon title="Delete">mdi-close-circle</v-icon>
+      <v-btn
+        v-if="canDelete"
+        icon
+        small
+        title="Delete"
+        class="ml-2"
+        @click.stop="onClickDelete"
+      >
+        <v-icon small>mdi-close</v-icon>
       </v-btn>
     </v-list-item-action>
   </v-list-item>
@@ -55,6 +92,11 @@ export default {
     }
   },
   computed: {
+    icon() {
+      return ['cancelled', 'failed'].includes(this.download.status)
+        ? 'mdi-image-broken-variant'
+        : 'mdi-file-outline'
+    },
     sizeText() {
       if (
         ['progressing', 'paused', 'interrupted'].includes(this.download.status)
