@@ -124,6 +124,20 @@ export default {
           }
         })
         this.webview.addEventListener(
+          'did-navigate-in-page',
+          ({ url, isMainFrame }) => {
+            if (isMainFrame) {
+              this.updateTab({
+                id: this.tab.id,
+                url,
+                query: url,
+                canGoBack: this.webview.canGoBack(),
+                canGoForward: this.webview.canGoForward()
+              })
+            }
+          }
+        )
+        this.webview.addEventListener(
           'did-fail-load',
           ({ errorCode, errorDescription, validatedURL, isMainFrame }) => {
             // TODO: Handle load failure
