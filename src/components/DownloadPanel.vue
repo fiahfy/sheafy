@@ -9,14 +9,28 @@
         downloads
       </span>
     </v-toolbar>
-    <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar"></div>
+    <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">
+      <v-list two-line dense class="py-0">
+        <download-list-item
+          v-for="download of downloads"
+          :key="download.key"
+          :download="download"
+        />
+      </v-list>
+    </div>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import DownloadListItem from '~/components/DownloadListItem'
+
 export default {
-  components: {},
-  computed: {},
-  methods: {}
+  components: {
+    DownloadListItem
+  },
+  computed: {
+    ...mapState('download', ['downloads'])
+  }
 }
 </script>

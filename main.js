@@ -268,6 +268,7 @@ const createWindow = async () => {
       id,
       url: item.getURL(),
       filename: item.getFilename(),
+      receivedBytes: 0,
       totalBytes: item.getTotalBytes()
     }
     send('updateDownload', download)
