@@ -1,6 +1,6 @@
 <template>
   <div
-    class="download-panel flex-column"
+    class="download-panel d-flex flex-column"
     @dragover.prevent="onDragOver"
     @drop.prevent="onDrop"
   >

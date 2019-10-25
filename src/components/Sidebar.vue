@@ -2,12 +2,9 @@
   <div class="side-bar d-flex" :style="{ width: `${width}px` }">
     <div class="pane flex-grow-1">
       <template v-for="panel in panels">
-        <component
-          :is="panel.component"
-          :key="panel.id"
-          class="fill-height"
-          :class="panel.id === panelId ? 'd-flex' : 'd-none'"
-        />
+        <div v-show="panel.id === panelId" :key="panel.id" class="fill-height">
+          <component :is="panel.component" class="fill-height" />
+        </div>
       </template>
     </div>
     <div ref="resizer" class="resizer" :class="classes">
