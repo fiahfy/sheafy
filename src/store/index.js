@@ -2,7 +2,7 @@ import createPersistedState from 'vuex-persistedstate'
 
 export const state = () => ({
   fullScreen: false,
-  panelId: 'app',
+  panelId: 'apps',
   shortcutBar: false
 })
 

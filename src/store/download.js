@@ -21,6 +21,10 @@ export const actions = {
       downloads = [...state.downloads, { id, ...params }]
     }
     commit('setDownloads', { downloads })
+  },
+  deleteDownload({ commit, state }, { id }) {
+    const downloads = state.downloads.filter((download) => download.id !== id)
+    commit('setDownloads', { downloads })
   }
 }
 

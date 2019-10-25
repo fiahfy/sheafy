@@ -1,7 +1,7 @@
 const http = require('http')
 const path = require('path')
 const nanoid = require('nanoid')
-const { app, shell, BrowserWindow, Menu } = require('electron')
+const { app, ipcMain, shell, BrowserWindow, Menu } = require('electron')
 const windowStateKeeper = require('electron-window-state')
 
 const dev = process.env.NODE_ENV === 'development'
@@ -258,33 +258,76 @@ const createWindow = async () => {
   mainWindow.on('swipe', (e, direction) => send('swipe', direction))
 
   let downloadItems = {}
+  ipcMain.on('pauseDownload', (e, id) => {
+    const item = downloadItems[id]
+    if (item) {
+      item.pause()
+    }
+  })
+  ipcMain.on('resumeDownload', (e, id) => {
+    const item = downloadItems[id]
+    if (item) {
+      item.resume()
+    }
+  })
+  ipcMain.on('cancelDownload', (e, id) => {
+    const item = downloadItems[id]
+    if (item) {
+      item.cancel()
+    } else {
+      const download = {
+        id,
+        status: 'failed'
+      }
+      send('updateDownload', download)
+    }
+  })
   mainWindow.webContents.session.on('will-download', (e, item) => {
     const id = nanoid()
     downloadItems = {
       ...downloadItems,
       [id]: item
     }
+
+    const filename = item.getFilename()
+    const filepath = path.join(app.getPath('downloads'), filename)
     const download = {
       id,
+      filepath,
+      filename,
       url: item.getURL(),
-      filename: item.getFilename(),
       receivedBytes: 0,
-      totalBytes: item.getTotalBytes()
+      totalBytes: item.getTotalBytes(),
+      startTime: Math.floor(item.getStartTime() * 1000)
     }
     send('updateDownload', download)
-    item.setSavePath(path.join(app.getPath('downloads'), download.filename))
+    send('showDownloads')
+
+    item.setSavePath(filepath)
     item.on('updated', (e, state) => {
+      let status
+      if (state === 'interrupted') {
+        status = 'interrupted'
+      } else {
+        status = item.isPaused() ? 'paused' : 'progressing'
+      }
       const download = {
         id,
-        status: state,
+        status,
         receivedBytes: item.getReceivedBytes()
       }
       send('updateDownload', download)
     })
     item.once('done', (e, state) => {
+      let status
+      if (state === 'interrupted') {
+        status = 'failed'
+      } else {
+        status = state
+      }
       const download = {
         id,
-        status: state,
+        status,
         receivedBytes: item.getReceivedBytes()
       }
       send('updateDownload', download)

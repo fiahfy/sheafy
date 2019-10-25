@@ -29,8 +29,8 @@ export default {
   data() {
     return {
       panels: [
-        { id: 'app', component: AppPanel },
-        { id: 'download', component: DownloadPanel },
+        { id: 'apps', component: AppPanel },
+        { id: 'downloads', component: DownloadPanel },
         { id: 'settings', component: SettingsPanel }
       ]
     }

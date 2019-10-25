@@ -8,26 +8,23 @@
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         downloads
       </span>
+      <badge class="ml-3" :num="downloads.length" />
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">
-      <v-list two-line dense class="py-0">
-        <download-list-item
-          v-for="download of downloads"
-          :key="download.key"
-          :download="download"
-        />
-      </v-list>
+      <download-list :downloads="downloads" />
     </div>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import DownloadListItem from '~/components/DownloadListItem'
+import Badge from '~/components/Badge'
+import DownloadList from '~/components/DownloadList'
 
 export default {
   components: {
-    DownloadListItem
+    Badge,
+    DownloadList
   },
   computed: {
     ...mapState('download', ['downloads'])

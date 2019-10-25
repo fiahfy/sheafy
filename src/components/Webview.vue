@@ -60,6 +60,7 @@ export default {
     this.$eventBus.$off('reload', this.reload)
     this.$eventBus.$off('forceReload', this.forceReload)
     this.$eventBus.$off('load', this.load)
+    this.$eventBus.$off('download', this.download)
     this.$eventBus.$off('findInPage', this.findInPage)
     this.$eventBus.$off('stopFindInPage', this.stopFindInPage)
     this.$eventBus.$off('requestBackHistories', this.requestBackHistories)
@@ -92,6 +93,7 @@ export default {
         this.$eventBus.$on('reload', this.reload)
         this.$eventBus.$on('forceReload', this.forceReload)
         this.$eventBus.$on('load', this.load)
+        this.$eventBus.$on('download', this.download)
         this.$eventBus.$on('findInPage', this.findInPage)
         this.$eventBus.$on('stopFindInPage', this.stopFindInPage)
         this.$eventBus.$on('requestBackHistories', this.requestBackHistories)
@@ -127,13 +129,16 @@ export default {
           'did-navigate-in-page',
           ({ url, isMainFrame }) => {
             if (isMainFrame) {
-              this.updateTab({
-                id: this.tab.id,
-                url,
-                query: url,
-                canGoBack: this.webview.canGoBack(),
-                canGoForward: this.webview.canGoForward()
-              })
+              const home = url === 'https://www.google.com/?sheafy'
+              if (!home) {
+                this.updateTab({
+                  id: this.tab.id,
+                  url,
+                  query: url,
+                  canGoBack: this.webview.canGoBack(),
+                  canGoForward: this.webview.canGoForward()
+                })
+              }
             }
           }
         )
@@ -296,6 +301,11 @@ export default {
         if (url) {
           this.webview.loadURL(url)
         }
+      }
+    },
+    download(url) {
+      if (this.active) {
+        this.webview.downloadURL(url)
       }
     },
     findInPage(text, { forward, findNext }) {
