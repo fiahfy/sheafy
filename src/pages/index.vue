@@ -3,8 +3,10 @@
     <activity-bar v-if="!fullScreen" />
     <toolbar v-if="!fullScreen" />
     <div class="d-flex flex-grow-1 fill-height" :class="classes">
-      <div class="wrapper flex-grow-1 white">
-        <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
+      <div class="wrapper flex-grow-1 white overflow-hidden">
+        <div class="fill-height">
+          <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
+        </div>
         <shortcut-bar />
         <search-bar />
         <status-bar />
