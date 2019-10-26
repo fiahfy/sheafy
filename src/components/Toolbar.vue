@@ -60,7 +60,9 @@
       @mouseup="onMouseUp"
       @keypress.enter="onKeyPressEnter"
       @contextmenu.stop="onContextMenuTextField"
-    />
+    >
+      <v-icon slot="prepend-inner" small v-text="icon" />
+    </v-text-field>
     <v-divider slot="extension" />
   </v-toolbar>
 </template>
@@ -75,6 +77,13 @@ export default {
     }
   },
   computed: {
+    icon() {
+      const match = this.activeTab.url.match(/^http(s)?:\/\//)
+      if (match) {
+        return match[1] ? 'mdi-lock' : 'mdi-alert-circle-outline'
+      }
+      return 'mdi-help-circle-outline'
+    },
     query: {
       get() {
         return this.activeTab && this.activeTab.query
@@ -182,6 +191,12 @@ export default {
   }
   .v-text-field--outlined > .v-input__control > .v-input__slot {
     min-height: unset;
+    padding-left: 10px;
+    > .v-input__prepend-inner {
+      margin-top: 0;
+      padding-right: 8px;
+      align-self: center;
+    }
     > .v-text-field__slot > input {
       padding: 4px 0;
     }
