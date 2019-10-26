@@ -2,7 +2,12 @@ export const state = () => ({
   downloads: []
 })
 
-export const getters = {}
+export const getters = {
+  isDeletable() {
+    return ({ download }) =>
+      ['completed', 'cancelled', 'failed'].includes(download.status)
+  }
+}
 
 export const actions = {
   updateDownload({ commit, state }, { id, ...params }) {
@@ -22,8 +27,16 @@ export const actions = {
     }
     commit('setDownloads', { downloads })
   },
-  deleteDownload({ commit, state }, { id }) {
-    const downloads = state.downloads.filter((download) => download.id !== id)
+  deleteDownload({ commit, getters, state }, { id }) {
+    const downloads = state.downloads.filter(
+      (download) => download.id !== id || !getters.isDeletable({ download })
+    )
+    commit('setDownloads', { downloads })
+  },
+  clearDownloads({ commit, getters, state }) {
+    const downloads = state.downloads.filter(
+      (download) => !getters.isDeletable({ download })
+    )
     commit('setDownloads', { downloads })
   }
 }

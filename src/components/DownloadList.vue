@@ -1,7 +1,7 @@
 <template>
   <v-list two-line dense class="download-list py-0">
     <download-list-item
-      v-for="download of downloads"
+      v-for="download of downloads.slice().reverse()"
       :key="download.key"
       :download="download"
     />

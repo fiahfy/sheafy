@@ -48,7 +48,15 @@ export default {
       }
     },
     ...mapState(['panelId']),
+    ...mapState('tab', ['activeId']),
     ...mapState('settings', ['sideBarLocation', 'sideBarWidth'])
+  },
+  watch: {
+    activeId(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.setPanelId({ panelId: 'apps' })
+      }
+    }
   },
   mounted() {
     this.setupResizeHandler()
@@ -82,6 +90,7 @@ export default {
         document.removeEventListener('mousemove', resize, false)
       })
     },
+    ...mapMutations(['setPanelId']),
     ...mapMutations('settings', ['setSideBarWidth'])
   }
 }

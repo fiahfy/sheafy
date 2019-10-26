@@ -52,8 +52,8 @@ export default {
     ...mapGetters('tab', ['activeTab', 'apps', 'getUrlWithQuery'])
   },
   watch: {
-    activeTab(oldValue, newValue) {
-      if (oldValue.id === newValue.id && oldValue.host === newValue.host) {
+    activeTab(newValue, oldValue) {
+      if (newValue.id === oldValue.id && newValue.host === oldValue.host) {
         return
       }
       this.$nextTick(() => {

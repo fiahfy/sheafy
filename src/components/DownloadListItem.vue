@@ -1,11 +1,19 @@
 <template>
-  <v-list-item class="download-list-item" @click="onClickItem">
+  <v-list-item
+    class="download-list-item"
+    :title="download.filename"
+    @click="onClickItem"
+  >
     <v-list-item-avatar class="my-0 mr-3">
       <v-icon v-text="icon" />
     </v-list-item-avatar>
 
     <v-list-item-content>
-      <v-list-item-title v-text="download.filename" />
+      <v-list-item-title class="d-flex">
+        <span class="text-truncate mr-3" v-text="download.filename" />
+        <v-spacer />
+        <span class="secondary--text" v-text="startedAt" />
+      </v-list-item-title>
       <v-list-item-subtitle>
         <span class="text--primary">{{ sizeText }}</span>
         <span v-if="statusText" class="text-capitalize">
@@ -18,62 +26,68 @@
       <v-btn
         v-if="canPause"
         icon
-        small
+        width="36"
+        height="36"
         title="Pause"
-        class="ml-2"
+        class="ml-1"
         @click.stop="onClickPause"
       >
-        <v-icon small>mdi-pause</v-icon>
+        <v-icon size="20">mdi-pause</v-icon>
       </v-btn>
       <v-btn
         v-if="canResume"
         icon
-        small
+        width="36"
+        height="36"
         title="Resume"
-        class="ml-2"
+        class="ml-1"
         @click.stop="onClickResume"
       >
-        <v-icon small>mdi-play</v-icon>
+        <v-icon size="20">mdi-play</v-icon>
       </v-btn>
       <v-btn
         v-if="canCancel"
         icon
-        small
+        width="36"
+        height="36"
         title="Cancel"
-        class="ml-2"
+        class="ml-1"
         @click.stop="onClickCancel"
       >
-        <v-icon small>mdi-cancel</v-icon>
+        <v-icon size="20">mdi-cancel</v-icon>
       </v-btn>
       <v-btn
         v-if="canShowInFolder"
         icon
-        small
+        width="36"
+        height="36"
         title="Show in Folder"
-        class="ml-2"
+        class="ml-1"
         @click.stop="onClickShowInFolder"
       >
-        <v-icon small>mdi-folder-outline</v-icon>
+        <v-icon size="20">mdi-folder-outline</v-icon>
       </v-btn>
       <v-btn
         v-if="canRetry"
         icon
-        small
+        width="36"
+        height="36"
         title="Retry"
-        class="ml-2"
+        class="ml-1"
         @click.stop="onClickRetry"
       >
-        <v-icon small>mdi-refresh</v-icon>
+        <v-icon size="20">mdi-refresh</v-icon>
       </v-btn>
       <v-btn
         v-if="canDelete"
         icon
-        small
+        width="36"
+        height="36"
         title="Delete"
-        class="ml-2"
+        class="ml-1"
         @click.stop="onClickDelete"
       >
-        <v-icon small>mdi-close</v-icon>
+        <v-icon size="20">mdi-close</v-icon>
       </v-btn>
     </v-list-item-action>
   </v-list-item>
@@ -97,17 +111,20 @@ export default {
         ? 'mdi-image-broken-variant'
         : 'mdi-file-outline'
     },
+    startedAt() {
+      return new Date(this.download.startTime).toLocaleDateString()
+    },
     sizeText() {
       if (
         ['progressing', 'paused', 'interrupted'].includes(this.download.status)
       ) {
         return (
-          prettyBytes(this.download.receivedBytes) +
+          prettyBytes(this.download.receivedBytes || 0) +
           ' of ' +
-          prettyBytes(this.download.totalBytes)
+          prettyBytes(this.download.totalBytes || 0)
         )
       }
-      return prettyBytes(this.download.receivedBytes)
+      return prettyBytes(this.download.receivedBytes || 0)
     },
     statusText() {
       return ['paused', 'interrupted', 'cancelled', 'failed'].includes(

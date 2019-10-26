@@ -39,8 +39,8 @@ export default {
     }
   },
   watch: {
-    loading(newValue, prevValue) {
-      if (newValue && !prevValue) {
+    loading(newValue, oldValue) {
+      if (newValue && !oldValue) {
         this.error = false
       }
     }
