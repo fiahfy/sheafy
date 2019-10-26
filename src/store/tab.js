@@ -1,4 +1,5 @@
 import { remote } from 'electron'
+import nanoid from 'nanoid'
 
 const getHost = (url) => {
   return url.replace(/^https?:\/\/([^/]+).*$/, '$1')
@@ -83,7 +84,7 @@ export const actions = {
   newTab({ commit, state }, { options, ...params } = {}) {
     const { activate = true, position = 'last', srcId = state.activeId } =
       options || {}
-    const id = state.tabs.reduce((carry, tab) => Math.max(carry, tab.id), 0) + 1
+    const id = nanoid()
     const url = 'https://www.google.com/?sheafy'
     const tab = convertTab({
       id,
