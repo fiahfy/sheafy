@@ -95,14 +95,17 @@ export default {
   }
   .resizer {
     position: absolute;
-    right: -5px;
+    right: -1px;
     height: 100%;
-    padding: 0 5px;
+    padding: 0 1px;
     z-index: 5;
     cursor: ew-resize;
     &.resizer--right {
-      left: -5px;
+      left: -1px;
       right: unset;
+    }
+    > .v-divider {
+      border-color: transparent;
     }
   }
 }

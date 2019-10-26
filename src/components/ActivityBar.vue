@@ -3,7 +3,6 @@
     class="activity-bar"
     permanent
     app
-    clipped
     mini-variant
     mini-variant-width="48"
     :right="right"
@@ -62,6 +61,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.activity-bar ::v-deep .v-navigation-drawer__border {
+  background-color: unset !important;
+}
 // .activity-bar .v-list-item:last-child {
 //   position: absolute;
 //   bottom: 0;

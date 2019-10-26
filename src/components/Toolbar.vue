@@ -1,14 +1,5 @@
 <template>
-  <v-app-bar
-    class="toolbar"
-    app
-    clipped-left
-    clipped-right
-    flat
-    dense
-    height="44"
-    extension-height="1"
-  >
+  <v-toolbar class="toolbar" flat dense extension-height="0">
     <v-btn
       v-long-press="onContextMenuBack"
       icon
@@ -71,7 +62,7 @@
       @contextmenu.stop="onContextMenuTextField"
     />
     <v-divider slot="extension" />
-  </v-app-bar>
+  </v-toolbar>
 </template>
 
 <script>
@@ -185,6 +176,9 @@ export default {
 .toolbar ::v-deep {
   .v-toolbar__extension {
     padding: 0;
+    > .v-divider {
+      border-color: transparent;
+    }
   }
   .v-text-field--outlined > .v-input__control > .v-input__slot {
     min-height: unset;
