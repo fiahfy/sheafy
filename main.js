@@ -1,6 +1,7 @@
 const http = require('http')
 const path = require('path')
 const nanoid = require('nanoid')
+const increment = require('add-filename-increment')
 const { app, ipcMain, shell, BrowserWindow, Menu } = require('electron')
 const windowStateKeeper = require('electron-window-state')
 
@@ -289,8 +290,11 @@ const createWindow = async () => {
       [id]: item
     }
 
-    const filename = item.getFilename()
-    const filepath = path.join(app.getPath('downloads'), filename)
+    const filepath = increment(
+      path.join(app.getPath('downloads'), item.getFilename()),
+      { fs: true, platform: 'win32' }
+    )
+    const filename = path.basename(filepath)
     const download = {
       id,
       filepath,
