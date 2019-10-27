@@ -36,8 +36,8 @@ export default {
     return {
       items: [
         { id: 'apps', title: 'Apps', icon: 'mdi-tab' },
-        { id: 'downloads', title: 'Downloads', icon: 'mdi-download' },
-        { id: 'settings', title: 'Settings', icon: 'mdi-settings' }
+        { id: 'downloads', title: 'Downloads', icon: 'mdi-download-outline' },
+        { id: 'settings', title: 'Settings', icon: 'mdi-settings-outline' }
       ]
     }
   },
@@ -61,12 +61,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.activity-bar ::v-deep .v-navigation-drawer__border {
-  background-color: unset !important;
+.activity-bar {
+  ::v-deep .v-navigation-drawer__border {
+    background-color: unset !important;
+  }
+  .v-list-item {
+    opacity: 0.66;
+    &:hover,
+    &.v-list-item--active {
+      opacity: 1;
+    }
+    &:before {
+      opacity: 0;
+    }
+  }
 }
-// .activity-bar .v-list-item:last-child {
-//   position: absolute;
-//   bottom: 0;
-//   width: 100%;
-// }
 </style>
