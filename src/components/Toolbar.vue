@@ -1,14 +1,5 @@
 <template>
-  <v-app-bar
-    class="toolbar"
-    app
-    clipped-left
-    clipped-right
-    flat
-    dense
-    height="44"
-    extension-height="1"
-  >
+  <v-toolbar class="toolbar" flat dense extension-height="0">
     <v-btn
       v-long-press="onContextMenuBack"
       icon
@@ -63,22 +54,62 @@
       v-model="query"
       outlined
       hide-details
-      class="ml-1 body-2"
+      class="mx-1 body-2"
       name="query"
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
       @keypress.enter="onKeyPressEnter"
       @contextmenu.stop="onContextMenuTextField"
-    />
+    >
+      <v-icon slot="prepend-inner" small v-text="icon" />
+    </v-text-field>
+    <v-btn
+      v-long-press="onContextMenuBackTab"
+      icon
+      width="36"
+      height="36"
+      class="ml-1"
+      title="Go Back Tab"
+      :disabled="!canGoBackTab"
+      @click="goBackTab"
+      @contextmenu.stop="onContextMenuBackTab"
+    >
+      <v-icon size="20">mdi-chevron-left</v-icon>
+    </v-btn>
+    <v-btn
+      v-long-press="onContextMenuForwardTab"
+      icon
+      width="36"
+      height="36"
+      class="ml-1"
+      title="Go Forward Tab"
+      :disabled="!canGoForwardTab"
+      @click="goForwardTab"
+      @contextmenu.stop="onContextMenuForwardTab"
+    >
+      <v-icon size="20">mdi-chevron-right</v-icon>
+    </v-btn>
     <v-divider slot="extension" />
-  </v-app-bar>
+  </v-toolbar>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
+  data() {
+    return {
+      focusIn: false
+    }
+  },
   computed: {
+    icon() {
+      const match = this.activeTab.url.match(/^http(s)?:\/\//)
+      if (match) {
+        return match[1] ? 'mdi-lock' : 'mdi-alert-circle-outline'
+      }
+      return 'mdi-help-circle-outline'
+    },
     query: {
       get() {
         return this.activeTab && this.activeTab.query
@@ -89,15 +120,21 @@ export default {
         }
       }
     },
-    ...mapGetters('tab', ['activeTab'])
+    ...mapGetters('tab', [
+      'activeTab',
+      'canGoBackTab',
+      'canGoForwardTab',
+      'backTabHistory',
+      'forwardTabHistory'
+    ])
   },
   mounted() {
-    this.$eventBus.$on('showBackHistories', this.showBackHistories)
-    this.$eventBus.$on('showForwardHistories', this.showForwardHistories)
+    this.$eventBus.$on('showBackHistory', this.showBackHistory)
+    this.$eventBus.$on('showForwardHistory', this.showForwardHistory)
   },
   destroyed() {
-    this.$eventBus.$off('showBackHistories', this.showBackHistories)
-    this.$eventBus.$off('showForwardHistories', this.showForwardHistories)
+    this.$eventBus.$off('showBackHistory', this.showBackHistory)
+    this.$eventBus.$off('showForwardHistory', this.showForwardHistory)
   },
   methods: {
     goBack() {
@@ -112,9 +149,9 @@ export default {
     stop() {
       this.$eventBus.$emit('stop')
     },
-    showBackHistories(histories) {
+    showBackHistory(history) {
       this.$contextMenu.show(
-        histories.map((history, index) => {
+        history.map((history, index) => {
           return {
             label: history,
             click: () => this.$eventBus.$emit('goToOffset', -index - 1)
@@ -122,9 +159,9 @@ export default {
         })
       )
     },
-    showForwardHistories(histories) {
+    showForwardHistory(history) {
       this.$contextMenu.show(
-        histories.map((history, index) => {
+        history.map((history, index) => {
           return {
             label: history,
             click: () => this.$eventBus.$emit('goToOffset', index + 1)
@@ -133,10 +170,10 @@ export default {
       )
     },
     onContextMenuBack() {
-      this.$eventBus.$emit('requestBackHistories')
+      this.$eventBus.$emit('requestBackHistory')
     },
     onContextMenuForward() {
-      this.$eventBus.$emit('requestForwardHistories')
+      this.$eventBus.$emit('requestForwardHistory')
     },
     onContextMenuReload() {
       this.$contextMenu.show([
@@ -154,19 +191,49 @@ export default {
         { role: 'paste' }
       ])
     },
-    onMouseDown() {
+    onContextMenuBackTab() {
+      this.$contextMenu.show(
+        this.backTabHistory.map((history, index) => {
+          return {
+            label: history.title,
+            click: () => this.goToOffsetTab({ offset: -index - 1 })
+          }
+        })
+      )
+    },
+    onContextMenuForwardTab() {
+      this.$contextMenu.show(
+        this.forwardTabHistory.map((history, index) => {
+          return {
+            label: history.title,
+            click: () => this.goToOffsetTab({ offset: index + 1 })
+          }
+        })
+      )
+    },
+    onMouseDown(e) {
+      if (e.target === document.activeElement) {
+        return
+      }
       window.getSelection().empty()
+      this.focusIn = true
     },
     onMouseUp(e) {
-      if (!window.getSelection().toString()) {
+      if (this.focusIn && !window.getSelection().toString()) {
         e.target.select()
       }
+      this.focusIn = false
     },
     onKeyPressEnter(e) {
       e.target.blur()
       this.$eventBus.$emit('load')
     },
-    ...mapActions('tab', ['updateTab'])
+    ...mapActions('tab', [
+      'updateTab',
+      'goToOffsetTab',
+      'goBackTab',
+      'goForwardTab'
+    ])
   }
 }
 </script>
@@ -175,9 +242,18 @@ export default {
 .toolbar ::v-deep {
   .v-toolbar__extension {
     padding: 0;
+    > .v-divider {
+      border-color: transparent;
+    }
   }
   .v-text-field--outlined > .v-input__control > .v-input__slot {
     min-height: unset;
+    padding-left: 10px;
+    > .v-input__prepend-inner {
+      margin-top: 0;
+      padding-right: 8px;
+      align-self: center;
+    }
     > .v-text-field__slot > input {
       padding: 4px 0;
     }

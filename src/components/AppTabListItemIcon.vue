@@ -15,6 +15,7 @@
         height="16"
         width="16"
         contain
+        @load="error = false"
         @error="error = true"
       />
     </template>
@@ -36,13 +37,6 @@ export default {
   data() {
     return {
       error: false
-    }
-  },
-  watch: {
-    loading(newValue, prevValue) {
-      if (newValue && !prevValue) {
-        this.error = false
-      }
     }
   }
 }

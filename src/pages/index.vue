@@ -1,13 +1,15 @@
 <template>
   <v-container class="index" fluid pa-0 :class="{ resizing: resizing }">
     <activity-bar v-if="!fullScreen" />
-    <toolbar v-if="!fullScreen" />
     <div class="d-flex flex-grow-1 fill-height" :class="classes">
-      <div class="wrapper flex-grow-1 white">
-        <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
-        <shortcut-bar />
-        <search-bar />
-        <status-bar />
+      <div class="d-flex flex-grow-1 flex-column white">
+        <toolbar v-if="!fullScreen" class="flex-grow-0" />
+        <div class="wrapper flex-grow-1 overflow-hidden">
+          <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
+          <shortcut-bar />
+          <search-bar />
+          <status-bar />
+        </div>
       </div>
       <sidebar v-if="!fullScreen" :resizing.sync="resizing" />
     </div>

@@ -36,18 +36,6 @@ export default ({ store }) => {
     el && el.focus()
     el && el.select()
   })
-  ipcRenderer.on('goBack', () => {
-    store.$eventBus.$emit('goBack')
-  })
-  ipcRenderer.on('goForward', () => {
-    store.$eventBus.$emit('goForward')
-  })
-  ipcRenderer.on('reload', () => {
-    store.$eventBus.$emit('reload')
-  })
-  ipcRenderer.on('forceReload', () => {
-    store.$eventBus.$emit('forceReload')
-  })
   ipcRenderer.on('search', () => {
     const id = store.state.tab.activeId
     store.dispatch('tab/updateTab', { id, searching: true })
@@ -60,6 +48,21 @@ export default ({ store }) => {
   })
   ipcRenderer.on('showApps', () => {
     store.commit('setPanelId', { panelId: 'apps' })
+  })
+  ipcRenderer.on('showDownloads', () => {
+    store.commit('setPanelId', { panelId: 'downloads' })
+  })
+  ipcRenderer.on('reload', () => {
+    store.$eventBus.$emit('reload')
+  })
+  ipcRenderer.on('forceReload', () => {
+    store.$eventBus.$emit('forceReload')
+  })
+  ipcRenderer.on('goBack', () => {
+    store.$eventBus.$emit('goBack')
+  })
+  ipcRenderer.on('goForward', () => {
+    store.$eventBus.$emit('goForward')
   })
   // TODO: https://github.com/electron/electron/issues/15728
   ipcRenderer.on('undo', () => {
@@ -75,5 +78,8 @@ export default ({ store }) => {
     } else {
       document.execCommand('redo')
     }
+  })
+  ipcRenderer.on('updateDownload', (e, download) => {
+    store.dispatch('download/updateDownload', { ...download })
   })
 }

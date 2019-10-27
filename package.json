@@ -1,7 +1,7 @@
 {
   "name": "sheafy",
   "description": "Browser Application that organizes Web Applications",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": {
     "name": "fiahfy",
     "email": "d.fiahfy@gmail.com",
@@ -12,9 +12,12 @@
     "@fiahfy/electron-context-menu": "^0.0.3",
     "@mdi/font": "^4.5.95",
     "@nuxtjs/vuetify": "^1.9.0",
+    "add-filename-increment": "^1.0.0",
     "electron-devtools-installer": "^2.2.4",
     "electron-window-state": "^5.0.3",
+    "nanoid": "^2.1.6",
     "nuxt": "^2.10.1",
+    "pretty-bytes": "^5.3.0",
     "typeface-roboto": "^0.0.75",
     "vue-long-press-directive": "^1.0.2",
     "vuedraggable": "^2.23.2",

@@ -3,9 +3,9 @@
     v-if="titleBar"
     class="title-bar caption px-0 align-start user-select-none"
     app
-    height="16"
+    height="22"
   >
-    <v-sheet tile class="flex-grow-1" @dblclick="onDoubleClick">
+    <v-sheet tile class="fill-height flex-grow-1" @dblclick="onDoubleClick">
       <div class="text-truncate text-center" v-text="title" />
     </v-sheet>
   </v-system-bar>
@@ -27,7 +27,7 @@ export default {
     ...mapGetters('tab', ['activeTab'])
   },
   methods: {
-    // TODO: https://github.com/electron/electron/issues/16385
+    // @see https://github.com/electron/electron/issues/16385
     onDoubleClick() {
       const doubleClickAction = remote.systemPreferences.getUserDefault(
         'AppleActionOnDoubleClick',
@@ -53,12 +53,11 @@ export default {
   z-index: 9999;
   .v-sheet {
     position: relative;
-    height: 20px;
     padding: 0 72px;
     min-width: 0;
     -webkit-app-region: drag;
     > div {
-      margin-top: 2px;
+      margin-top: 6px;
     }
   }
 }

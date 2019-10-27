@@ -1,4 +1,5 @@
 import { remote } from 'electron'
+import nanoid from 'nanoid'
 
 const getHost = (url) => {
   return url.replace(/^https?:\/\/([^/]+).*$/, '$1')
@@ -22,7 +23,9 @@ export const state = () => ({
   hosts: [],
   activeId: null,
   parentId: null,
-  childIds: []
+  childIds: [],
+  history: [],
+  historyIndex: -1
 })
 
 export const getters = {
@@ -62,11 +65,31 @@ export const getters = {
       return aIndex > bIndex ? 1 : -1
     })
   },
+  canGoBackTab(state) {
+    return !!state.history[state.historyIndex - 1]
+  },
+  canGoForwardTab(state) {
+    return !!state.history[state.historyIndex + 1]
+  },
+  backTabHistory(state, getters) {
+    return state.history
+      .slice(0, state.historyIndex)
+      .map((id) => getters.getTab({ id }))
+      .reverse()
+  },
+  forwardTabHistory(state, getters) {
+    return state.history
+      .slice(state.historyIndex + 1)
+      .map((id) => getters.getTab({ id }))
+  },
   isActiveTab(state) {
     return ({ id }) => id === state.activeId
   },
+  getTab(state) {
+    return ({ id }) => state.tabs.find((tab) => tab.id === id)
+  },
   getUrlWithQuery() {
-    return (query) => {
+    return ({ query }) => {
       if (!query) {
         return ''
       }
@@ -80,10 +103,10 @@ export const getters = {
 }
 
 export const actions = {
-  newTab({ commit, state }, { options, ...params } = {}) {
+  newTab({ commit, dispatch, state }, { options, ...params } = {}) {
     const { activate = true, position = 'last', srcId = state.activeId } =
       options || {}
-    const id = state.tabs.reduce((carry, tab) => Math.max(carry, tab.id), 0) + 1
+    const id = nanoid()
     const url = 'https://www.google.com/?sheafy'
     const tab = convertTab({
       id,
@@ -138,7 +161,7 @@ export const actions = {
     commit('setChildIds', { childIds })
 
     if (activate) {
-      commit('setActiveId', { activeId: id })
+      dispatch('activateTab', { id })
     }
   },
   newTabIfEmpty({ dispatch, state }) {
@@ -178,7 +201,7 @@ export const actions = {
       if (state.childIds.includes(id)) {
         const childIds = state.childIds.filter((childId) => childId !== id)
         commit('setChildIds', { childIds })
-        commit('setActiveId', { activeId: state.parentId })
+        dispatch('activateTab', { id: state.parentId })
       } else {
         if (id === state.parentId) {
           commit('setParentId', { parentId: null })
@@ -195,13 +218,13 @@ export const actions = {
           }
           const index = app.tabs.findIndex((tab) => tab.id === id)
           if (index < app.tabs.length - 1) {
-            const activeId = app.tabs[index + 1].id
-            commit('setActiveId', { activeId })
+            const id = app.tabs[index + 1].id
+            dispatch('activateTab', { id })
           } else if (index > 0) {
-            const activeId = app.tabs[index - 1].id
-            commit('setActiveId', { activeId })
+            const id = app.tabs[index - 1].id
+            dispatch('activateTab', { id })
           } else {
-            commit('setActiveId', { activeId: null })
+            dispatch('activateTab', { id: null })
           }
         }
       }
@@ -209,16 +232,52 @@ export const actions = {
 
     const tabs = state.tabs.filter((tab) => tab.id !== id)
     commit('setTabs', { tabs })
+
+    const previousTabs = state.history
+      .slice(0, state.historyIndex)
+      .filter((item) => item === id).length
+    const history = state.history.slice().filter((item) => item !== id)
+    commit('setHistory', { history })
+    commit('setHistoryIndex', {
+      historyIndex: state.historyIndex - previousTabs
+    })
+
     if (!tabs.length) {
       remote.getCurrentWindow().close()
     }
   },
   activateTab({ commit, state }, { id }) {
+    if (state.activeId === id) {
+      return
+    }
     if (state.parentId !== id && !state.childIds.includes(id)) {
       commit('setParentId', { parentId: null })
       commit('setChildIds', { childIds: [] })
     }
     commit('setActiveId', { activeId: id })
+    if (id) {
+      const history = [...state.history.slice(0, state.historyIndex + 1), id]
+      commit('setHistory', { history })
+      commit('setHistoryIndex', { historyIndex: history.length - 1 })
+    } else {
+      commit('setHistory', { history: [] })
+      commit('setHistoryIndex', { historyIndex: -1 })
+    }
+  },
+  goToOffsetTab({ commit, state }, { offset }) {
+    const index = state.historyIndex + offset
+    const id = state.history[index]
+    if (!id) {
+      return
+    }
+    commit('setActiveId', { activeId: id })
+    commit('setHistoryIndex', { historyIndex: index })
+  },
+  goBackTab({ dispatch }) {
+    dispatch('goToOffsetTab', { offset: -1 })
+  },
+  goForwardTab({ dispatch }) {
+    dispatch('goToOffsetTab', { offset: 1 })
   },
   sortTabs({ commit, state }, { ids }) {
     const sortedTabs = ids.map((id) => state.tabs.find((tab) => tab.id === id))
@@ -228,7 +287,7 @@ export const actions = {
     ]
     commit('setTabs', { tabs })
   },
-  closeApp({ commit, getters, state }, { host }) {
+  closeApp({ commit, dispatch, getters, state }, { host }) {
     const app = getters.apps.find((app) => app.host === host)
     const tabIds = app.tabs.map((tab) => tab.id)
     const active = tabIds.includes(state.activeId)
@@ -238,20 +297,30 @@ export const actions = {
 
       const index = getters.apps.findIndex((app) => app.host === host)
       if (index < getters.apps.length - 1) {
-        const activeId = getters.apps[index + 1].tabs[0].id
-        commit('setActiveId', { activeId })
+        const id = getters.apps[index + 1].tabs[0].id
+        dispatch('activateTab', { id })
       } else if (index > 0) {
-        const activeId =
+        const id =
           getters.apps[index - 1].tabs[getters.apps[index - 1].tabs.length - 1]
             .id
-        commit('setActiveId', { activeId })
+        dispatch('activateTab', { id })
       } else {
-        commit('setActiveId', { activeId: null })
+        dispatch('activateTab', { id: null })
       }
     }
 
     const tabs = state.tabs.filter((tab) => !tabIds.includes(tab.id))
     commit('setTabs', { tabs })
+
+    const previousTabs = state.history
+      .slice(0, state.historyIndex)
+      .filter((id) => tabIds.includes(id)).length
+    const history = state.history.slice().filter((id) => !tabIds.includes(id))
+    commit('setHistory', { history })
+    commit('setHistoryIndex', {
+      historyIndex: state.historyIndex - previousTabs
+    })
+
     if (!tabs.length) {
       remote.getCurrentWindow().close()
     }
@@ -276,5 +345,11 @@ export const mutations = {
   },
   setChildIds(state, { childIds }) {
     state.childIds = childIds
+  },
+  setHistory(state, { history }) {
+    state.history = history
+  },
+  setHistoryIndex(state, { historyIndex }) {
+    state.historyIndex = historyIndex
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-panel flex-column">
+  <div class="settings-panel d-flex flex-column">
     <v-toolbar tile dense flat class="flex-grow-0">
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         settings

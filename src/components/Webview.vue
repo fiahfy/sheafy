@@ -60,10 +60,11 @@ export default {
     this.$eventBus.$off('reload', this.reload)
     this.$eventBus.$off('forceReload', this.forceReload)
     this.$eventBus.$off('load', this.load)
+    this.$eventBus.$off('download', this.download)
     this.$eventBus.$off('findInPage', this.findInPage)
     this.$eventBus.$off('stopFindInPage', this.stopFindInPage)
-    this.$eventBus.$off('requestBackHistories', this.requestBackHistories)
-    this.$eventBus.$off('requestForwardHistories', this.requestForwardHistories)
+    this.$eventBus.$off('requestBackHistory', this.requestBackHistory)
+    this.$eventBus.$off('requestForwardHistory', this.requestForwardHistory)
     this.webview && this.webview.remove()
   },
   methods: {
@@ -92,13 +93,11 @@ export default {
         this.$eventBus.$on('reload', this.reload)
         this.$eventBus.$on('forceReload', this.forceReload)
         this.$eventBus.$on('load', this.load)
+        this.$eventBus.$on('download', this.download)
         this.$eventBus.$on('findInPage', this.findInPage)
         this.$eventBus.$on('stopFindInPage', this.stopFindInPage)
-        this.$eventBus.$on('requestBackHistories', this.requestBackHistories)
-        this.$eventBus.$on(
-          'requestForwardHistories',
-          this.requestForwardHistories
-        )
+        this.$eventBus.$on('requestBackHistory', this.requestBackHistory)
+        this.$eventBus.$on('requestForwardHistory', this.requestForwardHistory)
 
         this.webview.addEventListener('load-commit', ({ url, isMainFrame }) => {
           if (isMainFrame) {
@@ -124,6 +123,23 @@ export default {
           }
         })
         this.webview.addEventListener(
+          'did-navigate-in-page',
+          ({ url, isMainFrame }) => {
+            if (isMainFrame) {
+              const home = url === 'https://www.google.com/?sheafy'
+              if (!home) {
+                this.updateTab({
+                  id: this.tab.id,
+                  url,
+                  query: url,
+                  canGoBack: this.webview.canGoBack(),
+                  canGoForward: this.webview.canGoForward()
+                })
+              }
+            }
+          }
+        )
+        this.webview.addEventListener(
           'did-fail-load',
           ({ errorCode, errorDescription, validatedURL, isMainFrame }) => {
             // TODO: Handle load failure
@@ -136,7 +152,7 @@ export default {
         this.webview.addEventListener(
           'page-favicon-updated',
           ({ favicons }) => {
-            const favicon = favicons[0]
+            const favicon = favicons[favicons.length - 1]
             this.updateTab({ id: this.tab.id, favicon })
           }
         )
@@ -201,8 +217,8 @@ export default {
               break
             }
             case 'search': {
-              const [text] = args
-              const url = this.getUrlWithQuery(text)
+              const [query] = args
+              const url = this.getUrlWithQuery({ query })
               this.newTab({ url, options: { position: 'next' } })
               break
             }
@@ -237,34 +253,6 @@ export default {
         this.webview.addEventListener('update-target-url', ({ url }) => {
           this.$eventBus.$emit('updateTargetUrl', url)
         })
-        // loadUrl() is not working if do not use setTimeout()
-        setTimeout(() => {
-          // TODO: Show download progress
-          // const contents = this.webview.getWebContents()
-          // contents.session.on('will-download', (event, item, webContents) => {
-          //   console.log(item)
-          //   // Set the save path, making Electron not to prompt a save dialog.
-          //   item.savePath = '/Users/fiahfy/Downloads/save.pdf'
-          //   item.on('updated', (event, state) => {
-          //     if (state === 'interrupted') {
-          //       console.log('Download is interrupted but can be resumed')
-          //     } else if (state === 'progressing') {
-          //       if (item.isPaused()) {
-          //         console.log('Download is paused')
-          //       } else {
-          //         console.log(`Received bytes: ${item.getReceivedBytes()}`)
-          //       }
-          //     }
-          //   })
-          //   item.once('done', (event, state) => {
-          //     if (state === 'completed') {
-          //       console.log('Download successfully')
-          //     } else {
-          //       console.log(`Download failed: ${state}`)
-          //     }
-          //   })
-          // })
-        }, 0)
       })
     },
     undo() {
@@ -306,10 +294,16 @@ export default {
     },
     load() {
       if (this.active) {
-        const url = this.getUrlWithQuery(this.tab.query)
+        const query = this.tab.query
+        const url = this.getUrlWithQuery({ query })
         if (url) {
           this.webview.loadURL(url)
         }
+      }
+    },
+    download(url) {
+      if (this.active) {
+        this.webview.downloadURL(url)
       }
     },
     findInPage(text, { forward, findNext }) {
@@ -322,20 +316,20 @@ export default {
         this.webview.stopFindInPage('clearSelection')
       }
     },
-    requestBackHistories() {
+    requestBackHistory() {
       if (this.active) {
         const contents = this.webview.getWebContents()
-        const histories = contents.history
+        const history = contents.history
           .slice(0, contents.getActiveIndex())
           .reverse()
-        this.$eventBus.$emit('showBackHistories', histories)
+        this.$eventBus.$emit('showBackHistory', history)
       }
     },
-    requestForwardHistories() {
+    requestForwardHistory() {
       if (this.active) {
         const contents = this.webview.getWebContents()
-        const histories = contents.history.slice(contents.getActiveIndex() + 1)
-        this.$eventBus.$emit('showForwardHistories', histories)
+        const history = contents.history.slice(contents.getActiveIndex() + 1)
+        this.$eventBus.$emit('showForwardHistory', history)
       }
     },
     ...mapActions(['hideShortcutBar']),

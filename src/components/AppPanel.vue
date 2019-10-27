@@ -1,6 +1,6 @@
 <template>
   <div
-    class="app-panel flex-column"
+    class="app-panel d-flex flex-column"
     @dragover.prevent="onDragOver"
     @drop.prevent="onDrop"
   >
@@ -52,8 +52,8 @@ export default {
     ...mapGetters('tab', ['activeTab', 'apps', 'getUrlWithQuery'])
   },
   watch: {
-    activeTab(oldValue, newValue) {
-      if (oldValue.id === newValue.id && oldValue.host === newValue.host) {
+    activeTab(newValue, oldValue) {
+      if (newValue.id === oldValue.id && newValue.host === oldValue.host) {
         return
       }
       this.$nextTick(() => {
@@ -93,7 +93,8 @@ export default {
       if (effectAllowed === 'move') {
         return
       }
-      const url = this.getUrlWithQuery(e.dataTransfer.getData('text'))
+      const query = e.dataTransfer.getData('text')
+      const url = this.getUrlWithQuery({ query })
       if (url) {
         this.newTab({ url })
       }

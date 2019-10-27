@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { remote } from 'electron'
+import { shell } from 'electron'
 import { mapActions, mapGetters } from 'vuex'
 import AppTabListItemIcon from '~/components/AppTabListItemIcon'
 import Badge from '~/components/Badge'
@@ -73,7 +73,7 @@ export default {
         },
         {
           label: 'Open Current Page in a Default Browser',
-          click: () => remote.shell.openExternal(this.tab.url)
+          click: () => shell.openExternal(this.tab.url)
         },
         { type: 'separator' },
         {
