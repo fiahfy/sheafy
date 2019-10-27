@@ -3,9 +3,36 @@ export const state = () => ({
 })
 
 export const getters = {
-  isDeletable() {
-    return ({ download }) =>
-      ['completed', 'cancelled', 'failed'].includes(download.status)
+  getDownload(state) {
+    return ({ id }) => state.downloads.find((download) => download.id === id)
+  },
+  canPause(state, getters) {
+    return ({ id }) =>
+      ['progressing'].includes(getters.getDownload({ id }).status)
+  },
+  canResume(state, getters) {
+    return ({ id }) =>
+      ['paused', 'interrupted'].includes(getters.getDownload({ id }).status)
+  },
+  canCancel(state, getters) {
+    return ({ id }) =>
+      ['progressing', 'paused', 'interrupted'].includes(
+        getters.getDownload({ id }).status
+      )
+  },
+  canShowInFolder(state, getters) {
+    return ({ id }) =>
+      ['completed'].includes(getters.getDownload({ id }).status)
+  },
+  canRetry(state, getters) {
+    return ({ id }) =>
+      ['cancelled', 'failed'].includes(getters.getDownload({ id }).status)
+  },
+  canDelete(state, getters) {
+    return ({ id }) =>
+      ['completed', 'cancelled', 'failed'].includes(
+        getters.getDownload({ id }).status
+      )
   }
 }
 
@@ -29,13 +56,14 @@ export const actions = {
   },
   deleteDownload({ commit, getters, state }, { id }) {
     const downloads = state.downloads.filter(
-      (download) => download.id !== id || !getters.isDeletable({ download })
+      (download) =>
+        download.id !== id || !getters.canDelete({ id: download.id })
     )
     commit('setDownloads', { downloads })
   },
   clearDownloads({ commit, getters, state }) {
     const downloads = state.downloads.filter(
-      (download) => !getters.isDeletable({ download })
+      (download) => !getters.canDelete({ id: download.id })
     )
     commit('setDownloads', { downloads })
   }

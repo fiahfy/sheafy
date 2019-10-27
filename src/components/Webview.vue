@@ -155,7 +155,7 @@ export default {
         this.webview.addEventListener(
           'page-favicon-updated',
           ({ favicons }) => {
-            const favicon = favicons[0]
+            const favicon = favicons[favicons.length - 1]
             this.updateTab({ id: this.tab.id, favicon })
           }
         )
@@ -220,8 +220,8 @@ export default {
               break
             }
             case 'search': {
-              const [text] = args
-              const url = this.getUrlWithQuery(text)
+              const [query] = args
+              const url = this.getUrlWithQuery({ query })
               this.newTab({ url, options: { position: 'next' } })
               break
             }
@@ -297,7 +297,8 @@ export default {
     },
     load() {
       if (this.active) {
-        const url = this.getUrlWithQuery(this.tab.query)
+        const query = this.tab.query
+        const url = this.getUrlWithQuery({ query })
         if (url) {
           this.webview.loadURL(url)
         }

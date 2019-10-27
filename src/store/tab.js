@@ -67,7 +67,7 @@ export const getters = {
     return ({ id }) => id === state.activeId
   },
   getUrlWithQuery() {
-    return (query) => {
+    return ({ query }) => {
       if (!query) {
         return ''
       }

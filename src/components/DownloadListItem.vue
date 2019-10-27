@@ -3,6 +3,7 @@
     class="download-list-item"
     :title="download.filename"
     @click="onClickItem"
+    @contextmenu.stop="onContextMenu"
   >
     <v-list-item-avatar class="my-0 mr-3">
       <v-icon v-text="icon" />
@@ -24,7 +25,7 @@
 
     <v-list-item-action class="flex-row align-center my-0">
       <v-btn
-        v-if="canPause"
+        v-if="canPause({ id: download.id })"
         icon
         width="36"
         height="36"
@@ -35,7 +36,7 @@
         <v-icon size="20">mdi-pause</v-icon>
       </v-btn>
       <v-btn
-        v-if="canResume"
+        v-if="canResume({ id: download.id })"
         icon
         width="36"
         height="36"
@@ -46,7 +47,7 @@
         <v-icon size="20">mdi-play</v-icon>
       </v-btn>
       <v-btn
-        v-if="canCancel"
+        v-if="canCancel({ id: download.id })"
         icon
         width="36"
         height="36"
@@ -57,7 +58,7 @@
         <v-icon size="20">mdi-cancel</v-icon>
       </v-btn>
       <v-btn
-        v-if="canShowInFolder"
+        v-if="canShowInFolder({ id: download.id })"
         icon
         width="36"
         height="36"
@@ -68,7 +69,7 @@
         <v-icon size="20">mdi-folder-outline</v-icon>
       </v-btn>
       <v-btn
-        v-if="canRetry"
+        v-if="canRetry({ id: download.id })"
         icon
         width="36"
         height="36"
@@ -79,7 +80,7 @@
         <v-icon size="20">mdi-refresh</v-icon>
       </v-btn>
       <v-btn
-        v-if="canDelete"
+        v-if="canDelete({ id: download.id })"
         icon
         width="36"
         height="36"
@@ -95,7 +96,7 @@
 
 <script>
 import { ipcRenderer, shell } from 'electron'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import prettyBytes from 'pretty-bytes'
 
 export default {
@@ -107,9 +108,17 @@ export default {
   },
   computed: {
     icon() {
-      return ['cancelled', 'failed'].includes(this.download.status)
-        ? 'mdi-image-broken-variant'
-        : 'mdi-file-outline'
+      switch (this.download.status) {
+        case 'progressing':
+        case 'paused':
+        case 'interrupted':
+          return 'mdi-file-download-outline'
+        case 'cancelled':
+        case 'failed':
+          return 'mdi-file-alert-outline'
+        default:
+          return 'mdi-file-outline'
+      }
     },
     startedAt() {
       return new Date(this.download.startTime).toLocaleDateString()
@@ -133,26 +142,14 @@ export default {
         ? this.download.status
         : ''
     },
-    canPause() {
-      return ['progressing'].includes(this.download.status)
-    },
-    canResume() {
-      return ['paused', 'interrupted'].includes(this.download.status)
-    },
-    canCancel() {
-      return ['progressing', 'paused', 'interrupted'].includes(
-        this.download.status
-      )
-    },
-    canShowInFolder() {
-      return ['completed'].includes(this.download.status)
-    },
-    canRetry() {
-      return ['cancelled', 'failed'].includes(this.download.status)
-    },
-    canDelete() {
-      return ['completed', 'cancelled', 'failed'].includes(this.download.status)
-    }
+    ...mapGetters('download', [
+      'canPause',
+      'canResume',
+      'canCancel',
+      'canShowInFolder',
+      'canRetry',
+      'canDelete'
+    ])
   },
   methods: {
     onClickItem() {
@@ -177,6 +174,76 @@ export default {
     },
     onClickDelete() {
       this.deleteDownload({ id: this.download.id })
+    },
+    onContextMenu() {
+      let template = []
+
+      if (this.download.status === 'completed') {
+        template = [
+          ...template,
+          {
+            label: 'Open File',
+            click: () => shell.openItem(this.download.filepath)
+          }
+        ]
+      }
+      if (this.canPause({ id: this.download.id })) {
+        template = [
+          ...template,
+          {
+            label: 'Pause',
+            click: () => ipcRenderer.send('pauseDownload', this.download.id)
+          }
+        ]
+      }
+      if (this.canResume({ id: this.download.id })) {
+        template = [
+          ...template,
+          {
+            label: 'Resume',
+            click: () => ipcRenderer.send('resumeDownload', this.download.id)
+          }
+        ]
+      }
+      if (this.canCancel({ id: this.download.id })) {
+        template = [
+          ...template,
+          {
+            label: 'Cancel',
+            click: () => ipcRenderer.send('cancelDownload', this.download.id)
+          }
+        ]
+      }
+      if (this.canShowInFolder({ id: this.download.id })) {
+        template = [
+          ...template,
+          {
+            label: 'Show in Folder',
+            click: () => shell.showItemInFolder(this.download.filepath)
+          }
+        ]
+      }
+      if (this.canRetry({ id: this.download.id })) {
+        template = [
+          ...template,
+          {
+            label: 'Retry',
+            click: () => this.$eventBus.$emit('download', this.download.url)
+          }
+        ]
+      }
+      if (this.canDelete({ id: this.download.id })) {
+        template = [
+          ...template,
+          { type: 'separator' },
+          {
+            label: 'Delete',
+            click: () => this.deleteDownload({ id: this.download.id })
+          }
+        ]
+      }
+
+      this.$contextMenu.show(template)
     },
     ...mapActions('download', ['deleteDownload'])
   }

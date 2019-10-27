@@ -93,7 +93,8 @@ export default {
       if (effectAllowed === 'move') {
         return
       }
-      const url = this.getUrlWithQuery(e.dataTransfer.getData('text'))
+      const query = e.dataTransfer.getData('text')
+      const url = this.getUrlWithQuery({ query })
       if (url) {
         this.newTab({ url })
       }
