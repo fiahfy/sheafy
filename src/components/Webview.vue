@@ -63,8 +63,8 @@ export default {
     this.$eventBus.$off('download', this.download)
     this.$eventBus.$off('findInPage', this.findInPage)
     this.$eventBus.$off('stopFindInPage', this.stopFindInPage)
-    this.$eventBus.$off('requestBackHistories', this.requestBackHistories)
-    this.$eventBus.$off('requestForwardHistories', this.requestForwardHistories)
+    this.$eventBus.$off('requestBackHistory', this.requestBackHistory)
+    this.$eventBus.$off('requestForwardHistory', this.requestForwardHistory)
     this.webview && this.webview.remove()
   },
   methods: {
@@ -96,11 +96,8 @@ export default {
         this.$eventBus.$on('download', this.download)
         this.$eventBus.$on('findInPage', this.findInPage)
         this.$eventBus.$on('stopFindInPage', this.stopFindInPage)
-        this.$eventBus.$on('requestBackHistories', this.requestBackHistories)
-        this.$eventBus.$on(
-          'requestForwardHistories',
-          this.requestForwardHistories
-        )
+        this.$eventBus.$on('requestBackHistory', this.requestBackHistory)
+        this.$eventBus.$on('requestForwardHistory', this.requestForwardHistory)
 
         this.webview.addEventListener('load-commit', ({ url, isMainFrame }) => {
           if (isMainFrame) {
@@ -319,20 +316,20 @@ export default {
         this.webview.stopFindInPage('clearSelection')
       }
     },
-    requestBackHistories() {
+    requestBackHistory() {
       if (this.active) {
         const contents = this.webview.getWebContents()
-        const histories = contents.history
+        const history = contents.history
           .slice(0, contents.getActiveIndex())
           .reverse()
-        this.$eventBus.$emit('showBackHistories', histories)
+        this.$eventBus.$emit('showBackHistory', history)
       }
     },
-    requestForwardHistories() {
+    requestForwardHistory() {
       if (this.active) {
         const contents = this.webview.getWebContents()
-        const histories = contents.history.slice(contents.getActiveIndex() + 1)
-        this.$eventBus.$emit('showForwardHistories', histories)
+        const history = contents.history.slice(contents.getActiveIndex() + 1)
+        this.$eventBus.$emit('showForwardHistory', history)
       }
     },
     ...mapActions(['hideShortcutBar']),

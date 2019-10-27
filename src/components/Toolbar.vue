@@ -54,7 +54,7 @@
       v-model="query"
       outlined
       hide-details
-      class="ml-1 body-2"
+      class="mx-1 body-2"
       name="query"
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
@@ -63,6 +63,32 @@
     >
       <v-icon slot="prepend-inner" small v-text="icon" />
     </v-text-field>
+    <v-btn
+      v-long-press="onContextMenuBackTab"
+      icon
+      width="36"
+      height="36"
+      class="ml-1"
+      title="Go Back Tab"
+      :disabled="!canGoBackTab"
+      @click="goBackTab"
+      @contextmenu.stop="onContextMenuBackTab"
+    >
+      <v-icon size="20">mdi-chevron-left</v-icon>
+    </v-btn>
+    <v-btn
+      v-long-press="onContextMenuForwardTab"
+      icon
+      width="36"
+      height="36"
+      class="ml-1"
+      title="Go Forward Tab"
+      :disabled="!canGoForwardTab"
+      @click="goForwardTab"
+      @contextmenu.stop="onContextMenuForwardTab"
+    >
+      <v-icon size="20">mdi-chevron-right</v-icon>
+    </v-btn>
     <v-divider slot="extension" />
   </v-toolbar>
 </template>
@@ -94,15 +120,21 @@ export default {
         }
       }
     },
-    ...mapGetters('tab', ['activeTab'])
+    ...mapGetters('tab', [
+      'activeTab',
+      'canGoBackTab',
+      'canGoForwardTab',
+      'backTabHistory',
+      'forwardTabHistory'
+    ])
   },
   mounted() {
-    this.$eventBus.$on('showBackHistories', this.showBackHistories)
-    this.$eventBus.$on('showForwardHistories', this.showForwardHistories)
+    this.$eventBus.$on('showBackHistory', this.showBackHistory)
+    this.$eventBus.$on('showForwardHistory', this.showForwardHistory)
   },
   destroyed() {
-    this.$eventBus.$off('showBackHistories', this.showBackHistories)
-    this.$eventBus.$off('showForwardHistories', this.showForwardHistories)
+    this.$eventBus.$off('showBackHistory', this.showBackHistory)
+    this.$eventBus.$off('showForwardHistory', this.showForwardHistory)
   },
   methods: {
     goBack() {
@@ -117,9 +149,9 @@ export default {
     stop() {
       this.$eventBus.$emit('stop')
     },
-    showBackHistories(histories) {
+    showBackHistory(history) {
       this.$contextMenu.show(
-        histories.map((history, index) => {
+        history.map((history, index) => {
           return {
             label: history,
             click: () => this.$eventBus.$emit('goToOffset', -index - 1)
@@ -127,9 +159,9 @@ export default {
         })
       )
     },
-    showForwardHistories(histories) {
+    showForwardHistory(history) {
       this.$contextMenu.show(
-        histories.map((history, index) => {
+        history.map((history, index) => {
           return {
             label: history,
             click: () => this.$eventBus.$emit('goToOffset', index + 1)
@@ -138,10 +170,10 @@ export default {
       )
     },
     onContextMenuBack() {
-      this.$eventBus.$emit('requestBackHistories')
+      this.$eventBus.$emit('requestBackHistory')
     },
     onContextMenuForward() {
-      this.$eventBus.$emit('requestForwardHistories')
+      this.$eventBus.$emit('requestForwardHistory')
     },
     onContextMenuReload() {
       this.$contextMenu.show([
@@ -158,6 +190,26 @@ export default {
         { role: 'copy' },
         { role: 'paste' }
       ])
+    },
+    onContextMenuBackTab() {
+      this.$contextMenu.show(
+        this.backTabHistory.map((history, index) => {
+          return {
+            label: history.title,
+            click: () => this.goToOffsetTab({ offset: -index - 1 })
+          }
+        })
+      )
+    },
+    onContextMenuForwardTab() {
+      this.$contextMenu.show(
+        this.forwardTabHistory.map((history, index) => {
+          return {
+            label: history.title,
+            click: () => this.goToOffsetTab({ offset: index + 1 })
+          }
+        })
+      )
     },
     onMouseDown(e) {
       if (e.target === document.activeElement) {
@@ -176,7 +228,12 @@ export default {
       e.target.blur()
       this.$eventBus.$emit('load')
     },
-    ...mapActions('tab', ['updateTab'])
+    ...mapActions('tab', [
+      'updateTab',
+      'goToOffsetTab',
+      'goBackTab',
+      'goForwardTab'
+    ])
   }
 }
 </script>
