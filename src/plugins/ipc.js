@@ -64,6 +64,12 @@ export default ({ store }) => {
   ipcRenderer.on('goForward', () => {
     store.$eventBus.$emit('goForward')
   })
+  ipcRenderer.on('goBackTab', () => {
+    store.dispatch('tab/goBackTab')
+  })
+  ipcRenderer.on('goForwardTab', () => {
+    store.dispatch('tab/goForwardTab')
+  })
   // TODO: https://github.com/electron/electron/issues/15728
   ipcRenderer.on('undo', () => {
     if (document.activeElement.tagName.toLocaleLowerCase() === 'webview') {

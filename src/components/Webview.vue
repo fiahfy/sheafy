@@ -42,7 +42,13 @@ export default {
       }
       this.$nextTick(() => {
         this.webview.style.display = this.display
-        value ? this.webview.focus() : this.webview.blur()
+        // TODO: the accelerator is not worked if the active tab is changed
+        this.webview.blur()
+        if (value) {
+          this.$nextTick(() => {
+            this.webview.focus()
+          })
+        }
       })
     }
   },

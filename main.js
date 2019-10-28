@@ -129,6 +129,17 @@ const createTemplate = () => {
           label: 'Forward',
           accelerator: 'CmdOrCtrl+Right',
           click: () => send('goForward')
+        },
+        { type: 'separator' },
+        {
+          label: 'Back Tab',
+          accelerator: 'Alt+Left',
+          click: () => send('goBackTab')
+        },
+        {
+          label: 'Forward Tab',
+          accelerator: 'Alt+Right',
+          click: () => send('goForwardTab')
         }
       ]
     },
