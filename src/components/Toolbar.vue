@@ -39,14 +39,12 @@
     </v-btn>
     <v-btn
       v-else
-      v-long-press="onContextMenuReload"
       icon
       width="36"
       height="36"
       class="mr-1"
       title="Reload"
       @click="reload"
-      @contextmenu.stop="onContextMenuReload"
     >
       <v-icon size="20">mdi-refresh</v-icon>
     </v-btn>
