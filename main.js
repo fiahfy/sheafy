@@ -101,10 +101,6 @@ const createTemplate = () => {
           click: () => send('forceReload')
         },
         { type: 'separator' },
-        { role: 'resetzoom' },
-        { role: 'zoomin' },
-        { role: 'zoomout' },
-        { type: 'separator' },
         {
           label: 'Developer',
           submenu: [
@@ -114,6 +110,10 @@ const createTemplate = () => {
           ]
         },
         { type: 'separator' },
+        // { role: 'resetzoom' },
+        // { role: 'zoomin' },
+        // { role: 'zoomout' },
+        // { type: 'separator' },
         { role: 'togglefullscreen' }
       ]
     },
