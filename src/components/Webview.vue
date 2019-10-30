@@ -163,7 +163,7 @@ export default {
           }
         )
         this.webview.addEventListener('did-start-loading', () => {
-          this.updateTab({ id: this.tab.id, loading: true, searching: false })
+          this.updateTab({ id: this.tab.id, loading: true, finding: false })
           this.webview.stopFindInPage('clearSelection')
         })
         this.webview.addEventListener('did-stop-loading', () => {
@@ -172,8 +172,8 @@ export default {
         this.webview.addEventListener('found-in-page', ({ result }) => {
           this.updateTab({
             id: this.tab.id,
-            searchActiveMatchOrdinal: result.activeMatchOrdinal,
-            searchMatches: result.matches
+            foundActiveMatchOrdinal: result.activeMatchOrdinal,
+            foundMatches: result.matches
           })
         })
         this.webview.addEventListener('new-window', ({ disposition, url }) => {

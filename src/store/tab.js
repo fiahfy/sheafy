@@ -119,10 +119,10 @@ export const actions = {
       canGoBack: false,
       canGoForward: false,
       query: '',
-      searching: false,
-      searchText: '',
-      searchActiveMatchOrdinal: null,
-      searchMatches: null,
+      finding: false,
+      findingText: '',
+      foundActiveMatchOrdinal: null,
+      foundMatches: null,
       loaded: false,
       ...params
     })

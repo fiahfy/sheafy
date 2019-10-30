@@ -47,7 +47,7 @@ Download the app from [release page](https://github.com/fiahfy/sheafy/releases) 
 | Cut | ⌘X |
 | Copy | ⌘C |
 | Paste | ⌘V |
-| Search | ⌘F |
+| Find | ⌘F |
 
 ### View
 

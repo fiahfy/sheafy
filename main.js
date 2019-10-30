@@ -70,9 +70,9 @@ const createTemplate = () => {
         { role: 'selectall' },
         { type: 'separator' },
         {
-          label: 'Search...',
+          label: 'Find...',
           accelerator: 'CmdOrCtrl+F',
-          click: () => send('search')
+          click: () => send('find')
         }
       ]
     },
@@ -100,6 +100,10 @@ const createTemplate = () => {
           accelerator: 'CmdOrCtrl+Shift+R',
           click: () => send('forceReload')
         },
+        // { type: 'separator' },
+        // { role: 'resetzoom' },
+        // { role: 'zoomin' },
+        // { role: 'zoomout' },
         { type: 'separator' },
         {
           label: 'Developer',
@@ -110,10 +114,6 @@ const createTemplate = () => {
           ]
         },
         { type: 'separator' },
-        // { role: 'resetzoom' },
-        // { role: 'zoomin' },
-        // { role: 'zoomout' },
-        // { type: 'separator' },
         { role: 'togglefullscreen' }
       ]
     },

@@ -7,7 +7,7 @@
         <div class="wrapper flex-grow-1 overflow-hidden">
           <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
           <shortcut-bar />
-          <search-bar />
+          <finding-bar />
           <status-bar />
         </div>
       </div>
@@ -19,7 +19,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import ActivityBar from '~/components/ActivityBar'
-import SearchBar from '~/components/SearchBar'
+import FindingBar from '~/components/FindingBar'
 import ShortcutBar from '~/components/ShortcutBar'
 import Sidebar from '~/components/Sidebar'
 import StatusBar from '~/components/StatusBar'
@@ -29,7 +29,7 @@ import Webview from '~/components/Webview'
 export default {
   components: {
     ActivityBar,
-    SearchBar,
+    FindingBar,
     ShortcutBar,
     Sidebar,
     StatusBar,
@@ -66,7 +66,7 @@ export default {
   .wrapper {
     position: relative;
   }
-  .search-bar {
+  .finding-bar {
     position: absolute;
     top: 0;
     right: 0;

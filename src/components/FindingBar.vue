@@ -1,8 +1,8 @@
 <template>
-  <v-toolbar v-if="activeTab.searching" dense class="search-bar">
+  <v-toolbar v-if="activeTab.finding" dense class="finding-bar">
     <v-text-field
-      v-model="searchText"
-      name="search-text"
+      v-model="findingText"
+      name="finding-text"
       class="body-2"
       autofocus
       hide-details
@@ -10,8 +10,8 @@
       @keydown.enter="onKeyDownEnter"
       @keydown.esc="onKeyDownEsc"
     />
-    <div v-if="activeTab.searchMatches !== null" class="ml-2 body-2">
-      {{ activeTab.searchActiveMatchOrdinal }} / {{ activeTab.searchMatches }}
+    <div v-if="activeTab.foundMatches !== null" class="ml-2 body-2">
+      {{ activeTab.foundActiveMatchOrdinal }} / {{ activeTab.foundMatches }}
     </div>
     <v-btn
       icon
@@ -19,7 +19,7 @@
       height="36"
       class="ml-1"
       title="Close"
-      :disabled="!searchText"
+      :disabled="!findingText"
       @click="onClickUp"
     >
       <v-icon size="20">mdi-chevron-up</v-icon>
@@ -30,7 +30,7 @@
       height="36"
       class="ml-1"
       title="Close"
-      :disabled="!searchText"
+      :disabled="!findingText"
       @click="onClickDown"
     >
       <v-icon size="20">mdi-chevron-down</v-icon>
@@ -49,18 +49,18 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   computed: {
-    searchText: {
+    findingText: {
       get() {
-        return this.activeTab.searchText
+        return this.activeTab.findingText
       },
-      set(searchText) {
-        this.updateTab({ id: this.activeTab.id, searchText })
-        if (searchText) {
-          this.$eventBus.$emit('findInPage', searchText, {
+      set(value) {
+        this.updateTab({ id: this.activeTab.id, findingText: value })
+        if (value) {
+          this.$eventBus.$emit('findInPage', value, {
             forward: true,
             findNext: false
           })
@@ -68,8 +68,8 @@ export default {
           this.$eventBus.$emit('stopFindInPage')
           this.updateTab({
             id: this.activeTab.id,
-            searchActiveMatchOrdinal: null,
-            searchMatches: null
+            foundActiveMatchOrdinal: null,
+            foundMatches: null
           })
         }
       }
@@ -79,16 +79,16 @@ export default {
   methods: {
     onFocus(e) {
       e.target.select()
-      if (this.searchText) {
-        this.$eventBus.$emit('findInPage', this.searchText, {
+      if (this.findingText) {
+        this.$eventBus.$emit('findInPage', this.findingText, {
           forward: true,
           findNext: false
         })
       }
     },
     onKeyDownEnter(e) {
-      if (this.searchText) {
-        this.$eventBus.$emit('findInPage', this.searchText, {
+      if (this.findingText) {
+        this.$eventBus.$emit('findInPage', this.findingText, {
           forward: !e.shiftKey,
           findNext: true
         })
@@ -96,19 +96,19 @@ export default {
     },
     onKeyDownEsc() {
       this.$eventBus.$emit('stopFindInPage')
-      this.updateTab({ id: this.activeTab.id, searching: false })
+      this.updateTab({ id: this.activeTab.id, finding: false })
     },
     onClickUp() {
-      if (this.searchText) {
-        this.$eventBus.$emit('findInPage', this.searchText, {
+      if (this.findingText) {
+        this.$eventBus.$emit('findInPage', this.findingText, {
           forward: false,
           findNext: true
         })
       }
     },
     onClickDown() {
-      if (this.searchText) {
-        this.$eventBus.$emit('findInPage', this.searchText, {
+      if (this.findingText) {
+        this.$eventBus.$emit('findInPage', this.findingText, {
           forward: true,
           findNext: true
         })
@@ -116,7 +116,7 @@ export default {
     },
     onClickClose() {
       this.$eventBus.$emit('stopFindInPage')
-      this.updateTab({ id: this.activeTab.id, searching: false })
+      this.updateTab({ id: this.activeTab.id, finding: false })
     },
     ...mapActions('tab', ['updateTab'])
   }

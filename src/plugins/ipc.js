@@ -36,10 +36,10 @@ export default ({ store }) => {
     el && el.focus()
     el && el.select()
   })
-  ipcRenderer.on('search', () => {
+  ipcRenderer.on('find', () => {
     const id = store.state.tab.activeId
-    store.dispatch('tab/updateTab', { id, searching: true })
-    const el = document.querySelector('input[name=search-text]')
+    store.dispatch('tab/updateTab', { id, finding: true })
+    const el = document.querySelector('input[name=finding-text]')
     el && el.focus()
     el && el.select()
   })
