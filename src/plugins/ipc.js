@@ -36,10 +36,10 @@ export default ({ store }) => {
     el && el.focus()
     el && el.select()
   })
-  ipcRenderer.on('search', () => {
+  ipcRenderer.on('find', () => {
     const id = store.state.tab.activeId
-    store.dispatch('tab/updateTab', { id, searching: true })
-    const el = document.querySelector('input[name=search-text]')
+    store.dispatch('tab/updateTab', { id, finding: true })
+    const el = document.querySelector('input[name=finding-text]')
     el && el.focus()
     el && el.select()
   })
@@ -58,11 +58,26 @@ export default ({ store }) => {
   ipcRenderer.on('forceReload', () => {
     store.$eventBus.$emit('forceReload')
   })
+  ipcRenderer.on('resetZoom', () => {
+    store.$eventBus.$emit('resetZoom')
+  })
+  ipcRenderer.on('zoomIn', () => {
+    store.$eventBus.$emit('zoomIn')
+  })
+  ipcRenderer.on('zoomOut', () => {
+    store.$eventBus.$emit('zoomOut')
+  })
   ipcRenderer.on('goBack', () => {
     store.$eventBus.$emit('goBack')
   })
   ipcRenderer.on('goForward', () => {
     store.$eventBus.$emit('goForward')
+  })
+  ipcRenderer.on('goBackTab', () => {
+    store.dispatch('tab/goBackTab')
+  })
+  ipcRenderer.on('goForwardTab', () => {
+    store.dispatch('tab/goForwardTab')
   })
   // TODO: https://github.com/electron/electron/issues/15728
   ipcRenderer.on('undo', () => {

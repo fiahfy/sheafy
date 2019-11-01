@@ -70,9 +70,9 @@ const createTemplate = () => {
         { role: 'selectall' },
         { type: 'separator' },
         {
-          label: 'Search...',
+          label: 'Find...',
           accelerator: 'CmdOrCtrl+F',
-          click: () => send('search')
+          click: () => send('find')
         }
       ]
     },
@@ -102,6 +102,22 @@ const createTemplate = () => {
         },
         { type: 'separator' },
         {
+          label: 'Actual Size',
+          accelerator: 'CmdOrCtrl+0',
+          click: () => send('resetZoom')
+        },
+        {
+          label: 'Zoom In',
+          accelerator: 'CmdOrCtrl+Plus',
+          click: () => send('zoomIn')
+        },
+        {
+          label: 'Zoom Out',
+          accelerator: 'CmdOrCtrl+-',
+          click: () => send('zoomOut')
+        },
+        { type: 'separator' },
+        {
           label: 'Developer',
           submenu: [
             { role: 'reload', accelerator: 'CmdOrCtrl+Alt+R' },
@@ -110,10 +126,6 @@ const createTemplate = () => {
           ]
         },
         { type: 'separator' },
-        // { role: 'resetzoom' },
-        // { role: 'zoomin' },
-        // { role: 'zoomout' },
-        // { type: 'separator' },
         { role: 'togglefullscreen' }
       ]
     },
@@ -129,6 +141,17 @@ const createTemplate = () => {
           label: 'Forward',
           accelerator: 'CmdOrCtrl+Right',
           click: () => send('goForward')
+        },
+        { type: 'separator' },
+        {
+          label: 'Back Tab',
+          accelerator: 'Alt+Left',
+          click: () => send('goBackTab')
+        },
+        {
+          label: 'Forward Tab',
+          accelerator: 'Alt+Right',
+          click: () => send('goForwardTab')
         }
       ]
     },

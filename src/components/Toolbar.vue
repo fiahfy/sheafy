@@ -39,30 +39,16 @@
     </v-btn>
     <v-btn
       v-else
-      v-long-press="onContextMenuReload"
       icon
       width="36"
       height="36"
       class="mr-1"
       title="Reload"
       @click="reload"
-      @contextmenu.stop="onContextMenuReload"
     >
       <v-icon size="20">mdi-refresh</v-icon>
     </v-btn>
-    <v-text-field
-      v-model="query"
-      outlined
-      hide-details
-      class="mx-1 body-2"
-      name="query"
-      @mousedown="onMouseDown"
-      @mouseup="onMouseUp"
-      @keypress.enter="onKeyPressEnter"
-      @contextmenu.stop="onContextMenuTextField"
-    >
-      <v-icon slot="prepend-inner" small v-text="icon" />
-    </v-text-field>
+    <query-text-field class="mx-1" />
     <v-btn
       v-long-press="onContextMenuBackTab"
       icon
@@ -95,31 +81,13 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import QueryTextField from '~/components/QueryTextField'
 
 export default {
-  data() {
-    return {
-      focusIn: false
-    }
+  components: {
+    QueryTextField
   },
   computed: {
-    icon() {
-      const match = this.activeTab.url.match(/^http(s)?:\/\//)
-      if (match) {
-        return match[1] ? 'mdi-lock' : 'mdi-alert-circle-outline'
-      }
-      return 'mdi-help-circle-outline'
-    },
-    query: {
-      get() {
-        return this.activeTab && this.activeTab.query
-      },
-      set(value) {
-        if (this.activeTab) {
-          this.updateTab({ id: this.activeTab.id, query: value })
-        }
-      }
-    },
     ...mapGetters('tab', [
       'activeTab',
       'canGoBackTab',
@@ -175,22 +143,6 @@ export default {
     onContextMenuForward() {
       this.$eventBus.$emit('requestForwardHistory')
     },
-    onContextMenuReload() {
-      this.$contextMenu.show([
-        { label: 'Reload', click: () => this.$eventBus.$emit('reload') },
-        {
-          label: 'Force Reload',
-          click: () => this.$eventBus.$emit('forceReload')
-        }
-      ])
-    },
-    onContextMenuTextField() {
-      this.$contextMenu.show([
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' }
-      ])
-    },
     onContextMenuBackTab() {
       this.$contextMenu.show(
         this.backTabHistory.map((history, index) => {
@@ -211,29 +163,7 @@ export default {
         })
       )
     },
-    onMouseDown(e) {
-      if (e.target === document.activeElement) {
-        return
-      }
-      window.getSelection().empty()
-      this.focusIn = true
-    },
-    onMouseUp(e) {
-      if (this.focusIn && !window.getSelection().toString()) {
-        e.target.select()
-      }
-      this.focusIn = false
-    },
-    onKeyPressEnter(e) {
-      e.target.blur()
-      this.$eventBus.$emit('load')
-    },
-    ...mapActions('tab', [
-      'updateTab',
-      'goToOffsetTab',
-      'goBackTab',
-      'goForwardTab'
-    ])
+    ...mapActions('tab', ['goToOffsetTab', 'goBackTab', 'goForwardTab'])
   }
 }
 </script>
@@ -244,18 +174,6 @@ export default {
     padding: 0;
     > .v-divider {
       border-color: transparent;
-    }
-  }
-  .v-text-field--outlined > .v-input__control > .v-input__slot {
-    min-height: unset;
-    padding-left: 10px;
-    > .v-input__prepend-inner {
-      margin-top: 0;
-      padding-right: 8px;
-      align-self: center;
-    }
-    > .v-text-field__slot > input {
-      padding: 4px 0;
     }
   }
 }

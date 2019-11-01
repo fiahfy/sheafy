@@ -42,7 +42,13 @@ export default {
       }
       this.$nextTick(() => {
         this.webview.style.display = this.display
-        value ? this.webview.focus() : this.webview.blur()
+        // TODO: the accelerator is not worked if the active tab is changed
+        this.webview.blur()
+        if (value) {
+          this.$nextTick(() => {
+            this.webview.focus()
+          })
+        }
       })
     }
   },
@@ -63,6 +69,9 @@ export default {
     this.$eventBus.$off('download', this.download)
     this.$eventBus.$off('findInPage', this.findInPage)
     this.$eventBus.$off('stopFindInPage', this.stopFindInPage)
+    this.$eventBus.$off('resetZoom', this.resetZoom)
+    this.$eventBus.$off('zoomIn', this.zoomIn)
+    this.$eventBus.$off('zoomOut', this.zoomOut)
     this.$eventBus.$off('requestBackHistory', this.requestBackHistory)
     this.$eventBus.$off('requestForwardHistory', this.requestForwardHistory)
     this.webview && this.webview.remove()
@@ -96,6 +105,9 @@ export default {
         this.$eventBus.$on('download', this.download)
         this.$eventBus.$on('findInPage', this.findInPage)
         this.$eventBus.$on('stopFindInPage', this.stopFindInPage)
+        this.$eventBus.$on('resetZoom', this.resetZoom)
+        this.$eventBus.$on('zoomIn', this.zoomIn)
+        this.$eventBus.$on('zoomOut', this.zoomOut)
         this.$eventBus.$on('requestBackHistory', this.requestBackHistory)
         this.$eventBus.$on('requestForwardHistory', this.requestForwardHistory)
 
@@ -157,7 +169,7 @@ export default {
           }
         )
         this.webview.addEventListener('did-start-loading', () => {
-          this.updateTab({ id: this.tab.id, loading: true, searching: false })
+          this.updateTab({ id: this.tab.id, loading: true, finding: false })
           this.webview.stopFindInPage('clearSelection')
         })
         this.webview.addEventListener('did-stop-loading', () => {
@@ -166,8 +178,8 @@ export default {
         this.webview.addEventListener('found-in-page', ({ result }) => {
           this.updateTab({
             id: this.tab.id,
-            searchActiveMatchOrdinal: result.activeMatchOrdinal,
-            searchMatches: result.matches
+            foundActiveMatchOrdinal: result.activeMatchOrdinal,
+            foundMatches: result.matches
           })
         })
         this.webview.addEventListener('new-window', ({ disposition, url }) => {
@@ -314,6 +326,27 @@ export default {
     stopFindInPage() {
       if (this.active) {
         this.webview.stopFindInPage('clearSelection')
+      }
+    },
+    resetZoom() {
+      if (this.active) {
+        this.webview.setZoomLevel(1)
+      }
+    },
+    zoomIn() {
+      if (this.active) {
+        const level = this.webview.getZoomLevel()
+        if (level < 9) {
+          this.webview.setZoomLevel(level + 1)
+        }
+      }
+    },
+    zoomOut() {
+      if (this.active) {
+        const level = this.webview.getZoomLevel()
+        if (level > -6) {
+          this.webview.setZoomLevel(level - 1)
+        }
       }
     },
     requestBackHistory() {

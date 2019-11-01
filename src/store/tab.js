@@ -119,10 +119,10 @@ export const actions = {
       canGoBack: false,
       canGoForward: false,
       query: '',
-      searching: false,
-      searchText: '',
-      searchActiveMatchOrdinal: null,
-      searchMatches: null,
+      finding: false,
+      findingText: '',
+      foundActiveMatchOrdinal: null,
+      foundMatches: null,
       loaded: false,
       ...params
     })
@@ -256,7 +256,10 @@ export const actions = {
     }
     commit('setActiveId', { activeId: id })
     if (id) {
-      const history = [...state.history.slice(0, state.historyIndex + 1), id]
+      const history = [
+        ...state.history.slice(0, state.historyIndex + 1),
+        id
+      ].slice(-1001)
       commit('setHistory', { history })
       commit('setHistoryIndex', { historyIndex: history.length - 1 })
     } else {
