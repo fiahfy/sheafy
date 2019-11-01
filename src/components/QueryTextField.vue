@@ -17,11 +17,23 @@
       x-small
       depressed
       rounded
-      title="Stop Find"
-      @click.stop="onClickStopFind"
+      title="Find"
+      @click.stop="onClickFind"
       @mouseup.stop
     >
       <v-icon small>mdi-file-search-outline</v-icon>
+    </v-btn>
+    <v-btn
+      v-if="activeTab && activeTab.zooming"
+      slot="append"
+      x-small
+      depressed
+      rounded
+      title="Zoom"
+      @click.stop="onClickStopFind"
+      @mouseup.stop
+    >
+      <v-icon small>mdi-magnify-plus-outline</v-icon>
     </v-btn>
   </v-text-field>
 </template>
@@ -80,7 +92,7 @@ export default {
       e.target.blur()
       this.$eventBus.$emit('load')
     },
-    onClickStopFind() {
+    onClickFind() {
       if (this.activeTab) {
         this.updateTab({ id: this.activeTab.id, finding: false })
       }

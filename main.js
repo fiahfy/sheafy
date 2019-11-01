@@ -100,10 +100,22 @@ const createTemplate = () => {
           accelerator: 'CmdOrCtrl+Shift+R',
           click: () => send('forceReload')
         },
-        // { type: 'separator' },
-        // { role: 'resetzoom' },
-        // { role: 'zoomin' },
-        // { role: 'zoomout' },
+        { type: 'separator' },
+        {
+          label: 'Actual Size',
+          accelerator: 'CmdOrCtrl+0',
+          click: () => send('resetZoom')
+        },
+        {
+          label: 'Zoom In',
+          accelerator: 'CmdOrCtrl+Plus',
+          click: () => send('zoomIn')
+        },
+        {
+          label: 'Zoom Out',
+          accelerator: 'CmdOrCtrl+-',
+          click: () => send('zoomOut')
+        },
         { type: 'separator' },
         {
           label: 'Developer',

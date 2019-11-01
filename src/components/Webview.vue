@@ -69,6 +69,9 @@ export default {
     this.$eventBus.$off('download', this.download)
     this.$eventBus.$off('findInPage', this.findInPage)
     this.$eventBus.$off('stopFindInPage', this.stopFindInPage)
+    this.$eventBus.$off('resetZoom', this.resetZoom)
+    this.$eventBus.$off('zoomIn', this.zoomIn)
+    this.$eventBus.$off('zoomOut', this.zoomOut)
     this.$eventBus.$off('requestBackHistory', this.requestBackHistory)
     this.$eventBus.$off('requestForwardHistory', this.requestForwardHistory)
     this.webview && this.webview.remove()
@@ -102,6 +105,9 @@ export default {
         this.$eventBus.$on('download', this.download)
         this.$eventBus.$on('findInPage', this.findInPage)
         this.$eventBus.$on('stopFindInPage', this.stopFindInPage)
+        this.$eventBus.$on('resetZoom', this.resetZoom)
+        this.$eventBus.$on('zoomIn', this.zoomIn)
+        this.$eventBus.$on('zoomOut', this.zoomOut)
         this.$eventBus.$on('requestBackHistory', this.requestBackHistory)
         this.$eventBus.$on('requestForwardHistory', this.requestForwardHistory)
 
@@ -320,6 +326,27 @@ export default {
     stopFindInPage() {
       if (this.active) {
         this.webview.stopFindInPage('clearSelection')
+      }
+    },
+    resetZoom() {
+      if (this.active) {
+        this.webview.setZoomLevel(1)
+      }
+    },
+    zoomIn() {
+      if (this.active) {
+        const level = this.webview.getZoomLevel()
+        if (level < 9) {
+          this.webview.setZoomLevel(level + 1)
+        }
+      }
+    },
+    zoomOut() {
+      if (this.active) {
+        const level = this.webview.getZoomLevel()
+        if (level > -6) {
+          this.webview.setZoomLevel(level - 1)
+        }
       }
     },
     requestBackHistory() {

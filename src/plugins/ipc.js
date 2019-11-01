@@ -58,6 +58,15 @@ export default ({ store }) => {
   ipcRenderer.on('forceReload', () => {
     store.$eventBus.$emit('forceReload')
   })
+  ipcRenderer.on('resetZoom', () => {
+    store.$eventBus.$emit('resetZoom')
+  })
+  ipcRenderer.on('zoomIn', () => {
+    store.$eventBus.$emit('zoomIn')
+  })
+  ipcRenderer.on('zoomOut', () => {
+    store.$eventBus.$emit('zoomOut')
+  })
   ipcRenderer.on('goBack', () => {
     store.$eventBus.$emit('goBack')
   })
