@@ -8,18 +8,17 @@
   </v-list>
 </template>
 
-<script>
-import DownloadListItem from '~/components/DownloadListItem'
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+import Download from '~/models/download'
+import DownloadListItem from '~/components/DownloadListItem.vue'
 
-export default {
+@Component({
   components: {
     DownloadListItem
-  },
-  props: {
-    downloads: {
-      type: Array,
-      default: () => []
-    }
   }
+})
+export default class DownloadList extends Vue {
+  @Prop({ type: Array, default: () => [] }) readonly downloads!: Download[]
 }
 </script>

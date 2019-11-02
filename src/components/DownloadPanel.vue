@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="download-panel d-flex flex-column"
-    @dragover.prevent="onDragOver"
-    @drop.prevent="onDrop"
-  >
+  <div class="download-panel d-flex flex-column">
     <v-toolbar tile dense flat class="flex-grow-0">
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         downloads
@@ -15,7 +11,7 @@
         width="36"
         height="36"
         title="Clear All"
-        @click="clearDownloads"
+        @click="onClickClearAll"
       >
         <v-icon size="20">mdi-notification-clear-all</v-icon>
       </v-btn>
@@ -29,21 +25,25 @@
   </div>
 </template>
 
-<script>
-import { mapActions, mapState } from 'vuex'
-import Badge from '~/components/Badge'
-import DownloadList from '~/components/DownloadList'
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import { downloadStore } from '~/store'
+import Badge from '~/components/Badge.vue'
+import DownloadList from '~/components/DownloadList.vue'
 
-export default {
+@Component({
   components: {
     Badge,
     DownloadList
-  },
-  computed: {
-    ...mapState('download', ['downloads'])
-  },
-  methods: {
-    ...mapActions('download', ['clearDownloads'])
+  }
+})
+export default class DownloadPanel extends Vue {
+  get downloads() {
+    return downloadStore.downloads
+  }
+
+  onClickClearAll() {
+    downloadStore.clearDownloads()
   }
 }
 </script>

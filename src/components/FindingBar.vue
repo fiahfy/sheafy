@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar v-if="activeTab.finding" dense class="finding-bar">
+  <v-toolbar v-if="activeTab && activeTab.finding" dense class="finding-bar">
     <v-text-field
       v-model="findingText"
       name="finding-text"
@@ -9,8 +9,9 @@
       @focus="onFocus"
       @keydown.enter="onKeyDownEnter"
       @keydown.esc="onKeyDownEsc"
+      @contextmenu.stop="onContextMenu"
     />
-    <div v-if="activeTab.foundMatches !== null" class="ml-2 body-2">
+    <div v-if="activeTab && activeTab.findingText" class="ml-2 body-2">
       {{ activeTab.foundActiveMatchOrdinal }} / {{ activeTab.foundMatches }}
     </div>
     <v-btn
@@ -48,77 +49,88 @@
   </v-toolbar>
 </template>
 
-<script>
-import { mapActions, mapGetters } from 'vuex'
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import { tabStore } from '~/store'
 
-export default {
-  computed: {
-    findingText: {
-      get() {
-        return this.activeTab.findingText
-      },
-      set(value) {
-        this.updateTab({ id: this.activeTab.id, findingText: value })
-        if (value) {
-          this.$eventBus.$emit('findInPage', value, {
-            forward: true,
-            findNext: false
-          })
-        } else {
-          this.$eventBus.$emit('stopFindInPage')
-          this.updateTab({
-            id: this.activeTab.id,
-            foundActiveMatchOrdinal: null,
-            foundMatches: null
-          })
-        }
-      }
-    },
-    ...mapGetters('tab', ['activeTab'])
-  },
-  methods: {
-    onFocus(e) {
-      e.target.select()
-      if (this.findingText) {
-        this.$eventBus.$emit('findInPage', this.findingText, {
-          forward: true,
-          findNext: false
-        })
-      }
-    },
-    onKeyDownEnter(e) {
-      if (this.findingText) {
-        this.$eventBus.$emit('findInPage', this.findingText, {
-          forward: !e.shiftKey,
-          findNext: true
-        })
-      }
-    },
-    onKeyDownEsc() {
+@Component
+export default class FindingBar extends Vue {
+  get findingText() {
+    return (tabStore.activeTab && tabStore.activeTab.findingText) || ''
+  }
+  set findingText(value) {
+    if (!tabStore.activeTab) {
+      return
+    }
+    tabStore.updateTab({ id: tabStore.activeTab.id, findingText: value })
+    if (value) {
+      this.$eventBus.$emit('findInPage', value, {
+        forward: true,
+        findNext: false
+      })
+    } else {
       this.$eventBus.$emit('stopFindInPage')
-      this.updateTab({ id: this.activeTab.id, finding: false })
-    },
-    onClickUp() {
-      if (this.findingText) {
-        this.$eventBus.$emit('findInPage', this.findingText, {
-          forward: false,
-          findNext: true
-        })
-      }
-    },
-    onClickDown() {
-      if (this.findingText) {
-        this.$eventBus.$emit('findInPage', this.findingText, {
-          forward: true,
-          findNext: true
-        })
-      }
-    },
-    onClickClose() {
-      this.$eventBus.$emit('stopFindInPage')
-      this.updateTab({ id: this.activeTab.id, finding: false })
-    },
-    ...mapActions('tab', ['updateTab'])
+      tabStore.updateTab({
+        id: tabStore.activeTab.id,
+        foundActiveMatchOrdinal: 0,
+        foundMatches: 0
+      })
+    }
+  }
+  get activeTab() {
+    return tabStore.activeTab
+  }
+
+  onFocus() {
+    if (this.findingText) {
+      this.$eventBus.$emit('findInPage', this.findingText, {
+        forward: true,
+        findNext: false
+      })
+    }
+  }
+  onKeyDownEnter(e: KeyboardEvent) {
+    if (this.findingText) {
+      this.$eventBus.$emit('findInPage', this.findingText, {
+        forward: !e.shiftKey,
+        findNext: true
+      })
+    }
+  }
+  onKeyDownEsc() {
+    this.$eventBus.$emit('stopFindInPage')
+    if (tabStore.activeTab) {
+      tabStore.updateTab({ id: tabStore.activeTab.id, finding: false })
+    }
+  }
+  onContextMenu() {
+    this.$contextMenu.show([
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' }
+    ])
+  }
+  onClickUp() {
+    if (this.findingText) {
+      this.$eventBus.$emit('findInPage', this.findingText, {
+        forward: false,
+        findNext: true
+      })
+    }
+  }
+  onClickDown() {
+    if (this.findingText) {
+      this.$eventBus.$emit('findInPage', this.findingText, {
+        forward: true,
+        findNext: true
+      })
+    }
+  }
+  onClickClose() {
+    this.$eventBus.$emit('stopFindInPage')
+    if (tabStore.activeTab) {
+      tabStore.updateTab({ id: tabStore.activeTab.id, finding: false })
+    }
   }
 }
 </script>

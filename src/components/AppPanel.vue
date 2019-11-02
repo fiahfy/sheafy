@@ -10,7 +10,7 @@
       </span>
       <badge class="ml-3" :num="apps.length" />
       <v-spacer />
-      <v-btn icon width="36" height="36" title="New Tab" @click="newTab">
+      <v-btn icon width="36" height="36" title="New Tab" @click="onClickNewTab">
         <v-icon size="20">mdi-tab-plus</v-icon>
       </v-btn>
       <v-btn
@@ -38,74 +38,84 @@
   </div>
 </template>
 
-<script>
-import { mapActions, mapGetters } from 'vuex'
-import AppList from '~/components/AppList'
-import Badge from '~/components/Badge'
+<script lang="ts">
+import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
+import { tabStore } from '~/store'
+import Tab from '~/models/tab'
+import AppList from '~/components/AppList.vue'
+import Badge from '~/components/Badge.vue'
 
-export default {
+@Component({
   components: {
     AppList,
     Badge
-  },
-  computed: {
-    ...mapGetters('tab', ['activeTab', 'apps', 'getUrlWithQuery'])
-  },
-  watch: {
-    activeTab(newValue, oldValue) {
-      if (newValue.id === oldValue.id && newValue.host === oldValue.host) {
-        return
-      }
-      this.$nextTick(() => {
-        // Disabled transform for vuedraggable
-        this.$el.querySelectorAll('.app-tab-list').forEach((el) => {
-          el.parentElement.style.transform = 'none'
-          el.querySelectorAll('.app-tab-list-item').forEach((el) => {
-            el.parentElement.style.transform = 'none'
-          })
-        })
-        const tab = this.$el.querySelector(
-          '.app-tab-list-item.v-list-item--active'
-        )
-        if (!tab) {
-          return
-        }
-        if (this.$refs.container.scrollTop > tab.offsetTop) {
-          this.$refs.container.scrollTop = tab.offsetTop
-        }
-        if (
-          this.$refs.container.scrollTop + this.$refs.container.offsetHeight <
-          tab.offsetTop + tab.offsetHeight
-        ) {
-          this.$refs.container.scrollTop =
-            tab.offsetTop + tab.offsetHeight - this.$refs.container.offsetHeight
-        }
-      })
+  }
+})
+export default class AppPanel extends Vue {
+  @Ref() readonly container!: HTMLDivElement
+
+  get apps() {
+    return tabStore.apps
+  }
+  get activeTab() {
+    return tabStore.activeTab
+  }
+
+  @Watch('activeTab')
+  onActiveTabChanged(newValue: Tab, oldValue: Tab) {
+    if (newValue.id === oldValue.id && newValue.host === oldValue.host) {
+      return
     }
-  },
-  methods: {
-    onDragOver(e) {
-      e.dataTransfer.dropEffect = 'link'
-    },
-    onDrop(e) {
-      const effectAllowed = e.dataTransfer.effectAllowed
-      // Prevent for sorting tabs
-      if (effectAllowed === 'move') {
+    this.$nextTick(() => {
+      // Disabled transform for vuedraggable
+      this.$el.querySelectorAll('.app-tab-list').forEach((el) => {
+        el.parentElement!.style.transform = 'none'
+        el.querySelectorAll('.app-tab-list-item').forEach((el) => {
+          el.parentElement!.style.transform = 'none'
+        })
+      })
+      const tab = <HTMLElement>(
+        this.$el.querySelector('.app-tab-list-item.v-list-item--active')
+      )
+      if (!tab) {
         return
       }
-      const query = e.dataTransfer.getData('text')
-      const url = this.getUrlWithQuery({ query })
-      if (url) {
-        this.newTab({ url })
+      if (this.container.scrollTop > tab.offsetTop) {
+        this.container.scrollTop = tab.offsetTop
       }
-    },
-    onClickExpand() {
-      this.$eventBus.$emit('expandApps')
-    },
-    onClickCollapse() {
-      this.$eventBus.$emit('collapseApps')
-    },
-    ...mapActions('tab', ['newTab'])
+      if (
+        this.container.scrollTop + this.container.offsetHeight <
+        tab.offsetTop + tab.offsetHeight
+      ) {
+        this.container.scrollTop =
+          tab.offsetTop + tab.offsetHeight - this.container.offsetHeight
+      }
+    })
+  }
+
+  onDragOver(e: DragEvent) {
+    e.dataTransfer!.dropEffect = 'link'
+  }
+  onDrop(e: DragEvent) {
+    const effectAllowed = e.dataTransfer!.effectAllowed
+    // Prevent for sorting tabs
+    if (effectAllowed === 'move') {
+      return
+    }
+    const query = e.dataTransfer!.getData('text')
+    const url = tabStore.getUrlWithQuery({ query })
+    if (url) {
+      tabStore.newTab({ url })
+    }
+  }
+  onClickNewTab() {
+    tabStore.newTab()
+  }
+  onClickExpand() {
+    this.$eventBus.$emit('expandApps')
+  }
+  onClickCollapse() {
+    this.$eventBus.$emit('collapseApps')
   }
 }
 </script>

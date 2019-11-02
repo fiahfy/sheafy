@@ -1,3 +1,4 @@
+// reset
 html, body, #__nuxt, #__layout, #app {
   height: 100%;
   margin: 0;
@@ -6,10 +7,12 @@ html, body, #__nuxt, #__layout, #app {
 html {
   overflow-y: hidden;
 }
+// override
 .v-toolbar {
   // Prevent background color transition if dark theme is toggled
   transition: none;
 }
+// custom classes
 .user-select-none {
   user-select: none;
 }
@@ -33,7 +36,7 @@ html {
     }
   }
 }
-// dark theme
+// for dark theme
 .v-application.theme--dark {
   .scrollbar {
     &::-webkit-scrollbar-thumb {

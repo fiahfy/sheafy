@@ -38,66 +38,65 @@
   </v-text-field>
 </template>
 
-<script>
-import { mapActions, mapGetters } from 'vuex'
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import { tabStore } from '~/store'
 
-export default {
-  data() {
-    return {
-      focusIn: false
+@Component
+export default class QueryTextField extends Vue {
+  focusIn = false
+
+  get query() {
+    return (tabStore.activeTab && tabStore.activeTab.query) || ''
+  }
+  set query(value) {
+    if (tabStore.activeTab) {
+      tabStore.updateTab({ id: tabStore.activeTab.id, query: value })
     }
-  },
-  computed: {
-    icon() {
-      const match = this.activeTab.url.match(/^http(s)?:\/\//)
-      if (match) {
-        return match[1] ? 'mdi-lock' : 'mdi-alert-circle-outline'
-      }
-      return 'mdi-help-circle-outline'
-    },
-    query: {
-      get() {
-        return this.activeTab && this.activeTab.query
-      },
-      set(value) {
-        if (this.activeTab) {
-          this.updateTab({ id: this.activeTab.id, query: value })
-        }
-      }
-    },
-    ...mapGetters('tab', ['activeTab'])
-  },
-  methods: {
-    onContextMenu() {
-      this.$contextMenu.show([
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' }
-      ])
-    },
-    onMouseDown(e) {
-      if (e.target === document.activeElement) {
-        return
-      }
-      window.getSelection().empty()
-      this.focusIn = true
-    },
-    onMouseUp(e) {
-      if (this.focusIn && !window.getSelection().toString()) {
-        e.target.select()
-      }
-      this.focusIn = false
-    },
-    onKeyPressEnter(e) {
-      e.target.blur()
-      this.$eventBus.$emit('load')
-    },
-    onClickFind() {
-      if (this.activeTab) {
-        this.updateTab({ id: this.activeTab.id, finding: false })
-      }
-    },
-    ...mapActions('tab', ['updateTab'])
+  }
+  get activeTab() {
+    return tabStore.activeTab
+  }
+  get icon() {
+    const url = (tabStore.activeTab && tabStore.activeTab.url) || ''
+    const match = url.match(/^http(s)?:\/\//)
+    if (match) {
+      return match[1] ? 'mdi-lock' : 'mdi-alert-circle-outline'
+    }
+    return 'mdi-help-circle-outline'
+  }
+
+  onContextMenu() {
+    this.$contextMenu.show([
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' }
+    ])
+  }
+  onMouseDown(e: MouseEvent) {
+    const input = e.target
+    if (input === document.activeElement) {
+      return
+    }
+    ;(<Window>window).getSelection()!.empty()
+    this.focusIn = true
+  }
+  onMouseUp(e: MouseEvent) {
+    const input = <HTMLInputElement>e.target
+    if (this.focusIn && !(<Window>window).getSelection()!.toString()) {
+      input.select()
+    }
+    this.focusIn = false
+  }
+  onKeyPressEnter(e: KeyboardEvent) {
+    const input = <HTMLInputElement>e.target
+    input.blur()
+    this.$eventBus.$emit('load')
+  }
+  onClickFind() {
+    if (tabStore.activeTab) {
+      tabStore.updateTab({ id: tabStore.activeTab.id, finding: false })
+    }
   }
 }
 </script>
