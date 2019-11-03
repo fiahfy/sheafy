@@ -14,7 +14,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { remote } from 'electron'
-import { rootStore, tabStore } from '~/store'
+import { layoutStore, tabStore } from '~/store'
 
 @Component
 export default class TitleBar extends Vue {
@@ -22,7 +22,7 @@ export default class TitleBar extends Vue {
     return tabStore.activeTab ? tabStore.activeTab.title : ''
   }
   get titleBar() {
-    return process.platform === 'darwin' && !rootStore.fullScreen
+    return process.platform === 'darwin' && !layoutStore.fullScreen
   }
 
   // @see https://github.com/electron/electron/issues/16385

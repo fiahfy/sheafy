@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { rootStore, settingsStore } from '~/store'
+import { layoutStore, settingsStore } from '~/store'
 import TitleBar from '~/components/TitleBar.vue'
 
 @Component({
@@ -25,7 +25,7 @@ export default class Layout extends Vue {
   mounted() {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        rootStore.hideShortcutBar()
+        layoutStore.hideShortcutBar()
       }
     })
     this.$vuetify.theme.dark = this.darkTheme

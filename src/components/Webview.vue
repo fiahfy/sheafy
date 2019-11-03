@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { remote, WebviewTag } from 'electron'
-import { rootStore, tabStore } from '~/store'
+import { layoutStore, tabStore } from '~/store'
 import Tab from '~/models/tab'
 
 const urlWithoutHash = (url: string) => {
@@ -235,7 +235,7 @@ export default class Webview extends Vue {
           case 'keydown': {
             const [e] = args
             if (e.key === 'Escape') {
-              rootStore.hideShortcutBar()
+              layoutStore.hideShortcutBar()
             }
             break
           }

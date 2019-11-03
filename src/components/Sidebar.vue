@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { Vue, Component, PropSync, Ref, Watch } from 'vue-property-decorator'
-import { rootStore, settingsStore } from '~/store'
+import { layoutStore, settingsStore } from '~/store'
 import AppPanel from '~/components/AppPanel.vue'
 import DownloadPanel from '~/components/DownloadPanel.vue'
 import SettingsPanel from '~/components/SettingsPanel.vue'
@@ -40,13 +40,13 @@ export default class Sidebar extends Vue {
     return settingsStore.sideBarLocation === 'right' ? 'resizer--right' : ''
   }
   get panelId() {
-    return rootStore.panelId
+    return layoutStore.panelId
   }
 
   @Watch('activeId')
   onActiveIdChanged(newValue: string, oldValue: string) {
     if (newValue !== oldValue) {
-      rootStore.setPanelId({ panelId: 'apps' })
+      layoutStore.setPanelId({ panelId: 'apps' })
     }
   }
 

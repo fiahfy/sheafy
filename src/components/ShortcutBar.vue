@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
-import { rootStore, tabStore } from '~/store'
+import { layoutStore, tabStore } from '~/store'
 import Tab from '~/models/tab'
 
 @Component
@@ -48,7 +48,7 @@ export default class ShortcutBar extends Vue {
     }
   }
   get shortcutBar() {
-    return rootStore.shortcutBar
+    return layoutStore.shortcutBar
   }
   get tabs() {
     return tabStore.tabs
@@ -60,7 +60,7 @@ export default class ShortcutBar extends Vue {
       this.$nextTick(() => {
         this.$el.querySelector('input')!.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') {
-            rootStore.hideShortcutBar()
+            layoutStore.hideShortcutBar()
           }
         })
         this.width = (<HTMLElement>this.$el).offsetWidth
@@ -74,7 +74,7 @@ export default class ShortcutBar extends Vue {
 
   onChange(value: string) {
     tabStore.activateTab({ id: value })
-    rootStore.hideShortcutBar()
+    layoutStore.hideShortcutBar()
   }
 }
 </script>

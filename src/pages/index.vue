@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { rootStore, settingsStore, tabStore } from '~/store'
+import { layoutStore, settingsStore, tabStore } from '~/store'
 import ActivityBar from '~/components/ActivityBar.vue'
 import FindingBar from '~/components/FindingBar.vue'
 import ShortcutBar from '~/components/ShortcutBar.vue'
@@ -47,7 +47,7 @@ export default class Index extends Vue {
       : 'flex-row-reverse'
   }
   get fullScreen() {
-    return rootStore.fullScreen
+    return layoutStore.fullScreen
   }
   get tabs() {
     return tabStore.tabs

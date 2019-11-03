@@ -1,11 +1,11 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 
 @Module({
-  name: 'root',
+  name: 'layout',
   stateFactory: true,
   namespaced: true
 })
-export default class SettingsModule extends VuexModule {
+export default class LayoutModule extends VuexModule {
   fullScreen = false
   panelId = 'apps'
   shortcutBar = false

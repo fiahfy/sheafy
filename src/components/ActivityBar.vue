@@ -30,7 +30,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { rootStore, settingsStore } from '~/store'
+import { layoutStore, settingsStore } from '~/store'
 
 @Component
 export default class ActivityBar extends Vue {
@@ -45,10 +45,10 @@ export default class ActivityBar extends Vue {
   }
 
   isActive({ id }: { id: string }) {
-    return id === rootStore.panelId
+    return id === layoutStore.panelId
   }
   onClickItem({ id }: { id: string }) {
-    rootStore.setPanelId({ panelId: id })
+    layoutStore.setPanelId({ panelId: id })
   }
 }
 </script>

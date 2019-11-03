@@ -1,13 +1,13 @@
 import { Plugin } from '@nuxt/types'
 import { ipcRenderer } from 'electron'
-import { rootStore, downloadStore, tabStore } from '~/store'
+import { layoutStore, downloadStore, tabStore } from '~/store'
 
 const ipcPlugin: Plugin = (ctx) => {
   ipcRenderer.on('enterFullScreen', () => {
-    rootStore.setFullScreen({ fullScreen: true })
+    layoutStore.setFullScreen({ fullScreen: true })
   })
   ipcRenderer.on('leaveFullScreen', () => {
-    rootStore.setFullScreen({ fullScreen: false })
+    layoutStore.setFullScreen({ fullScreen: false })
   })
   ipcRenderer.on('swipe', (_e, direction) => {
     switch (direction) {
@@ -36,7 +36,7 @@ const ipcPlugin: Plugin = (ctx) => {
     el.focus()
   })
   ipcRenderer.on('goToTab', () => {
-    rootStore.showShortcutBar()
+    layoutStore.showShortcutBar()
     const el = <HTMLInputElement>document.querySelector('input[name=shortcut]')
     el && el.focus()
     el && el.select()
@@ -53,13 +53,13 @@ const ipcPlugin: Plugin = (ctx) => {
     }, 0)
   })
   ipcRenderer.on('showSettings', () => {
-    rootStore.setPanelId({ panelId: 'settings' })
+    layoutStore.setPanelId({ panelId: 'settings' })
   })
   ipcRenderer.on('showApps', () => {
-    rootStore.setPanelId({ panelId: 'apps' })
+    layoutStore.setPanelId({ panelId: 'apps' })
   })
   ipcRenderer.on('showDownloads', () => {
-    rootStore.setPanelId({ panelId: 'downloads' })
+    layoutStore.setPanelId({ panelId: 'downloads' })
   })
   ipcRenderer.on('reload', () => {
     ctx.app.$eventBus.$emit('reload')
