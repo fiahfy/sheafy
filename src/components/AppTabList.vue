@@ -8,17 +8,12 @@
           :url="app.favicon"
           :host="app.host"
         />
-        <v-list-item-content @contextmenu="onContextMenu">
+        <v-list-item-content @contextmenu="onContextMenuItem">
           <v-list-item-title v-text="app.host" />
         </v-list-item-content>
         <badge v-if="app.tabs.length" class="ml-3" :num="app.tabs.length" />
         <v-list-item-action class="my-0 ml-4">
-          <v-btn
-            icon
-            small
-            title="Close App"
-            @click.stop="closeApp({ host: app.host })"
-          >
+          <v-btn icon small title="Close App" @click.stop="onClickClose">
             <v-icon small>mdi-close</v-icon>
           </v-btn>
         </v-list-item-action>
@@ -32,72 +27,68 @@
   </v-list>
 </template>
 
-<script>
-import { mapActions, mapGetters } from 'vuex'
-import AppTabListItem from '~/components/AppTabListItem'
-import AppTabListItemIcon from '~/components/AppTabListItemIcon'
-import Badge from '~/components/Badge'
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { tabStore } from '~/store'
+import App from '~/models/app'
+import Tab from '~/models/tab'
+import AppTabListItem from '~/components/AppTabListItem.vue'
+import AppTabListItemIcon from '~/components/AppTabListItemIcon.vue'
+import Badge from '~/components/Badge.vue'
 
-export default {
+@Component({
   components: {
     AppTabListItem,
     AppTabListItemIcon,
     Badge
-  },
-  props: {
-    app: {
-      type: Object,
-      required: true
+  }
+})
+export default class AppTabList extends Vue {
+  @Prop({ type: Object, required: true }) readonly app!: App
+
+  expand = true
+
+  get tabs() {
+    return this.app.tabs
+  }
+  set tabs(tabs) {
+    const ids = tabs.map((tab) => tab.id)
+    tabStore.sortTabs({ ids })
+  }
+
+  @Watch('activeTab')
+  onActiveTabChanged(value: Tab) {
+    if (this.app.host === value.host) {
+      this.expand = true
     }
-  },
-  data() {
-    return {
-      expand: true
-    }
-  },
-  computed: {
-    tabs: {
-      get() {
-        return this.app.tabs
-      },
-      set(tabs) {
-        const ids = tabs.map((tab) => tab.id)
-        this.sortTabs({ ids })
-      }
-    },
-    ...mapGetters('tab', ['activeTab'])
-  },
-  watch: {
-    activeTab(value) {
-      if (this.app.host === value.host) {
-        this.expand = true
-      }
-    }
-  },
+  }
+
   mounted() {
     this.$eventBus.$on('expandApps', this.expandApps)
     this.$eventBus.$on('collapseApps', this.collapseApps)
-  },
+  }
+
   destroyed() {
     this.$eventBus.$off('expandApps', this.expandApps)
     this.$eventBus.$off('collapseApps', this.collapseApps)
-  },
-  methods: {
-    expandApps() {
-      this.expand = true
-    },
-    collapseApps() {
-      this.expand = false
-    },
-    onContextMenu() {
-      this.$contextMenu.show([
-        {
-          label: 'Close App',
-          click: () => this.closeApp({ host: this.app.host })
-        }
-      ])
-    },
-    ...mapActions('tab', ['sortTabs', 'closeApp'])
+  }
+
+  expandApps() {
+    this.expand = true
+  }
+  collapseApps() {
+    this.expand = false
+  }
+  onClickClose() {
+    tabStore.closeApp({ host: this.app.host })
+  }
+  onContextMenuItem() {
+    this.$contextMenu.show([
+      {
+        label: 'Close App',
+        click: () => tabStore.closeApp({ host: this.app.host })
+      }
+    ])
   }
 }
 </script>

@@ -22,23 +22,15 @@
   </v-list-item-icon>
 </template>
 
-<script>
-export default {
-  props: {
-    url: {
-      type: String,
-      required: true
-    },
-    loading: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data() {
-    return {
-      error: false
-    }
-  }
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+
+@Component
+export default class AppTabListItemIcon extends Vue {
+  @Prop({ type: String, required: true }) readonly url!: string
+  @Prop({ type: Boolean, default: false }) readonly loading!: boolean
+
+  error = false
 }
 </script>
 

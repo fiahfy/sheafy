@@ -7,23 +7,23 @@
   />
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      url: ''
-    }
-  },
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+
+@Component
+export default class StatusBar extends Vue {
+  url = ''
+
   mounted() {
     this.$eventBus.$on('updateTargetUrl', this.updateTargetUrl)
-  },
+  }
+
   destroyed() {
     this.$eventBus.$off('updateTargetUrl', this.updateTargetUrl)
-  },
-  methods: {
-    updateTargetUrl(url) {
-      this.url = url
-    }
+  }
+
+  updateTargetUrl(url: string) {
+    this.url = url
   }
 }
 </script>

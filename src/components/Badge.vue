@@ -6,18 +6,13 @@
   />
 </template>
 
-<script>
-export default {
-  props: {
-    color: {
-      type: String,
-      default: null
-    },
-    num: {
-      type: [String, Number],
-      default: ''
-    }
-  }
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+
+@Component
+export default class Badge extends Vue {
+  @Prop({ type: String, default: '' }) readonly color!: string
+  @Prop({ type: [String, Number], default: '' }) readonly num!: string | number
 }
 </script>
 

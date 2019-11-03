@@ -26,53 +26,42 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      sideBarLocations: [
-        { text: 'Left', value: 'left' },
-        { text: 'Right', value: 'right' }
-      ]
-    }
-  },
-  computed: {
-    darwin() {
-      return process.platform === 'darwin'
-    },
-    darkTheme: {
-      get() {
-        return this.$store.state.settings.darkTheme
-      },
-      set(value) {
-        this.$store.commit('settings/setDarkTheme', { darkTheme: value })
-      }
-    },
-    sideBarLocation: {
-      get() {
-        return this.$store.state.settings.sideBarLocation
-      },
-      set(value) {
-        this.$store.commit('settings/setSideBarLocation', {
-          sideBarLocation: value
-        })
-      }
-    },
-    swipeToNavigate: {
-      get() {
-        return this.$store.state.settings.swipeToNavigate
-      },
-      set(value) {
-        this.$store.commit('settings/setSwipeToNavigate', {
-          swipeToNavigate: value
-        })
-      }
-    }
-  },
-  watch: {
-    darkTheme(value) {
-      this.$vuetify.theme.dark = value
-    }
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator'
+import { settingsStore } from '~/store'
+
+@Component
+export default class SettingsPanel extends Vue {
+  sideBarLocations = [
+    { text: 'Left', value: 'left' },
+    { text: 'Right', value: 'right' }
+  ]
+
+  get darwin() {
+    return process.platform === 'darwin'
+  }
+  get darkTheme() {
+    return settingsStore.darkTheme
+  }
+  set darkTheme(value) {
+    settingsStore.setDarkTheme({ darkTheme: value })
+  }
+  get sideBarLocation() {
+    return settingsStore.sideBarLocation
+  }
+  set sideBarLocation(value) {
+    settingsStore.setSideBarLocation({ sideBarLocation: value })
+  }
+  get swipeToNavigate() {
+    return settingsStore.swipeToNavigate
+  }
+  set swipeToNavigate(value) {
+    settingsStore.setSwipeToNavigate({ swipeToNavigate: value })
+  }
+
+  @Watch('darkTheme')
+  onDarkThemeChanged(value: boolean) {
+    this.$vuetify.theme.dark = value
   }
 }
 </script>

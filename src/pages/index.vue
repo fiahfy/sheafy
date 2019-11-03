@@ -16,17 +16,18 @@
   </v-container>
 </template>
 
-<script>
-import { mapActions, mapState } from 'vuex'
-import ActivityBar from '~/components/ActivityBar'
-import FindingBar from '~/components/FindingBar'
-import ShortcutBar from '~/components/ShortcutBar'
-import Sidebar from '~/components/Sidebar'
-import StatusBar from '~/components/StatusBar'
-import Toolbar from '~/components/Toolbar'
-import Webview from '~/components/Webview'
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import { layoutStore, settingsStore, tabStore } from '~/store'
+import ActivityBar from '~/components/ActivityBar.vue'
+import FindingBar from '~/components/FindingBar.vue'
+import ShortcutBar from '~/components/ShortcutBar.vue'
+import Sidebar from '~/components/Sidebar.vue'
+import StatusBar from '~/components/StatusBar.vue'
+import Toolbar from '~/components/Toolbar.vue'
+import Webview from '~/components/Webview.vue'
 
-export default {
+@Component({
   components: {
     ActivityBar,
     FindingBar,
@@ -35,25 +36,25 @@ export default {
     StatusBar,
     Toolbar,
     Webview
-  },
-  data() {
-    return {
-      resizing: false
-    }
-  },
-  computed: {
-    classes() {
-      return this.sideBarLocation === 'right' ? 'flex-row' : 'flex-row-reverse'
-    },
-    ...mapState(['fullScreen']),
-    ...mapState('settings', ['sideBarLocation']),
-    ...mapState('tab', ['tabs'])
-  },
+  }
+})
+export default class Index extends Vue {
+  resizing = false
+
+  get classes() {
+    return settingsStore.sideBarLocation === 'right'
+      ? 'flex-row'
+      : 'flex-row-reverse'
+  }
+  get fullScreen() {
+    return layoutStore.fullScreen
+  }
+  get tabs() {
+    return tabStore.tabs
+  }
+
   created() {
-    this.newTabIfEmpty()
-  },
-  methods: {
-    ...mapActions('tab', ['newTabIfEmpty'])
+    tabStore.newTabIfEmpty()
   }
 }
 </script>

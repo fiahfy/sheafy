@@ -11,37 +11,34 @@
   </v-system-bar>
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
 import { remote } from 'electron'
-import { mapGetters, mapState } from 'vuex'
+import { layoutStore, tabStore } from '~/store'
 
-export default {
-  computed: {
-    title() {
-      return this.activeTab ? this.activeTab.title : ''
-    },
-    titleBar() {
-      return process.platform === 'darwin' && !this.fullScreen
-    },
-    ...mapState(['fullScreen']),
-    ...mapGetters('tab', ['activeTab'])
-  },
-  methods: {
-    // @see https://github.com/electron/electron/issues/16385
-    onDoubleClick() {
-      const doubleClickAction = remote.systemPreferences.getUserDefault(
-        'AppleActionOnDoubleClick',
-        'string'
-      )
-      const win = remote.getCurrentWindow()
-      if (doubleClickAction === 'Minimize') {
-        win.minimize()
-      } else if (doubleClickAction === 'Maximize') {
-        if (win.isMaximized()) {
-          win.unmaximize()
-        } else {
-          win.maximize()
-        }
+@Component
+export default class TitleBar extends Vue {
+  get title() {
+    return tabStore.activeTab ? tabStore.activeTab.title : ''
+  }
+  get titleBar() {
+    return process.platform === 'darwin' && !layoutStore.fullScreen
+  }
+
+  // @see https://github.com/electron/electron/issues/16385
+  onDoubleClick() {
+    const doubleClickAction = remote.systemPreferences.getUserDefault(
+      'AppleActionOnDoubleClick',
+      'string'
+    )
+    const win = remote.getCurrentWindow()
+    if (doubleClickAction === 'Minimize') {
+      win.minimize()
+    } else if (doubleClickAction === 'Maximize') {
+      if (win.isMaximized()) {
+        win.unmaximize()
+      } else {
+        win.maximize()
       }
     }
   }

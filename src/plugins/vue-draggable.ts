@@ -1,4 +1,4 @@
 import Vue from 'vue'
-import draggable from 'vuedraggable'
+const draggable = require('vuedraggable')
 
 Vue.component('draggable', draggable)

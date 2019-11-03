@@ -18,64 +18,63 @@
   />
 </template>
 
-<script>
-import { mapActions, mapState } from 'vuex'
-export default {
-  data() {
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator'
+import { layoutStore, tabStore } from '~/store'
+import Tab from '~/models/tab'
+
+@Component
+export default class ShortcutBar extends Vue {
+  width = 0
+
+  get filter() {
+    return (item: Tab, queryText: string, itemText: string) => {
+      return (
+        itemText.toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) ||
+        item.host.toLocaleLowerCase().includes(queryText.toLocaleLowerCase())
+      )
+    }
+  }
+  get menuProps() {
     return {
-      width: 0
+      closeOnClick: false,
+      closeOnContentClick: false,
+      openOnClick: false,
+      maxHeight: 300,
+      offsetY: true,
+      offsetOverflow: true,
+      transition: false,
+      maxWidth: this.width
     }
-  },
-  computed: {
-    filter() {
-      return (item, queryText, itemText) => {
-        return (
-          itemText
-            .toLocaleLowerCase()
-            .includes(queryText.toLocaleLowerCase()) ||
-          item.host.toLocaleLowerCase().includes(queryText.toLocaleLowerCase())
-        )
-      }
-    },
-    menuProps() {
-      return {
-        closeOnClick: false,
-        closeOnContentClick: false,
-        openOnClick: false,
-        maxHeight: 300,
-        offsetY: true,
-        offsetOverflow: true,
-        transition: false,
-        maxWidth: this.width
-      }
-    },
-    ...mapState(['shortcutBar']),
-    ...mapState('tab', ['tabs'])
-  },
-  watch: {
-    shortcutBar(value) {
-      if (value) {
-        this.$nextTick(() => {
-          this.$el.querySelector('input').addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-              this.hideShortcutBar()
-            }
-          })
-          this.width = this.$el.offsetWidth
+  }
+  get shortcutBar() {
+    return layoutStore.shortcutBar
+  }
+  get tabs() {
+    return tabStore.tabs
+  }
+
+  @Watch('shortcutBar')
+  onShortcutBarChanged(value: boolean) {
+    if (value) {
+      this.$nextTick(() => {
+        this.$el.querySelector('input')!.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            layoutStore.hideShortcutBar()
+          }
         })
-      }
+        this.width = (<HTMLElement>this.$el).offsetWidth
+      })
     }
-  },
+  }
+
   mounted() {
-    this.width = this.$el.offsetWidth
-  },
-  methods: {
-    onChange(value) {
-      this.activateTab({ id: value })
-      this.hideShortcutBar()
-    },
-    ...mapActions(['hideShortcutBar']),
-    ...mapActions('tab', ['activateTab'])
+    this.width = (<HTMLElement>this.$el).offsetWidth
+  }
+
+  onChange(value: string) {
+    tabStore.activateTab({ id: value })
+    layoutStore.hideShortcutBar()
   }
 }
 </script>

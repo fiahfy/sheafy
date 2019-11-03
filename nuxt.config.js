@@ -16,6 +16,11 @@ module.exports = {
   },
 
   /*
+   ** Build modules
+   */
+  buildModules: ['@nuxt/typescript-build'],
+
+  /*
    ** Global CSS
    */
   css: ['@mdi/font/css/materialdesignicons.css', 'typeface-roboto/index.css'],
@@ -67,7 +72,8 @@ module.exports = {
     '~/plugins/event-bus',
     '~/plugins/ipc',
     '~/plugins/vue-draggable',
-    '~/plugins/vue-long-press'
+    '~/plugins/vue-long-press',
+    '~/plugins/vuex-persistedstate'
   ],
 
   /*
