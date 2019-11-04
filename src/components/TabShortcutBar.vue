@@ -1,7 +1,7 @@
 <template>
   <v-autocomplete
     v-if="shortcutBar"
-    class="shortcut-bar body-2"
+    class="tab-shortcut-bar body-2"
     name="shortcut"
     solo
     dense
@@ -80,7 +80,7 @@ export default class ShortcutBar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.shortcut-bar {
+.tab-shortcut-bar {
   border-radius: 0;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-if="url"
-    class="status-bar px-2 py-1 caption grey--text text--darken-1 text-truncate"
+    class="tab-status-bar px-2 py-1 caption grey--text text--darken-1 text-truncate"
     tile
     v-text="url"
   />

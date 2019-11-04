@@ -1,5 +1,9 @@
 <template>
-  <v-toolbar v-if="activeTab && activeTab.finding" dense class="finding-bar">
+  <v-toolbar
+    v-if="activeTab && activeTab.finding"
+    dense
+    class="tab-finding-bar"
+  >
     <v-text-field
       v-model="findingText"
       name="finding-text"

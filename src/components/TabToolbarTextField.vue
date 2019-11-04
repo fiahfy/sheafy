@@ -4,7 +4,7 @@
     filled
     rounded
     hide-details
-    class="query-text-field body-2"
+    class="tab-toolbar-text-field body-2"
     name="query"
     @mousedown="onMouseDown"
     @mouseup="onMouseUp"
@@ -103,7 +103,7 @@ export default class QueryTextField extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.query-text-field ::v-deep .v-input__control > .v-input__slot {
+.tab-toolbar-text-field ::v-deep .v-input__control > .v-input__slot {
   min-height: unset;
   padding: 0 6px 0 12px !important;
   > .v-input__prepend-inner {
