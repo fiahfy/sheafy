@@ -1,59 +1,26 @@
 <template>
-  <v-toolbar class="toolbar" flat dense extension-height="0">
-    <v-btn
-      v-long-press="onContextMenuBack"
-      icon
-      width="36"
-      height="36"
-      class="mr-1"
-      title="Go Back"
-      :disabled="!activeTab || !activeTab.canGoBack"
-      @click="onClickGoBack"
-      @contextmenu.stop="onContextMenuBack"
-    >
-      <v-icon size="20">mdi-arrow-left</v-icon>
-    </v-btn>
-    <v-btn
-      v-long-press="onContextMenuForward"
-      icon
-      width="36"
-      height="36"
-      class="mr-1"
-      title="Go Forward"
-      :disabled="!activeTab || !activeTab.canGoForward"
-      @click="onClickGoForward"
-      @contextmenu.stop="onContextMenuForward"
-    >
-      <v-icon size="20">mdi-arrow-right</v-icon>
-    </v-btn>
-    <v-btn
-      v-if="activeTab && activeTab.loading"
-      icon
-      width="36"
-      height="36"
-      class="mr-1"
-      title="Stop"
-      @click="onClickStop"
-    >
-      <v-icon size="20">mdi-close</v-icon>
-    </v-btn>
-    <v-btn
-      v-else
-      icon
-      width="36"
-      height="36"
-      class="mr-1"
-      title="Reload"
-      @click="onClickReload"
-    >
-      <v-icon size="20">mdi-refresh</v-icon>
-    </v-btn>
-    <query-text-field class="mx-1" />
+  <v-toolbar
+    class="toolbar"
+    flat
+    dense
+    height="36"
+    extended
+    extension-height="36"
+  >
+    <favicon
+      class="mr-3"
+      :url="activeTab.favicon"
+      :loading="activeTab.loading"
+    />
+    <div
+      class="subtitle-2 flex-grow-1 text-truncate user-select-none"
+      v-text="activeTab.title"
+    />
     <v-btn
       v-long-press="onContextMenuBackTab"
       icon
-      width="36"
-      height="36"
+      width="32"
+      height="32"
       class="ml-1"
       title="Go Back Tab"
       :disabled="!canGoBackTab"
@@ -65,8 +32,8 @@
     <v-btn
       v-long-press="onContextMenuForwardTab"
       icon
-      width="36"
-      height="36"
+      width="32"
+      height="32"
       class="ml-1"
       title="Go Forward Tab"
       :disabled="!canGoForwardTab"
@@ -75,17 +42,69 @@
     >
       <v-icon size="20">mdi-chevron-right</v-icon>
     </v-btn>
-    <v-divider slot="extension" />
+    <template slot="extension">
+      <v-btn
+        v-long-press="onContextMenuBack"
+        icon
+        width="32"
+        height="32"
+        class="mr-1"
+        title="Go Back"
+        :disabled="!activeTab || !activeTab.canGoBack"
+        @click="onClickGoBack"
+        @contextmenu.stop="onContextMenuBack"
+      >
+        <v-icon size="20">mdi-arrow-left</v-icon>
+      </v-btn>
+      <v-btn
+        v-long-press="onContextMenuForward"
+        icon
+        width="32"
+        height="32"
+        class="mr-1"
+        title="Go Forward"
+        :disabled="!activeTab || !activeTab.canGoForward"
+        @click="onClickGoForward"
+        @contextmenu.stop="onContextMenuForward"
+      >
+        <v-icon size="20">mdi-arrow-right</v-icon>
+      </v-btn>
+      <v-btn
+        v-if="activeTab && activeTab.loading"
+        icon
+        width="32"
+        height="32"
+        class="mr-1"
+        title="Stop"
+        @click="onClickStop"
+      >
+        <v-icon size="20">mdi-close</v-icon>
+      </v-btn>
+      <v-btn
+        v-else
+        icon
+        width="32"
+        height="32"
+        class="mr-1"
+        title="Reload"
+        @click="onClickReload"
+      >
+        <v-icon size="20">mdi-refresh</v-icon>
+      </v-btn>
+      <query-text-field class="ml-1" />
+    </template>
   </v-toolbar>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { tabStore } from '~/store'
+import Favicon from '~/components/Favicon.vue'
 import QueryTextField from '~/components/QueryTextField.vue'
 
 @Component({
   components: {
+    Favicon,
     QueryTextField
   }
 })
@@ -176,14 +195,3 @@ export default class Toolbar extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.toolbar ::v-deep {
-  .v-toolbar__extension {
-    padding: 0;
-    > .v-divider {
-      border-color: transparent;
-    }
-  }
-}
-</style>

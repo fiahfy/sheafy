@@ -3,11 +3,9 @@
     <app-tab-list-item v-if="app.tabs.length < 2" :tab="app.tabs[0]" />
     <v-list-group v-else v-model="expand">
       <template v-slot:activator>
-        <app-tab-list-item-icon
-          class="mr-2"
-          :url="app.favicon"
-          :host="app.host"
-        />
+        <v-list-item-icon class="mr-3 align-self-center">
+          <favicon :url="app.favicon" />
+        </v-list-item-icon>
         <v-list-item-content @contextmenu="onContextMenuItem">
           <v-list-item-title v-text="app.host" />
         </v-list-item-content>
@@ -33,14 +31,14 @@ import { tabStore } from '~/store'
 import App from '~/models/app'
 import Tab from '~/models/tab'
 import AppTabListItem from '~/components/AppTabListItem.vue'
-import AppTabListItemIcon from '~/components/AppTabListItemIcon.vue'
 import Badge from '~/components/Badge.vue'
+import Favicon from '~/components/Favicon.vue'
 
 @Component({
   components: {
     AppTabListItem,
-    AppTabListItemIcon,
-    Badge
+    Badge,
+    Favicon
   }
 })
 export default class AppTabList extends Vue {
@@ -102,6 +100,7 @@ export default class AppTabList extends Vue {
     }
   }
   ::v-deep .v-list-group__header {
+    min-height: 36px;
     &:not(:hover) .v-list-item__action:not(:first-child) {
       display: none;
     }
@@ -111,6 +110,9 @@ export default class AppTabList extends Vue {
     .v-list-group__header__append-icon {
       margin-left: 16px;
       padding: 0 2px;
+      min-width: unset;
+    }
+    .v-list-item__icon {
       min-width: unset;
     }
   }

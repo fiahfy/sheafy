@@ -7,9 +7,7 @@
         </div>
       </template>
     </div>
-    <div ref="resizer" class="resizer" :class="classes">
-      <v-divider vertical />
-    </div>
+    <div ref="resizer" class="resizer" :class="classes" />
   </div>
 </template>
 
@@ -97,9 +95,6 @@ export default class Sidebar extends Vue {
     &.resizer--right {
       left: -1px;
       right: unset;
-    }
-    > .v-divider {
-      border-color: transparent;
     }
   }
 }

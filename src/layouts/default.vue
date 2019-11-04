@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { layoutStore, settingsStore } from '~/store'
+import { layoutStore, settingsStore, tabStore } from '~/store'
 import TitleBar from '~/components/TitleBar.vue'
 
 @Component({
@@ -29,6 +29,10 @@ export default class Layout extends Vue {
       }
     })
     this.$vuetify.theme.dark = this.darkTheme
+  }
+
+  created() {
+    tabStore.newTabIfEmpty()
   }
 
   onContextMenu() {

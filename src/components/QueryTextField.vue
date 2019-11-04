@@ -1,7 +1,8 @@
 <template>
   <v-text-field
     v-model="query"
-    outlined
+    filled
+    rounded
     hide-details
     class="query-text-field body-2"
     name="query"
@@ -104,7 +105,7 @@ export default class QueryTextField extends Vue {
 <style lang="scss" scoped>
 .query-text-field ::v-deep .v-input__control > .v-input__slot {
   min-height: unset;
-  padding-left: 10px;
+  padding: 0 6px 0 12px !important;
   > .v-input__prepend-inner {
     margin-top: 0;
     padding-right: 8px;
@@ -112,6 +113,7 @@ export default class QueryTextField extends Vue {
   }
   > .v-text-field__slot > input {
     padding: 4px 0;
+    margin-top: 0;
   }
   > .v-input__append-inner {
     margin-top: 0;

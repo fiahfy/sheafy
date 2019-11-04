@@ -1,11 +1,12 @@
 <template>
-  <v-list-item-icon class="app-tab-list-item-icon align-self-center">
+  <div class="favicon">
     <v-progress-circular
       v-if="loading"
       indeterminate
       size="16"
       width="2"
       color="primary"
+      class="d-flex"
     />
     <template v-else>
       <v-icon v-if="error" small color="grey darken-1">mdi-earth</v-icon>
@@ -19,11 +20,11 @@
         @error="error = true"
       />
     </template>
-  </v-list-item-icon>
+  </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 
 @Component
 export default class AppTabListItemIcon extends Vue {
@@ -31,11 +32,12 @@ export default class AppTabListItemIcon extends Vue {
   @Prop({ type: Boolean, default: false }) readonly loading!: boolean
 
   error = false
+
+  @Watch('url')
+  chnaged(newValue: string, oldValue: string) {
+    if (newValue !== oldValue) {
+      this.error = false
+    }
+  }
 }
 </script>
-
-<style lang="scss" scoped>
-.app-tab-list-item-icon.v-list-item__icon {
-  padding: 0 6px;
-}
-</style>

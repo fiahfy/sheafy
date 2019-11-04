@@ -4,29 +4,38 @@
     @dragover.prevent="onDragOver"
     @drop.prevent="onDrop"
   >
-    <v-toolbar tile dense flat class="flex-grow-0">
+    <v-toolbar tile dense flat class="flex-grow-0" height="36">
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         apps
       </span>
       <badge class="ml-3" :num="apps.length" />
       <v-spacer />
-      <v-btn icon width="36" height="36" title="New Tab" @click="onClickNewTab">
+      <v-btn
+        icon
+        width="32"
+        height="32"
+        title="New Tab"
+        class="ml-1"
+        @click="onClickNewTab"
+      >
         <v-icon size="20">mdi-tab-plus</v-icon>
       </v-btn>
       <v-btn
         icon
-        width="36"
-        height="36"
+        width="32"
+        height="32"
         title="Expand Apps"
+        class="ml-1"
         @click="onClickExpand"
       >
         <v-icon size="20">mdi-expand-all</v-icon>
       </v-btn>
       <v-btn
         icon
-        width="36"
-        height="36"
+        width="32"
+        height="32"
         title="Collapse Apps"
+        class="ml-1"
         @click="onClickCollapse"
       >
         <v-icon size="20">mdi-collapse-all</v-icon>

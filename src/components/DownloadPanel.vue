@@ -1,6 +1,6 @@
 <template>
   <div class="download-panel d-flex flex-column">
-    <v-toolbar tile dense flat class="flex-grow-0">
+    <v-toolbar tile dense flat class="flex-grow-0" height="36">
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         downloads
       </span>
@@ -8,8 +8,8 @@
       <v-spacer />
       <v-btn
         icon
-        width="36"
-        height="36"
+        width="32"
+        height="32"
         title="Clear All"
         @click="onClickClearAll"
       >

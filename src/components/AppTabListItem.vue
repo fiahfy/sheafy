@@ -7,14 +7,11 @@
     @click="onClick"
     @contextmenu.stop="onContextMenu"
   >
-    <app-tab-list-item-icon
-      class="mr-2"
-      :url="tab.favicon"
-      :host="tab.host"
-      :loading="tab.loading"
-    />
+    <v-list-item-icon class="mr-3 align-self-center">
+      <favicon :url="tab.favicon" :loading="tab.loading" />
+    </v-list-item-icon>
     <v-list-item-content>
-      <v-list-item-title v-text="title" />
+      <v-list-item-title class="font-weight-regular caption" v-text="title" />
     </v-list-item-content>
     <badge v-if="tab.badge" class="ml-3" :num="badge" color="error" />
     <v-list-item-action class="my-0">
@@ -30,12 +27,12 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { shell } from 'electron'
 import { tabStore } from '~/store'
 import Tab from '~/models/tab'
-import AppTabListItemIcon from '~/components/AppTabListItemIcon.vue'
 import Badge from '~/components/Badge.vue'
+import Favicon from '~/components/Favicon.vue'
 
 @Component({
   components: {
-    AppTabListItemIcon,
+    Favicon,
     Badge
   }
 })
@@ -87,11 +84,15 @@ export default class AppTabListItem extends Vue {
 
 <style lang="scss" scoped>
 .app-tab-list-item {
+  min-height: 36px;
   &.sub-group {
     padding-left: 32px;
   }
   &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
     opacity: 0;
+  }
+  .v-list-item__icon {
+    min-width: unset;
   }
 }
 </style>
