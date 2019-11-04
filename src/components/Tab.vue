@@ -39,35 +39,30 @@ export default class Index extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.index {
-  &.resizing ::v-deep webview {
-    pointer-events: none;
+.tab .wrapper {
+  position: relative;
+  .tab-finding-bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 384px;
+    max-width: 100%;
   }
-  .wrapper {
-    position: relative;
-    .tab-finding-bar {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 384px;
-      max-width: 100%;
-    }
-    .tab-shortcut-bar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      width: 512px;
-      max-width: 100%;
-      margin: 0 auto;
-      z-index: 1;
-    }
-    .tab-status-bar {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      max-width: 100%;
-    }
+  .tab-shortcut-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 512px;
+    max-width: 100%;
+    margin: 0 auto;
+    z-index: 1;
+  }
+  .tab-status-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    max-width: 100%;
   }
 }
 </style>

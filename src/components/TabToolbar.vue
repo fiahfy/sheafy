@@ -13,7 +13,7 @@
       :loading="activeTab.loading"
     />
     <div
-      class="subtitle-2 flex-grow-1 text-truncate user-select-none"
+      class="caption flex-grow-1 text-truncate user-select-none"
       v-text="activeTab.title"
     />
     <v-btn

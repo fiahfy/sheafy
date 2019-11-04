@@ -27,8 +27,8 @@
       <v-btn
         v-if="canPause"
         icon
-        width="36"
-        height="36"
+        width="32"
+        height="32"
         title="Pause"
         class="ml-1"
         @click.stop="onClickPause"
@@ -38,8 +38,8 @@
       <v-btn
         v-if="canResume"
         icon
-        width="36"
-        height="36"
+        width="32"
+        height="32"
         title="Resume"
         class="ml-1"
         @click.stop="onClickResume"
@@ -49,8 +49,8 @@
       <v-btn
         v-if="canCancel"
         icon
-        width="36"
-        height="36"
+        width="32"
+        height="32"
         title="Cancel"
         class="ml-1"
         @click.stop="onClickCancel"
@@ -60,8 +60,8 @@
       <v-btn
         v-if="canShowInFolder"
         icon
-        width="36"
-        height="36"
+        width="32"
+        height="32"
         title="Show in Folder"
         class="ml-1"
         @click.stop="onClickShowInFolder"
@@ -71,8 +71,8 @@
       <v-btn
         v-if="canRetry"
         icon
-        width="36"
-        height="36"
+        width="32"
+        height="32"
         title="Retry"
         class="ml-1"
         @click.stop="onClickRetry"
@@ -82,8 +82,8 @@
       <v-btn
         v-if="canDelete"
         icon
-        width="36"
-        height="36"
+        width="32"
+        height="32"
         title="Delete"
         class="ml-1"
         @click.stop="onClickDelete"

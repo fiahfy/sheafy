@@ -38,3 +38,9 @@ export default class Index extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.index.resizing .tab {
+  pointer-events: none;
+}
+</style>
