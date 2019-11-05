@@ -36,7 +36,7 @@ export default class TabModule extends VuexModule {
   historyIndex = -1
 
   get activeTab() {
-    return this.tabs.find((tab) => tab.id === this.activeId)
+    return this.getTab({ id: this.activeId })
   }
   get apps() {
     return Object.values(
@@ -205,7 +205,7 @@ export default class TabModule extends VuexModule {
   }
   @Action
   duplicateTab({ id }: { id: string }) {
-    const tab = this.tabs.find((tab) => tab.id === id)
+    const tab = this.getTab({ id })
     if (!tab) {
       return
     }

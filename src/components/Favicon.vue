@@ -9,7 +9,9 @@
       class="d-flex"
     />
     <template v-else>
-      <v-icon v-if="error" small color="grey darken-1">mdi-earth</v-icon>
+      <v-icon v-if="error" small class="d-flex" color="grey darken-1">
+        mdi-earth
+      </v-icon>
       <v-img
         v-else
         :src="url"

@@ -13,9 +13,20 @@
       :loading="activeTab.loading"
     />
     <div
-      class="caption flex-grow-1 text-truncate user-select-none"
+      class="caption text-truncate user-select-none"
       v-text="activeTab.title"
     />
+    <v-btn
+      icon
+      width="32"
+      height="32"
+      class="ml-1"
+      title="Close"
+      @click="onClickClose"
+    >
+      <v-icon size="20">mdi-close</v-icon>
+    </v-btn>
+    <v-spacer />
     <v-btn
       v-long-press="onContextMenuBackTab"
       icon
@@ -160,6 +171,12 @@ export default class Toolbar extends Vue {
   }
   onClickStop() {
     this.$eventBus.$emit('stop')
+  }
+  onClickClose() {
+    const tab = tabStore.activeTab
+    if (tab) {
+      tabStore.closeTab({ id: tab.id })
+    }
   }
   onClickGoBackTab() {
     tabStore.goBackTab()
