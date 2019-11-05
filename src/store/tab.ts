@@ -1,23 +1,15 @@
 import { remote } from 'electron'
 import nanoid from 'nanoid'
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
+import TabUtils from '~/utils/tab'
 import Tab from '~/models/tab'
 import App from '~/models/app'
-
-const getHost = (url: string): string => {
-  return url.replace(/^https?:\/\/([^/]+).*$/, '$1')
-}
-
-const getBadge = (title: string): number => {
-  const match = title.match(/\(([\d,]+)\)\s*/)
-  return match ? Number(match[1].replace(',', '')) : 0
-}
 
 const convertTab = (tab: Tab): Tab => {
   return {
     ...tab,
-    host: getHost(tab.url),
-    badge: getBadge(tab.title)
+    host: TabUtils.getHost(tab.url),
+    badge: TabUtils.getBadge(tab.title)
   }
 }
 
@@ -30,8 +22,6 @@ export default class TabModule extends VuexModule {
   tabs: Tab[] = []
   hosts: string[] = []
   activeId = ''
-  parentId = ''
-  childIds: string[] = []
   history: string[] = []
   historyIndex = -1
 
@@ -92,18 +82,6 @@ export default class TabModule extends VuexModule {
   get getTab() {
     return ({ id }: { id: string }) => this.tabs.find((tab) => tab.id === id)
   }
-  get getUrlWithQuery() {
-    return ({ query }: { query: string }) => {
-      if (!query) {
-        return ''
-      }
-      if (query.match(/^https?:\/\//)) {
-        return query
-      } else {
-        return 'https://www.google.com/search?q=' + query
-      }
-    }
-  }
 
   @Mutation
   setTabs({ tabs }: { tabs: Tab[] }) {
@@ -116,14 +94,6 @@ export default class TabModule extends VuexModule {
   @Mutation
   setActiveId({ activeId }: { activeId: string }) {
     this.activeId = activeId
-  }
-  @Mutation
-  setParentId({ parentId }: { parentId: string }) {
-    this.parentId = parentId
-  }
-  @Mutation
-  setChildIds({ childIds }: { childIds: string[] }) {
-    this.childIds = childIds
   }
   @Mutation
   setHistory({ history }: { history: string[] }) {
@@ -139,10 +109,19 @@ export default class TabModule extends VuexModule {
     options,
     ...params
   }: Partial<Tab> & {
-    options?: { activate?: boolean; position?: string; srcId?: string }
+    options?: {
+      activate?: boolean
+      position?: string
+      srcId?: string
+      openerId?: string
+    }
   } = {}) {
-    const { activate = true, position = 'last', srcId = this.activeId } =
-      options || {}
+    const {
+      activate = true,
+      position = 'last',
+      srcId = this.activeId,
+      openerId = null
+    } = options || {}
     const id = nanoid()
     const url = 'https://www.google.com/?sheafy'
     const tab = convertTab({
@@ -161,6 +140,7 @@ export default class TabModule extends VuexModule {
       foundActiveMatchOrdinal: 0,
       foundMatches: 0,
       loaded: false,
+      openerId,
       ...params
     })
 
@@ -184,14 +164,6 @@ export default class TabModule extends VuexModule {
 
     const tabs = [...this.tabs.slice(0, index), tab, ...this.tabs.slice(index)]
     this.setTabs({ tabs })
-
-    const parentId = this.activeId
-    let childIds = [tab.id]
-    if (parentId === this.parentId) {
-      childIds = [...this.childIds.slice(), ...childIds]
-    }
-    this.setParentId({ parentId })
-    this.setChildIds({ childIds })
 
     if (activate) {
       this.activateTab({ id })
@@ -233,36 +205,43 @@ export default class TabModule extends VuexModule {
     this.setTabs({ tabs })
   }
   @Action
+  activateTab({ id }: { id: string }) {
+    if (this.activeId === id) {
+      return
+    }
+    this.setActiveId({ activeId: id })
+    if (id) {
+      const history = [
+        ...this.history.slice(0, this.historyIndex + 1),
+        id
+      ].slice(-1001)
+      this.setHistory({ history })
+      this.setHistoryIndex({ historyIndex: history.length - 1 })
+    } else {
+      this.setHistory({ history: [] })
+      this.setHistoryIndex({ historyIndex: -1 })
+    }
+  }
+  @Action
   closeTab({ id }: { id: string }) {
     if (id === this.activeId) {
-      if (this.childIds.includes(id)) {
-        const childIds = this.childIds.filter((childId) => childId !== id)
-        this.setChildIds({ childIds })
-        this.activateTab({ id: this.parentId })
+      const tab = this.getTab({ id })
+      if (tab && tab.openerId === this.history[this.historyIndex - 1]) {
+        this.activateTab({ id: tab.openerId })
       } else {
-        if (id === this.parentId) {
-          this.setParentId({ parentId: '' })
-          this.setChildIds({ childIds: [] })
-        }
-
-        const app = this.apps.find(
-          (app) => !!app.tabs.find((tab) => tab.id === id)
+        const tabs = this.apps.reduce(
+          (carry: Tab[], app: App) => [...carry, ...app.tabs],
+          []
         )
-        if (app) {
-          if (app.tabs.length <= 1) {
-            this.closeApp({ host: app.host })
-            return
-          }
-          const index = app.tabs.findIndex((tab) => tab.id === id)
-          if (index < app.tabs.length - 1) {
-            const id = app.tabs[index + 1].id
-            this.activateTab({ id })
-          } else if (index > 0) {
-            const id = app.tabs[index - 1].id
-            this.activateTab({ id })
-          } else {
-            this.activateTab({ id: '' })
-          }
+        const index = tabs.findIndex((tab) => tab.id === id)
+        if (index < tabs.length - 1) {
+          const id = tabs[index + 1].id
+          this.activateTab({ id })
+        } else if (index > 0) {
+          const id = tabs[index - 1].id
+          this.activateTab({ id })
+        } else {
+          this.activateTab({ id: '' })
         }
       }
     }
@@ -284,46 +263,6 @@ export default class TabModule extends VuexModule {
     }
   }
   @Action
-  activateTab({ id }: { id: string }) {
-    if (this.activeId === id) {
-      return
-    }
-    if (this.parentId !== id && !this.childIds.includes(id)) {
-      this.setParentId({ parentId: '' })
-      this.setChildIds({ childIds: [] })
-    }
-    this.setActiveId({ activeId: id })
-    if (id) {
-      const history = [
-        ...this.history.slice(0, this.historyIndex + 1),
-        id
-      ].slice(-1001)
-      this.setHistory({ history })
-      this.setHistoryIndex({ historyIndex: history.length - 1 })
-    } else {
-      this.setHistory({ history: [] })
-      this.setHistoryIndex({ historyIndex: -1 })
-    }
-  }
-  @Action
-  goToOffsetTab({ offset }: { offset: number }) {
-    const index = this.historyIndex + offset
-    const id = this.history[index]
-    if (!id) {
-      return
-    }
-    this.setActiveId({ activeId: id })
-    this.setHistoryIndex({ historyIndex: index })
-  }
-  @Action
-  goBackTab() {
-    this.goToOffsetTab({ offset: -1 })
-  }
-  @Action
-  goForwardTab() {
-    this.goToOffsetTab({ offset: 1 })
-  }
-  @Action
   sortTabs({ ids }: { ids: string[] }) {
     const sortedTabs = <Tab[]>(
       ids.map((id) => this.getTab({ id })).filter((tab) => !!tab)
@@ -340,9 +279,6 @@ export default class TabModule extends VuexModule {
     const tabIds = app.tabs.map((tab) => tab.id)
     const active = tabIds.includes(this.activeId)
     if (active) {
-      this.setParentId({ parentId: '' })
-      this.setChildIds({ childIds: [] })
-
       const index = this.apps.findIndex((app) => app.host === host)
       if (index < this.apps.length - 1) {
         const id = this.apps[index + 1].tabs[0].id
@@ -375,5 +311,23 @@ export default class TabModule extends VuexModule {
   @Action
   sortApps({ hosts }: { hosts: string[] }) {
     this.setHosts({ hosts })
+  }
+  @Action
+  goToOffsetTab({ offset }: { offset: number }) {
+    const index = this.historyIndex + offset
+    const id = this.history[index]
+    if (!id) {
+      return
+    }
+    this.setActiveId({ activeId: id })
+    this.setHistoryIndex({ historyIndex: index })
+  }
+  @Action
+  goBackTab() {
+    this.goToOffsetTab({ offset: -1 })
+  }
+  @Action
+  goForwardTab() {
+    this.goToOffsetTab({ offset: 1 })
   }
 }

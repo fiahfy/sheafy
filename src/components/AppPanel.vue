@@ -50,6 +50,7 @@
 <script lang="ts">
 import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
 import { tabStore } from '~/store'
+import TabUtils from '~/utils/tab'
 import Tab from '~/models/tab'
 import AppList from '~/components/AppList.vue'
 import Badge from '~/components/Badge.vue'
@@ -112,7 +113,7 @@ export default class AppPanel extends Vue {
       return
     }
     const query = e.dataTransfer!.getData('text')
-    const url = tabStore.getUrlWithQuery({ query })
+    const url = TabUtils.getUrlWithQuery(query)
     if (url) {
       tabStore.newTab({ url })
     }

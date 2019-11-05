@@ -6,6 +6,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { remote, WebviewTag } from 'electron'
 import { layoutStore, tabStore } from '~/store'
+import TabUtils from '~/utils/tab'
 import Tab from '~/models/tab'
 
 const urlWithoutHash = (url: string) => {
@@ -184,13 +185,21 @@ export default class Webview extends Vue {
           case 'foreground-tab':
             tabStore.newTab({
               url,
-              options: { position: 'next', activate: true }
+              options: {
+                activate: true,
+                position: 'next',
+                openerId: this.tab.id
+              }
             })
             break
           case 'background-tab':
             tabStore.newTab({
               url,
-              options: { position: 'next', activate: false }
+              options: {
+                activate: false,
+                position: 'next',
+                openerId: this.tab.id
+              }
             })
             break
         }
@@ -219,12 +228,15 @@ export default class Webview extends Vue {
           }
           case 'newTab': {
             const [url] = args
-            tabStore.newTab({ url, options: { position: 'next' } })
+            tabStore.newTab({
+              url,
+              options: { position: 'next', openerId: this.tab.id }
+            })
             break
           }
           case 'search': {
             const [query] = args
-            const url = tabStore.getUrlWithQuery({ query })
+            const url = TabUtils.getUrlWithQuery(query)
             tabStore.newTab({ url, options: { position: 'next' } })
             break
           }
@@ -301,7 +313,7 @@ export default class Webview extends Vue {
   load() {
     if (this.active) {
       const query = this.tab.query
-      const url = tabStore.getUrlWithQuery({ query })
+      const url = TabUtils.getUrlWithQuery(query)
       if (url) {
         this.webview.loadURL(url)
       }
