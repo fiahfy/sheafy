@@ -303,7 +303,7 @@ const createWindow = async () => {
         id,
         status: 'failed'
       }
-      send('updateDownload', download)
+      send('upsertDownload', download)
     }
   })
   mainWindow.webContents.session.on('will-download', (_e, item) => {
@@ -327,7 +327,7 @@ const createWindow = async () => {
       totalBytes: item.getTotalBytes(),
       startTime: Math.floor(item.getStartTime() * 1000)
     }
-    send('updateDownload', download)
+    send('upsertDownload', download)
     send('showDownloads')
 
     item.setSavePath(filepath)
@@ -343,7 +343,7 @@ const createWindow = async () => {
         status,
         receivedBytes: item.getReceivedBytes()
       }
-      send('updateDownload', download)
+      send('upsertDownload', download)
     })
     item.once('done', (_e, state) => {
       let status
@@ -357,7 +357,7 @@ const createWindow = async () => {
         status,
         receivedBytes: item.getReceivedBytes()
       }
-      send('updateDownload', download)
+      send('upsertDownload', download)
       delete downloadItems[id]
     })
   })

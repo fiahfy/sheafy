@@ -58,7 +58,7 @@ export default class DownloadModule extends VuexModule {
   }
 
   @Action
-  updateDownload({ id, ...params }: Partial<Download>) {
+  upsertDownload({ id, ...params }: Partial<Download>) {
     let downloads: Download[]
     if (this.downloads.find((download) => download.id === id)) {
       downloads = this.downloads.map((download) => {
