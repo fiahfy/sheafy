@@ -1,6 +1,6 @@
 <template>
   <div class="app-list">
-    <draggable v-model="model" animation="150">
+    <draggable v-model="model" animation="150" @end="onEnd">
       <v-sheet v-for="app in model" :key="app.host" tile>
         <app-tab-list :app="app" />
       </v-sheet>
@@ -28,6 +28,13 @@ export default class AppList extends Vue {
   set model(apps) {
     const hosts = apps.map((app) => app.host)
     tabStore.sortApps({ hosts })
+  }
+
+  onEnd() {
+    // Remove ripples if stop sorting
+    this.$el.querySelectorAll('.v-ripple__container').forEach((el) => {
+      el.remove()
+    })
   }
 }
 </script>

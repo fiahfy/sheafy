@@ -16,7 +16,7 @@
           </v-btn>
         </v-list-item-action>
       </template>
-      <draggable v-model="tabs" animation="150">
+      <draggable v-model="tabs" animation="150" @end="onEnd">
         <v-sheet v-for="tab in tabs" :key="tab.id" tile>
           <app-tab-list-item :tab="tab" sub-group />
         </v-sheet>
@@ -87,6 +87,12 @@ export default class AppTabList extends Vue {
         click: () => tabStore.closeApp({ host: this.app.host })
       }
     ])
+  }
+  onEnd() {
+    // Remove ripples if stop sorting
+    this.$el.querySelectorAll('.v-ripple__container').forEach((el) => {
+      el.remove()
+    })
   }
 }
 </script>
