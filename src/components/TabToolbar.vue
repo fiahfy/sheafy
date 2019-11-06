@@ -17,15 +17,8 @@
       @contextmenu.stop="onContextMenu"
       v-text="activeTab.title"
     />
-    <v-btn
-      icon
-      width="32"
-      height="32"
-      class="ml-1"
-      title="Close"
-      @click="onClickClose"
-    >
-      <v-icon size="20">mdi-close</v-icon>
+    <v-btn icon small class="ml-1" title="Close" @click="onClickClose">
+      <v-icon small>mdi-close</v-icon>
     </v-btn>
     <v-spacer />
     <v-btn
