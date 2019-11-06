@@ -120,7 +120,7 @@ export default class TabModule extends VuexModule {
       activate = true,
       position = 'last',
       srcId = this.activeId,
-      openerId = null
+      openerId = ''
     } = options || {}
     const id = nanoid()
     const url = 'https://www.google.com/?sheafy'

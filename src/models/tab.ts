@@ -14,5 +14,5 @@ export default interface Tab {
   foundActiveMatchOrdinal: number
   foundMatches: number
   loaded: boolean
-  openerId: string | null
+  openerId: string
 }
