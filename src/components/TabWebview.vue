@@ -339,7 +339,7 @@ export default class Webview extends Vue {
   }
   resetZoom() {
     if (this.active) {
-      this.webview.setZoomLevel(1)
+      this.webview.setZoomLevel(0)
     }
   }
   zoomIn() {
