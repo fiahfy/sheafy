@@ -144,7 +144,9 @@ export default class TabModule extends VuexModule {
       ...params
     })
     // Set url to query on new tab
-    tab.query = tab.url
+    if (url !== tab.url) {
+      tab.query = tab.url
+    }
 
     let index
     switch (position) {
