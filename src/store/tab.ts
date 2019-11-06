@@ -252,18 +252,8 @@ export default class TabModule extends VuexModule {
     const tabs = this.tabs.filter((tab) => tab.id !== id)
     this.setTabs({ tabs })
 
-    const previousTabs = this.history
-      .slice(0, this.historyIndex)
-      .filter((item) => item === id).length
-    const history = this.history.slice().filter((item) => item !== id)
-    this.setHistory({ history })
-    this.setHistoryIndex({
-      historyIndex: this.historyIndex - previousTabs
-    })
-
-    if (!tabs.length) {
-      remote.getCurrentWindow().close()
-    }
+    this.cleanHistory()
+    this.closeWindowIfEmpty()
   }
   @Action
   sortTabs({ ids }: { ids: string[] }) {
@@ -298,18 +288,8 @@ export default class TabModule extends VuexModule {
     const tabs = this.tabs.filter((tab) => !tabIds.includes(tab.id))
     this.setTabs({ tabs })
 
-    const previousTabs = this.history
-      .slice(0, this.historyIndex)
-      .filter((id) => tabIds.includes(id)).length
-    const history = this.history.slice().filter((id) => !tabIds.includes(id))
-    this.setHistory({ history })
-    this.setHistoryIndex({
-      historyIndex: this.historyIndex - previousTabs
-    })
-
-    if (!tabs.length) {
-      remote.getCurrentWindow().close()
-    }
+    this.cleanHistory()
+    this.closeWindowIfEmpty()
   }
   @Action
   sortApps({ hosts }: { hosts: string[] }) {
@@ -332,5 +312,23 @@ export default class TabModule extends VuexModule {
   @Action
   goForwardTab() {
     this.goToOffsetTab({ offset: 1 })
+  }
+  @Action
+  cleanHistory() {
+    const ids = this.tabs.map((tab) => tab.id)
+    const history = this.history.slice().filter((item) => ids.includes(item))
+    const historyIndex =
+      this.historyIndex -
+      this.history
+        .slice(0, this.historyIndex)
+        .filter((item) => !ids.includes(item)).length
+    this.setHistory({ history })
+    this.setHistoryIndex({ historyIndex })
+  }
+  @Action
+  closeWindowIfEmpty() {
+    if (!this.tabs.length) {
+      remote.getCurrentWindow().close()
+    }
   }
 }
