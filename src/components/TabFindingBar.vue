@@ -60,13 +60,15 @@ import { tabStore } from '~/store'
 @Component
 export default class FindingBar extends Vue {
   get findingText() {
-    return (tabStore.activeTab && tabStore.activeTab.findingText) || ''
+    const tab = tabStore.activeTab
+    return tab ? tab.findingText : ''
   }
   set findingText(value) {
-    if (!tabStore.activeTab) {
+    const tab = tabStore.activeTab
+    if (!tab) {
       return
     }
-    tabStore.updateTab({ id: tabStore.activeTab.id, findingText: value })
+    tabStore.updateTab({ id: tab.id, findingText: value })
     if (value) {
       this.$eventBus.$emit('findInPage', value, {
         forward: true,
@@ -75,7 +77,7 @@ export default class FindingBar extends Vue {
     } else {
       this.$eventBus.$emit('stopFindInPage')
       tabStore.updateTab({
-        id: tabStore.activeTab.id,
+        id: tab.id,
         foundActiveMatchOrdinal: 0,
         foundMatches: 0
       })
@@ -103,8 +105,9 @@ export default class FindingBar extends Vue {
   }
   onKeyDownEsc() {
     this.$eventBus.$emit('stopFindInPage')
-    if (tabStore.activeTab) {
-      tabStore.updateTab({ id: tabStore.activeTab.id, finding: false })
+    const tab = tabStore.activeTab
+    if (tab) {
+      tabStore.updateTab({ id: tab.id, finding: false })
     }
   }
   onContextMenu() {
@@ -132,8 +135,9 @@ export default class FindingBar extends Vue {
   }
   onClickClose() {
     this.$eventBus.$emit('stopFindInPage')
-    if (tabStore.activeTab) {
-      tabStore.updateTab({ id: tabStore.activeTab.id, finding: false })
+    const tab = tabStore.activeTab
+    if (tab) {
+      tabStore.updateTab({ id: tab.id, finding: false })
     }
   }
 }

@@ -14,6 +14,7 @@
     />
     <div
       class="caption text-truncate user-select-none"
+      @contextmenu.stop="onContextMenu"
       v-text="activeTab.title"
     />
     <v-btn
@@ -109,6 +110,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
+import { shell } from 'electron'
 import { tabStore } from '~/store'
 import Favicon from '~/components/Favicon.vue'
 import TabToolbarTextField from '~/components/TabToolbarTextField.vue'
@@ -183,6 +185,33 @@ export default class Toolbar extends Vue {
   }
   onClickGoForwardTab() {
     tabStore.goForwardTab()
+  }
+  onContextMenu() {
+    const tab = tabStore.activeTab
+    if (!tab) {
+      return
+    }
+    this.$contextMenu.show([
+      {
+        label: 'New Tab',
+        click: () =>
+          tabStore.newTab({ options: { srcId: tab.id, position: 'next' } })
+      },
+      { type: 'separator' },
+      {
+        label: 'Duplicate Tab',
+        click: () => tabStore.duplicateTab({ id: tab.id })
+      },
+      {
+        label: 'Open Current Page in a Default Browser',
+        click: () => shell.openExternal(tab.url)
+      },
+      { type: 'separator' },
+      {
+        label: 'Close Tab',
+        click: () => tabStore.closeTab({ id: tab.id })
+      }
+    ])
   }
   onContextMenuBack() {
     this.$eventBus.$emit('requestBackHistory')

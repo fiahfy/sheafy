@@ -182,13 +182,12 @@ export default class TabModule extends VuexModule {
   @Action
   duplicateTab({ id }: { id: string }) {
     const tab = this.getTab({ id })
-    if (!tab) {
-      return
+    if (tab) {
+      this.newTab({
+        url: tab.url,
+        options: { srcId: tab.id, position: 'next' }
+      })
     }
-    this.newTab({
-      url: tab.url,
-      options: { srcId: tab.id, position: 'next' }
-    })
   }
   @Action
   updateTab({ id, ...params }: Partial<Tab>) {

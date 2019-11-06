@@ -48,18 +48,21 @@ export default class QueryTextField extends Vue {
   focusIn = false
 
   get query() {
-    return (tabStore.activeTab && tabStore.activeTab.query) || ''
+    const tab = tabStore.activeTab
+    return tab ? tab.query : ''
   }
   set query(value) {
-    if (tabStore.activeTab) {
-      tabStore.updateTab({ id: tabStore.activeTab.id, query: value })
+    const tab = tabStore.activeTab
+    if (tab) {
+      tabStore.updateTab({ id: tab.id, query: value })
     }
   }
   get activeTab() {
     return tabStore.activeTab
   }
   get icon() {
-    const url = (tabStore.activeTab && tabStore.activeTab.url) || ''
+    const tab = tabStore.activeTab
+    const url = tab ? tab.url : ''
     const match = url.match(/^http(s)?:\/\//)
     if (match) {
       return match[1] ? 'mdi-lock' : 'mdi-alert-circle-outline'
@@ -95,8 +98,9 @@ export default class QueryTextField extends Vue {
     this.$eventBus.$emit('load')
   }
   onClickFind() {
-    if (tabStore.activeTab) {
-      tabStore.updateTab({ id: tabStore.activeTab.id, finding: false })
+    const tab = tabStore.activeTab
+    if (tab) {
+      tabStore.updateTab({ id: tab.id, finding: false })
     }
   }
 }

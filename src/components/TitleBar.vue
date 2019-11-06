@@ -19,7 +19,8 @@ import { layoutStore, tabStore } from '~/store'
 @Component
 export default class TitleBar extends Vue {
   get title() {
-    return tabStore.activeTab ? tabStore.activeTab.title : ''
+    const tab = tabStore.activeTab
+    return tab ? tab.title : ''
   }
   get titleBar() {
     return process.platform === 'darwin' && !layoutStore.fullScreen

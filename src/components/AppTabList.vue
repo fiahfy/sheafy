@@ -53,6 +53,9 @@ export default class AppTabList extends Vue {
     const ids = tabs.map((tab) => tab.id)
     tabStore.sortTabs({ ids })
   }
+  get activeTab() {
+    return tabStore.activeTab
+  }
 
   @Watch('activeTab')
   onActiveTabChanged(value: Tab) {
