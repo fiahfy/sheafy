@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { Vue, Component, PropSync, Ref, Watch } from 'vue-property-decorator'
-import { layoutStore, settingsStore } from '~/store'
+import { layoutStore, settingsStore, tabStore } from '~/store'
 import AppPanel from '~/components/AppPanel.vue'
 import DownloadPanel from '~/components/DownloadPanel.vue'
 import SettingsPanel from '~/components/SettingsPanel.vue'
@@ -39,6 +39,9 @@ export default class Sidebar extends Vue {
   }
   get panelId() {
     return layoutStore.panelId
+  }
+  get activeId() {
+    return tabStore.activeId
   }
 
   @Watch('activeId')
