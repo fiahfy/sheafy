@@ -227,27 +227,7 @@ export default class TabModule extends VuexModule {
   }
   @Action
   closeTab({ id }: { id: string }) {
-    if (id === this.activeId) {
-      const tab = this.getTab({ id })
-      if (tab && tab.openerId === this.history[this.historyIndex - 1]) {
-        this.activateTab({ id: tab.openerId })
-      } else {
-        const tabs = this.apps.reduce(
-          (carry: Tab[], app: App) => [...carry, ...app.tabs],
-          []
-        )
-        const index = tabs.findIndex((tab) => tab.id === id)
-        if (index < tabs.length - 1) {
-          const id = tabs[index + 1].id
-          this.activateTab({ id })
-        } else if (index > 0) {
-          const id = tabs[index - 1].id
-          this.activateTab({ id })
-        } else {
-          this.activateTab({ id: '' })
-        }
-      }
-    }
+    this.moveTabIfLost({ ids: [id] })
 
     const tabs = this.tabs.filter((tab) => tab.id !== id)
     this.setTabs({ tabs })
@@ -268,24 +248,12 @@ export default class TabModule extends VuexModule {
   }
   @Action
   closeApp({ host }: { host: string }) {
-    const app = this.apps.find((app) => app.host === host)!
-    const tabIds = app.tabs.map((tab) => tab.id)
-    const active = tabIds.includes(this.activeId)
-    if (active) {
-      const index = this.apps.findIndex((app) => app.host === host)
-      if (index < this.apps.length - 1) {
-        const id = this.apps[index + 1].tabs[0].id
-        this.activateTab({ id })
-      } else if (index > 0) {
-        const tabIndex = this.apps[index - 1].tabs.length - 1
-        const id = this.apps[index - 1].tabs[tabIndex].id
-        this.activateTab({ id })
-      } else {
-        this.activateTab({ id: '' })
-      }
-    }
+    const lostIds = this.tabs
+      .filter((tab) => tab.host === host)
+      .map((tab) => tab.id)
+    this.moveTabIfLost({ ids: lostIds })
 
-    const tabs = this.tabs.filter((tab) => !tabIds.includes(tab.id))
+    const tabs = this.tabs.filter((tab) => !lostIds.includes(tab.id))
     this.setTabs({ tabs })
 
     this.cleanHistory()
@@ -312,6 +280,27 @@ export default class TabModule extends VuexModule {
   @Action
   goForwardTab() {
     this.goToOffsetTab({ offset: 1 })
+  }
+  @Action
+  moveTabIfLost({ ids }: { ids: string[] }) {
+    if (!ids.includes(this.activeId)) {
+      return
+    }
+    const tabIds = this.apps
+      .reduce((carry: Tab[], app: App) => [...carry, ...app.tabs], [])
+      .map((tab) => tab.id)
+    const indexes = ids.map((id) => tabIds.indexOf(id))
+    const minIndex = Math.min.apply(null, indexes)
+    const maxIndex = Math.max.apply(null, indexes)
+    const nextTabId = tabIds[maxIndex + 1]
+    const previousTabId = tabIds[minIndex - 1]
+    if (nextTabId) {
+      this.activateTab({ id: nextTabId })
+    } else if (previousTabId) {
+      this.activateTab({ id: previousTabId })
+    } else {
+      this.activateTab({ id: '' })
+    }
   }
   @Action
   cleanHistory() {
