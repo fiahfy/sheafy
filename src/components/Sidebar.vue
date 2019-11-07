@@ -7,91 +7,77 @@
         </div>
       </template>
     </div>
-    <div ref="resizer" class="resizer" :class="classes">
-      <v-divider vertical />
-    </div>
+    <div ref="resizer" class="resizer" :class="classes" />
   </div>
 </template>
 
-<script>
-import { mapMutations, mapState } from 'vuex'
-import AppPanel from '~/components/AppPanel'
-import DownloadPanel from '~/components/DownloadPanel'
-import SettingsPanel from '~/components/SettingsPanel'
+<script lang="ts">
+import { Vue, Component, PropSync, Ref, Watch } from 'vue-property-decorator'
+import { layoutStore, settingsStore, tabStore } from '~/store'
+import AppPanel from '~/components/AppPanel.vue'
+import DownloadPanel from '~/components/DownloadPanel.vue'
+import SettingsPanel from '~/components/SettingsPanel.vue'
 
-export default {
-  props: {
-    resizing: {
-      type: Boolean,
-      required: true
+@Component
+export default class Sidebar extends Vue {
+  @PropSync('resizing', { type: Boolean }) syncedResizing!: boolean
+  @Ref() readonly resizer!: HTMLDivElement
+
+  panels = [
+    { id: 'apps', component: AppPanel },
+    { id: 'downloads', component: DownloadPanel },
+    { id: 'settings', component: SettingsPanel }
+  ]
+  get width() {
+    return settingsStore.sideBarWidth
+  }
+  set width(value) {
+    settingsStore.setSideBarWidth({ sideBarWidth: value })
+  }
+  get classes() {
+    return settingsStore.sideBarLocation === 'right' ? 'resizer--right' : ''
+  }
+  get panelId() {
+    return layoutStore.panelId
+  }
+  get activeId() {
+    return tabStore.activeId
+  }
+
+  @Watch('activeId')
+  onActiveIdChanged(newValue: string, oldValue: string) {
+    if (newValue !== oldValue) {
+      layoutStore.setPanelId({ panelId: 'apps' })
     }
-  },
-  data() {
-    return {
-      panels: [
-        { id: 'apps', component: AppPanel },
-        { id: 'downloads', component: DownloadPanel },
-        { id: 'settings', component: SettingsPanel }
-      ]
-    }
-  },
-  computed: {
-    classes() {
-      return this.sideBarLocation === 'right' ? 'resizer--right' : ''
-    },
-    width: {
-      get() {
-        return this.sideBarWidth
-      },
-      set(value) {
-        this.setSideBarWidth({ sideBarWidth: value })
-      }
-    },
-    ...mapState(['panelId']),
-    ...mapState('tab', ['activeId']),
-    ...mapState('settings', ['sideBarLocation', 'sideBarWidth'])
-  },
-  watch: {
-    activeId(newValue, oldValue) {
-      if (newValue !== oldValue) {
-        this.setPanelId({ panelId: 'apps' })
-      }
-    }
-  },
+  }
+
   mounted() {
-    this.setupResizeHandler()
-  },
-  methods: {
-    setupResizeHandler() {
-      const resize = (e) => {
-        document.body.style.cursor = 'ew-resize'
-        const width =
-          this.sideBarLocation === 'right'
-            ? -e.clientX + this.$el.getBoundingClientRect().right
-            : e.clientX - this.$el.getBoundingClientRect().left
-        if (width < 256 || width > window.innerWidth - 256) {
-          return
-        }
-        this.$el.style.width = width + 'px'
+    const resize = (e: MouseEvent) => {
+      document.body.style.cursor = 'ew-resize'
+      const width =
+        settingsStore.sideBarLocation === 'right'
+          ? -e.clientX + this.$el.getBoundingClientRect().right
+          : e.clientX - this.$el.getBoundingClientRect().left
+      if (width < 256 || width > window.innerWidth - 256) {
+        return
       }
+      ;(<HTMLElement>this.$el).style.width = width + 'px'
+    }
 
-      this.$refs.resizer.addEventListener('mousedown', () => {
-        this.$emit('update:resizing', true)
-        document.addEventListener('mousemove', resize, false)
-      })
+    this.resizer.addEventListener('mousedown', () => {
+      this.syncedResizing = true
+      document.addEventListener('mousemove', resize, false)
+    })
 
-      document.addEventListener('mouseup', () => {
-        if (!this.resizing) {
-          return
-        }
-        this.$emit('update:resizing', false)
-        this.width = Number(this.$el.style.width.slice(0, -2))
-        document.body.style.cursor = ''
-        document.removeEventListener('mousemove', resize, false)
-      })
-    },
-    ...mapMutations(['setPanelId']),
-    ...mapMutations('settings', ['setSideBarWidth'])
+    document.addEventListener('mouseup', () => {
+      if (!this.syncedResizing) {
+        return
+      }
+      this.syncedResizing = false
+      this.width = Number((<HTMLElement>this.$el).style.width!.slice(0, -2))
+      document.body.style.cursor = ''
+      document.removeEventListener('mousemove', resize, false)
+    })
   }
 }
 </script>
@@ -112,9 +98,6 @@ export default {
     &.resizer--right {
       left: -1px;
       right: unset;
-    }
-    > .v-divider {
-      border-color: transparent;
     }
   }
 }

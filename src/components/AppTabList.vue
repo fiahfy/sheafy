@@ -3,27 +3,20 @@
     <app-tab-list-item v-if="app.tabs.length < 2" :tab="app.tabs[0]" />
     <v-list-group v-else v-model="expand">
       <template v-slot:activator>
-        <app-tab-list-item-icon
-          class="mr-2"
-          :url="app.favicon"
-          :host="app.host"
-        />
-        <v-list-item-content @contextmenu="onContextMenu">
+        <v-list-item-icon class="mr-3 align-self-center">
+          <favicon :url="app.favicon" />
+        </v-list-item-icon>
+        <v-list-item-content @contextmenu="onContextMenuItem">
           <v-list-item-title v-text="app.host" />
         </v-list-item-content>
         <badge v-if="app.tabs.length" class="ml-3" :num="app.tabs.length" />
         <v-list-item-action class="my-0 ml-4">
-          <v-btn
-            icon
-            small
-            title="Close App"
-            @click.stop="closeApp({ host: app.host })"
-          >
+          <v-btn icon small title="Close App" @click.stop="onClickClose">
             <v-icon small>mdi-close</v-icon>
           </v-btn>
         </v-list-item-action>
       </template>
-      <draggable v-model="tabs" animation="150">
+      <draggable v-model="tabs" animation="150" @end="onEnd">
         <v-sheet v-for="tab in tabs" :key="tab.id" tile>
           <app-tab-list-item :tab="tab" sub-group />
         </v-sheet>
@@ -32,72 +25,77 @@
   </v-list>
 </template>
 
-<script>
-import { mapActions, mapGetters } from 'vuex'
-import AppTabListItem from '~/components/AppTabListItem'
-import AppTabListItemIcon from '~/components/AppTabListItemIcon'
-import Badge from '~/components/Badge'
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { tabStore } from '~/store'
+import App from '~/models/app'
+import Tab from '~/models/tab'
+import AppTabListItem from '~/components/AppTabListItem.vue'
+import Badge from '~/components/Badge.vue'
+import Favicon from '~/components/Favicon.vue'
 
-export default {
+@Component({
   components: {
     AppTabListItem,
-    AppTabListItemIcon,
-    Badge
-  },
-  props: {
-    app: {
-      type: Object,
-      required: true
+    Badge,
+    Favicon
+  }
+})
+export default class AppTabList extends Vue {
+  @Prop({ type: Object, required: true }) readonly app!: App
+
+  expand = true
+
+  get tabs() {
+    return this.app.tabs
+  }
+  set tabs(tabs) {
+    const ids = tabs.map((tab) => tab.id)
+    tabStore.sortTabs({ ids })
+  }
+  get activeTab() {
+    return tabStore.activeTab
+  }
+
+  @Watch('activeTab')
+  onActiveTabChanged(value: Tab) {
+    if (this.app.host === value.host) {
+      this.expand = true
     }
-  },
-  data() {
-    return {
-      expand: true
-    }
-  },
-  computed: {
-    tabs: {
-      get() {
-        return this.app.tabs
-      },
-      set(tabs) {
-        const ids = tabs.map((tab) => tab.id)
-        this.sortTabs({ ids })
-      }
-    },
-    ...mapGetters('tab', ['activeTab'])
-  },
-  watch: {
-    activeTab(value) {
-      if (this.app.host === value.host) {
-        this.expand = true
-      }
-    }
-  },
+  }
+
   mounted() {
     this.$eventBus.$on('expandApps', this.expandApps)
     this.$eventBus.$on('collapseApps', this.collapseApps)
-  },
+  }
+
   destroyed() {
     this.$eventBus.$off('expandApps', this.expandApps)
     this.$eventBus.$off('collapseApps', this.collapseApps)
-  },
-  methods: {
-    expandApps() {
-      this.expand = true
-    },
-    collapseApps() {
-      this.expand = false
-    },
-    onContextMenu() {
-      this.$contextMenu.show([
-        {
-          label: 'Close App',
-          click: () => this.closeApp({ host: this.app.host })
-        }
-      ])
-    },
-    ...mapActions('tab', ['sortTabs', 'closeApp'])
+  }
+
+  expandApps() {
+    this.expand = true
+  }
+  collapseApps() {
+    this.expand = false
+  }
+  onClickClose() {
+    tabStore.closeApp({ host: this.app.host })
+  }
+  onContextMenuItem() {
+    this.$contextMenu.show([
+      {
+        label: 'Close App',
+        click: () => tabStore.closeApp({ host: this.app.host })
+      }
+    ])
+  }
+  onEnd() {
+    // Remove ripples if stop sorting
+    this.$el.querySelectorAll('.v-ripple__container').forEach((el) => {
+      el.remove()
+    })
   }
 }
 </script>
@@ -111,6 +109,7 @@ export default {
     }
   }
   ::v-deep .v-list-group__header {
+    min-height: 36px;
     &:not(:hover) .v-list-item__action:not(:first-child) {
       display: none;
     }
@@ -120,6 +119,9 @@ export default {
     .v-list-group__header__append-icon {
       margin-left: 16px;
       padding: 0 2px;
+      min-width: unset;
+    }
+    .v-list-item__icon {
       min-width: unset;
     }
   }

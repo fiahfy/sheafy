@@ -172,6 +172,7 @@ window.open = ((func) => {
 Notification.requestPermission = ((func) => {
   return function(...args) {
     // TODO: Handle requestPermission
+    // eslint-disable-next-line no-console
     console.log('requestPermission')
     return func.apply(this, args)
   }

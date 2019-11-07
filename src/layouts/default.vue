@@ -7,30 +7,36 @@
   </v-app>
 </template>
 
-<script>
-import TitleBar from '~/components/TitleBar'
-import { mapActions, mapState } from 'vuex'
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import { layoutStore, settingsStore, tabStore } from '~/store'
+import TitleBar from '~/components/TitleBar.vue'
 
-export default {
+@Component({
   components: {
     TitleBar
-  },
-  computed: {
-    ...mapState('settings', ['darkTheme'])
-  },
+  }
+})
+export default class Layout extends Vue {
+  get darkTheme() {
+    return settingsStore.darkTheme
+  }
+
   mounted() {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        this.hideShortcutBar()
+        layoutStore.hideShortcutBar()
       }
     })
     this.$vuetify.theme.dark = this.darkTheme
-  },
-  methods: {
-    onContextMenu() {
-      this.$contextMenu.show()
-    },
-    ...mapActions(['hideShortcutBar'])
+  }
+
+  created() {
+    tabStore.newTabIfEmpty()
+  }
+
+  onContextMenu() {
+    this.$contextMenu.show()
   }
 }
 </script>

@@ -240,7 +240,7 @@ const createWindow = async () => {
 
   if (dev) {
     // Disable security warnings
-    process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true
+    process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true
 
     // Install vue dev tool and open chrome dev tools
     const {
@@ -279,22 +279,22 @@ const createWindow = async () => {
   mainWindow.on('closed', () => (mainWindow = null))
   mainWindow.on('enter-full-screen', () => send('enterFullScreen'))
   mainWindow.on('leave-full-screen', () => send('leaveFullScreen'))
-  mainWindow.on('swipe', (e, direction) => send('swipe', direction))
+  mainWindow.on('swipe', (_e, direction) => send('swipe', direction))
 
   let downloadItems = {}
-  ipcMain.on('pauseDownload', (e, id) => {
+  ipcMain.on('pauseDownload', (_e, id) => {
     const item = downloadItems[id]
     if (item) {
       item.pause()
     }
   })
-  ipcMain.on('resumeDownload', (e, id) => {
+  ipcMain.on('resumeDownload', (_e, id) => {
     const item = downloadItems[id]
     if (item) {
       item.resume()
     }
   })
-  ipcMain.on('cancelDownload', (e, id) => {
+  ipcMain.on('cancelDownload', (_e, id) => {
     const item = downloadItems[id]
     if (item) {
       item.cancel()
@@ -303,10 +303,10 @@ const createWindow = async () => {
         id,
         status: 'failed'
       }
-      send('updateDownload', download)
+      send('upsertDownload', download)
     }
   })
-  mainWindow.webContents.session.on('will-download', (e, item) => {
+  mainWindow.webContents.session.on('will-download', (_e, item) => {
     const id = nanoid()
     downloadItems = {
       ...downloadItems,
@@ -327,11 +327,11 @@ const createWindow = async () => {
       totalBytes: item.getTotalBytes(),
       startTime: Math.floor(item.getStartTime() * 1000)
     }
-    send('updateDownload', download)
+    send('upsertDownload', download)
     send('showDownloads')
 
     item.setSavePath(filepath)
-    item.on('updated', (e, state) => {
+    item.on('updated', (_e, state) => {
       let status
       if (state === 'interrupted') {
         status = 'interrupted'
@@ -343,9 +343,9 @@ const createWindow = async () => {
         status,
         receivedBytes: item.getReceivedBytes()
       }
-      send('updateDownload', download)
+      send('upsertDownload', download)
     })
-    item.once('done', (e, state) => {
+    item.once('done', (_e, state) => {
       let status
       if (state === 'interrupted') {
         status = 'failed'
@@ -357,7 +357,7 @@ const createWindow = async () => {
         status,
         receivedBytes: item.getReceivedBytes()
       }
-      send('updateDownload', download)
+      send('upsertDownload', download)
       delete downloadItems[id]
     })
   })
@@ -367,9 +367,9 @@ app.on('ready', createWindow)
 app.on('activate', () => mainWindow === null && createWindow())
 app.on('window-all-closed', () => process.platform !== 'darwin' && app.quit())
 // @see https://stackoverflow.com/questions/48298364/choose-which-popups-should-be-allowed-from-webview-in-electron-app
-app.on('web-contents-created', (e, contents) => {
+app.on('web-contents-created', (_e, contents) => {
   if (contents.getType() === 'webview') {
-    contents.on('new-window', (e, url, windowName, disposition) => {
+    contents.on('new-window', (e, _url, _windowName, disposition) => {
       disposition !== 'new-window' && e.preventDefault()
     })
   }

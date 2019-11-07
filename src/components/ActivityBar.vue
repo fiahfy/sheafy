@@ -14,7 +14,7 @@
         class="py-1"
         :title="item.title"
         :input-value="isActive(item)"
-        @click="() => onClick(item)"
+        @click="() => onClickItem(item)"
       >
         <v-list-item-icon>
           <v-icon v-text="item.icon" />
@@ -28,34 +28,27 @@
   </v-navigation-drawer>
 </template>
 
-<script>
-import { mapMutations, mapState } from 'vuex'
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
+import { layoutStore, settingsStore } from '~/store'
 
-export default {
-  data() {
-    return {
-      items: [
-        { id: 'apps', title: 'Apps', icon: 'mdi-tab' },
-        { id: 'downloads', title: 'Downloads', icon: 'mdi-download-outline' },
-        { id: 'settings', title: 'Settings', icon: 'mdi-settings-outline' }
-      ]
-    }
-  },
-  computed: {
-    right() {
-      return this.sideBarLocation === 'right'
-    },
-    ...mapState(['panelId']),
-    ...mapState('settings', ['sideBarLocation'])
-  },
-  methods: {
-    isActive({ id }) {
-      return id === this.panelId
-    },
-    onClick({ id }) {
-      this.setPanelId({ panelId: id })
-    },
-    ...mapMutations(['setPanelId'])
+@Component
+export default class ActivityBar extends Vue {
+  items = [
+    { id: 'apps', title: 'Apps', icon: 'mdi-tab' },
+    { id: 'downloads', title: 'Downloads', icon: 'mdi-download-outline' },
+    { id: 'settings', title: 'Settings', icon: 'mdi-settings-outline' }
+  ]
+
+  get right() {
+    return settingsStore.sideBarLocation === 'right'
+  }
+
+  isActive({ id }: { id: string }) {
+    return id === layoutStore.panelId
+  }
+  onClickItem({ id }: { id: string }) {
+    layoutStore.setPanelId({ panelId: id })
   }
 }
 </script>
