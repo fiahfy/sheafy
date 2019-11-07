@@ -20,8 +20,8 @@
     </div>
     <v-btn
       icon
-      width="36"
-      height="36"
+      width="32"
+      height="32"
       class="ml-1"
       title="Close"
       :disabled="!findingText"
@@ -31,8 +31,8 @@
     </v-btn>
     <v-btn
       icon
-      width="36"
-      height="36"
+      width="32"
+      height="32"
       class="ml-1"
       title="Close"
       :disabled="!findingText"
@@ -42,8 +42,8 @@
     </v-btn>
     <v-btn
       icon
-      width="36"
-      height="36"
+      width="32"
+      height="32"
       class="ml-1"
       title="Close"
       @click="onClickClose"
@@ -87,6 +87,18 @@ export default class FindingBar extends Vue {
     return tabStore.activeTab
   }
 
+  mounted() {
+    this.$eventBus.$on('focusFinding', this.focus)
+  }
+
+  destroyed() {
+    this.$eventBus.$off('focusFinding', this.focus)
+  }
+
+  focus() {
+    const el = this.$el.querySelector('input')
+    el && el.focus()
+  }
   onFocus() {
     if (this.findingText) {
       this.$eventBus.$emit('findInPage', this.findingText, {

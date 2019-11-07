@@ -32,25 +32,16 @@ const ipcPlugin: Plugin = (ctx) => {
     tabStore.closeTab({ id: tabStore.activeId })
   })
   ipcRenderer.on('openLocation', () => {
-    const el = <HTMLInputElement>document.querySelector('input[name=query]')
-    el.focus()
+    ctx.app.$eventBus.$emit('focusLocation')
   })
   ipcRenderer.on('goToTab', () => {
     layoutStore.showShortcutBar()
-    const el = <HTMLInputElement>document.querySelector('input[name=shortcut]')
-    el && el.focus()
-    el && el.select()
+    ctx.app.$eventBus.$emit('focusShortcut')
   })
   ipcRenderer.on('find', () => {
     const id = tabStore.activeId
     tabStore.updateTab({ id, finding: true })
-    setTimeout(() => {
-      const el = <HTMLInputElement>(
-        document.querySelector('input[name=finding-text]')
-      )
-      el && el.focus()
-      el && el.select()
-    }, 0)
+    ctx.app.$eventBus.$emit('focusFinding')
   })
   ipcRenderer.on('showSettings', () => {
     layoutStore.setPanelId({ panelId: 'settings' })

@@ -70,8 +70,17 @@ export default class ShortcutBar extends Vue {
 
   mounted() {
     this.width = (<HTMLElement>this.$el).offsetWidth
+    this.$eventBus.$on('focusShortcut', this.focus)
   }
 
+  destroyed() {
+    this.$eventBus.$off('focusShortcut', this.focus)
+  }
+
+  focus() {
+    const el = this.$el.querySelector('input')
+    el && el.focus()
+  }
   onChange(value: string) {
     tabStore.activateTab({ id: value })
     layoutStore.hideShortcutBar()

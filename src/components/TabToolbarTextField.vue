@@ -70,6 +70,18 @@ export default class QueryTextField extends Vue {
     return 'mdi-help-circle-outline'
   }
 
+  mounted() {
+    this.$eventBus.$on('focusLocation', this.focus)
+  }
+
+  destroyed() {
+    this.$eventBus.$off('focusLocation', this.focus)
+  }
+
+  focus() {
+    const el = this.$el.querySelector('input')
+    el && el.focus()
+  }
   onContextMenu() {
     this.$contextMenu.show([
       { role: 'cut' },

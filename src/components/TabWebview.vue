@@ -120,8 +120,7 @@ export default class Webview extends Vue {
             canGoForward: this.webview.canGoForward()
           })
           if (home) {
-            // TODO: selector name
-            ;(<HTMLInputElement>document.querySelector('[name=query]')).focus()
+            this.$eventBus.$emit('focusLocation')
           } else if (urlChanged || this.needFocus) {
             tabStore.updateTab({ id: this.tab.id, query: url })
             this.needFocus = false
