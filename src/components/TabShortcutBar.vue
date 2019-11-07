@@ -78,8 +78,10 @@ export default class ShortcutBar extends Vue {
   }
 
   focus() {
-    const el = this.$el.querySelector('input')
-    el && el.focus()
+    this.$nextTick(() => {
+      const el = this.$el.querySelector('input')
+      el && el.focus()
+    })
   }
   onChange(value: string) {
     tabStore.activateTab({ id: value })

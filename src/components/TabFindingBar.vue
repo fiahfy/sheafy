@@ -96,8 +96,10 @@ export default class FindingBar extends Vue {
   }
 
   focus() {
-    const el = this.$el.querySelector('input')
-    el && el.focus()
+    this.$nextTick(() => {
+      const el = this.$el.querySelector('input')
+      el && el.focus()
+    })
   }
   onFocus() {
     if (this.findingText) {

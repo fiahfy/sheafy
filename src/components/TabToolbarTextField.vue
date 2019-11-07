@@ -79,8 +79,10 @@ export default class QueryTextField extends Vue {
   }
 
   focus() {
-    const el = this.$el.querySelector('input')
-    el && el.focus()
+    this.$nextTick(() => {
+      const el = this.$el.querySelector('input')
+      el && el.focus()
+    })
   }
   onContextMenu() {
     this.$contextMenu.show([
