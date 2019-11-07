@@ -18,6 +18,7 @@
         height="16"
         width="16"
         contain
+        eager
         @load="error = false"
         @error="error = true"
       />
@@ -36,7 +37,7 @@ export default class AppTabListItemIcon extends Vue {
   error = false
 
   @Watch('url')
-  chnaged(newValue: string, oldValue: string) {
+  onUrlChanged(newValue: string, oldValue: string) {
     if (newValue !== oldValue) {
       this.error = false
     }
