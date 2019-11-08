@@ -227,6 +227,14 @@ export default class TabModule extends VuexModule {
   }
   @Action
   closeTab({ id }: { id: string }) {
+    // back tab if prev tab is opener
+    if (id === this.activeId) {
+      const tab = this.getTab({ id })
+      if (tab && tab.openerId === this.history[this.historyIndex - 1]) {
+        this.goBackTab()
+      }
+    }
+
     this.moveTabIfLost({ ids: [id] })
 
     const tabs = this.tabs.filter((tab) => tab.id !== id)
