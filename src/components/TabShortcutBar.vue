@@ -80,7 +80,10 @@ export default class ShortcutBar extends Vue {
   focus() {
     this.$nextTick(() => {
       const el = this.$el.querySelector('input')
-      el && el.focus()
+      if (el) {
+        el.focus()
+        el.select()
+      }
     })
   }
   onChange(value: string) {
