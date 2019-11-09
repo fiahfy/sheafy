@@ -18,7 +18,7 @@ export default class Badge extends Vue {
 
 <style lang="scss" scoped>
 .v-chip {
-  height: 18px;
+  height: 18px !important;
   padding: 0 6px !important;
 }
 </style>

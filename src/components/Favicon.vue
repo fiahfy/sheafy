@@ -9,7 +9,7 @@
       class="d-flex"
     />
     <template v-else>
-      <v-icon v-if="error" small class="d-flex" color="grey darken-1">
+      <v-icon v-if="error || !url" small class="d-flex" color="grey darken-1">
         mdi-earth
       </v-icon>
       <v-img
@@ -19,6 +19,7 @@
         width="16"
         contain
         eager
+        transition="false"
         @load="error = false"
         @error="error = true"
       />

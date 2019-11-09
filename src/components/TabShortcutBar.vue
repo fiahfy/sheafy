@@ -15,15 +15,32 @@
     :filter="filter"
     :menu-props="menuProps"
     @change="onChange"
-  />
+  >
+    <template v-slot:item="{ item }">
+      <v-list-item-icon class="mr-3 align-self-center">
+        <favicon :url="item.favicon" :loading="item.loading" />
+      </v-list-item-icon>
+      <v-list-item-content>
+        <v-list-item-title
+          class="font-weight-regular caption"
+          v-text="item.title"
+        />
+      </v-list-item-content>
+    </template>
+  </v-autocomplete>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import { layoutStore, tabStore } from '~/store'
 import Tab from '~/models/tab'
+import Favicon from '~/components/Favicon.vue'
 
-@Component
+@Component({
+  components: {
+    Favicon
+  }
+})
 export default class ShortcutBar extends Vue {
   width = 0
 
@@ -80,7 +97,10 @@ export default class ShortcutBar extends Vue {
   focus() {
     this.$nextTick(() => {
       const el = this.$el.querySelector('input')
-      el && el.focus()
+      if (el) {
+        el.focus()
+        el.select()
+      }
     })
   }
   onChange(value: string) {
@@ -93,5 +113,11 @@ export default class ShortcutBar extends Vue {
 <style lang="scss" scoped>
 .tab-shortcut-bar {
   border-radius: 0;
+}
+::v-deep .v-list-item {
+  min-height: 36px;
+  .v-list-item__icon {
+    min-width: unset;
+  }
 }
 </style>
