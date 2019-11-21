@@ -1,12 +1,12 @@
 <template>
-  <v-container class="index" fluid pa-0 :class="{ resizing: resizing }">
+  <v-container class="index" fluid pa-0>
     <activity-bar v-if="!fullScreen" />
     <div
       class="d-flex flex-grow-1 overflow-hidden fill-height"
       :class="classes"
     >
       <tab class="flex-grow-1 overflow-hidden" />
-      <sidebar v-if="!fullScreen" :resizing.sync="resizing" />
+      <sidebar v-if="!fullScreen" />
     </div>
   </v-container>
 </template>
@@ -26,8 +26,6 @@ import Tab from '~/components/Tab.vue'
   }
 })
 export default class Index extends Vue {
-  resizing = false
-
   get classes() {
     return settingsStore.sideBarLocation === 'right'
       ? 'flex-row'
@@ -38,9 +36,3 @@ export default class Index extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.index.resizing .tab {
-  pointer-events: none;
-}
-</style>

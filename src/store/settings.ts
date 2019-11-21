@@ -10,6 +10,7 @@ export default class SettingsModule extends VuexModule {
   swipeToNavigate = false
   sideBarLocation = 'left'
   sideBarWidth = 256
+  topContentHeight = 256
 
   @Mutation
   setDarkTheme({ darkTheme }: { darkTheme: boolean }) {
@@ -26,5 +27,9 @@ export default class SettingsModule extends VuexModule {
   @Mutation
   setSideBarWidth({ sideBarWidth }: { sideBarWidth: number }) {
     this.sideBarWidth = sideBarWidth
+  }
+  @Mutation
+  setTopContentHeight({ topContentHeight }: { topContentHeight: number }) {
+    this.topContentHeight = topContentHeight
   }
 }

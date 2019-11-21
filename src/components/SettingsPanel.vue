@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator'
+import { Vue, Component } from 'vue-property-decorator'
 import { settingsStore } from '~/store'
 
 @Component
@@ -57,11 +57,6 @@ export default class SettingsPanel extends Vue {
   }
   set swipeToNavigate(value) {
     settingsStore.setSwipeToNavigate({ swipeToNavigate: value })
-  }
-
-  @Watch('darkTheme')
-  onDarkThemeChanged(value: boolean) {
-    this.$vuetify.theme.dark = value
   }
 }
 </script>

@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync, Ref, Watch } from 'vue-property-decorator'
+import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
 import { layoutStore, settingsStore, tabStore } from '~/store'
 import AppPanel from '~/components/AppPanel.vue'
 import DownloadPanel from '~/components/DownloadPanel.vue'
@@ -20,9 +20,9 @@ import SettingsPanel from '~/components/SettingsPanel.vue'
 
 @Component
 export default class Sidebar extends Vue {
-  @PropSync('resizing', { type: Boolean }) syncedResizing!: boolean
   @Ref() readonly resizer!: HTMLDivElement
 
+  resizing = false
   panels = [
     { id: 'apps', component: AppPanel },
     { id: 'downloads', component: DownloadPanel },
@@ -53,7 +53,6 @@ export default class Sidebar extends Vue {
 
   mounted() {
     const resize = (e: MouseEvent) => {
-      document.body.style.cursor = 'ew-resize'
       const width =
         settingsStore.sideBarLocation === 'right'
           ? -e.clientX + this.$el.getBoundingClientRect().right
@@ -65,18 +64,21 @@ export default class Sidebar extends Vue {
     }
 
     this.resizer.addEventListener('mousedown', () => {
-      this.syncedResizing = true
-      document.addEventListener('mousemove', resize, false)
+      this.resizing = true
+      layoutStore.setResizing({ resizing: true })
+      document.body.style.cursor = 'ew-resize'
+      document.addEventListener('mousemove', resize)
     })
 
     document.addEventListener('mouseup', () => {
-      if (!this.syncedResizing) {
+      if (!this.resizing) {
         return
       }
-      this.syncedResizing = false
+      this.resizing = false
+      layoutStore.setResizing({ resizing: false })
       this.width = Number((<HTMLElement>this.$el).style.width!.slice(0, -2))
       document.body.style.cursor = ''
-      document.removeEventListener('mousemove', resize, false)
+      document.removeEventListener('mousemove', resize)
     })
   }
 }
