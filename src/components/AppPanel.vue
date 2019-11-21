@@ -86,13 +86,11 @@ export default class AppPanel extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.app-panel {
-  .resizer {
-    width: 100%;
-    padding: 1px 0;
-    margin: -1px 0;
-    z-index: 5;
-    cursor: ns-resize;
-  }
+.app-panel .resizer {
+  width: 100%;
+  padding: 1px 0;
+  margin: -1px 0;
+  z-index: 5;
+  cursor: ns-resize;
 }
 </style>

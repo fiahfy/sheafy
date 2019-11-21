@@ -1,6 +1,6 @@
 <template>
   <div class="side-bar d-flex" :style="{ width: `${width}px` }">
-    <div class="pane flex-grow-1">
+    <div class="wrapper flex-grow-1">
       <template v-for="panel in panels">
         <div v-show="panel.id === panelId" :key="panel.id" class="fill-height">
           <component :is="panel.component" class="fill-height" />
@@ -87,7 +87,7 @@ export default class Sidebar extends Vue {
 <style lang="scss" scoped>
 .side-bar {
   position: relative;
-  .pane {
+  .wrapper {
     min-width: 0;
   }
   .resizer {
