@@ -4,7 +4,7 @@
     filled
     rounded
     hide-details
-    class="tab-toolbar-text-field body-2"
+    class="toolbar-text-field body-2"
     name="query"
     @mousedown="onMouseDown"
     @mouseup="onMouseUp"
@@ -44,7 +44,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import { tabStore } from '~/store'
 
 @Component
-export default class QueryTextField extends Vue {
+export default class ToolbarTextField extends Vue {
   focusIn = false
 
   get query() {
@@ -124,7 +124,7 @@ export default class QueryTextField extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.tab-toolbar-text-field ::v-deep .v-input__control > .v-input__slot {
+.toolbar-text-field ::v-deep .v-input__control > .v-input__slot {
   min-height: unset;
   padding: 0 6px 0 12px !important;
   > .v-input__prepend-inner {

@@ -5,7 +5,7 @@
       class="d-flex flex-grow-1 overflow-hidden fill-height"
       :class="classes"
     >
-      <tab class="flex-grow-1 overflow-hidden" />
+      <tab-content class="flex-grow-1 overflow-hidden" />
       <sidebar v-if="!fullScreen" />
     </div>
   </v-container>
@@ -16,13 +16,13 @@ import { Vue, Component } from 'vue-property-decorator'
 import { layoutStore, settingsStore } from '~/store'
 import ActivityBar from '~/components/ActivityBar.vue'
 import Sidebar from '~/components/Sidebar.vue'
-import Tab from '~/components/Tab.vue'
+import TabContent from '~/components/TabContent.vue'
 
 @Component({
   components: {
     ActivityBar,
     Sidebar,
-    Tab
+    TabContent
   }
 })
 export default class Index extends Vue {

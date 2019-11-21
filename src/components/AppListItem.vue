@@ -1,6 +1,6 @@
 <template>
-  <v-list class="app-tab-list primary--text py-0" dense>
-    <app-tab-list-item v-if="app.tabs.length < 2" :tab="app.tabs[0]" />
+  <v-list class="app-list-item primary--text py-0" dense>
+    <tab-list-item v-if="app.tabs.length < 2" :tab="app.tabs[0]" app />
     <v-list-group v-else v-model="expand">
       <template v-slot:activator>
         <v-list-item-icon class="mr-3 align-self-center">
@@ -18,7 +18,7 @@
       </template>
       <draggable v-model="tabs" animation="150" @end="onEnd">
         <v-sheet v-for="tab in tabs" :key="tab.id" tile>
-          <app-tab-list-item :tab="tab" sub-group />
+          <tab-list-item :tab="tab" inset />
         </v-sheet>
       </draggable>
     </v-list-group>
@@ -30,18 +30,18 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { tabStore } from '~/store'
 import App from '~/models/app'
 import Tab from '~/models/tab'
-import AppTabListItem from '~/components/AppTabListItem.vue'
 import Badge from '~/components/Badge.vue'
 import Favicon from '~/components/Favicon.vue'
+import TabListItem from '~/components/TabListItem.vue'
 
 @Component({
   components: {
-    AppTabListItem,
+    TabListItem,
     Badge,
     Favicon
   }
 })
-export default class AppTabList extends Vue {
+export default class AppListItem extends Vue {
   @Prop({ type: Object, required: true }) readonly app!: App
 
   expand = true
@@ -101,7 +101,7 @@ export default class AppTabList extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.app-tab-list {
+.app-list-item {
   .v-sheet {
     color: inherit;
     &.sortable-ghost {

@@ -2,7 +2,7 @@
   <div class="app-list">
     <draggable v-model="model" animation="150" @end="onEnd">
       <v-sheet v-for="app in model" :key="app.host" tile>
-        <app-tab-list :app="app" />
+        <app-list-item :app="app" />
       </v-sheet>
     </draggable>
   </div>
@@ -12,11 +12,11 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { tabStore } from '~/store'
 import App from '~/models/app'
-import AppTabList from '~/components/AppTabList.vue'
+import AppListItem from '~/components/AppListItem.vue'
 
 @Component({
   components: {
-    AppTabList
+    AppListItem
   }
 })
 export default class AppList extends Vue {

@@ -1,6 +1,6 @@
 <template>
   <v-toolbar
-    class="tab-toolbar"
+    class="toolbar"
     flat
     dense
     height="36"
@@ -96,7 +96,7 @@
       >
         <v-icon size="20">mdi-refresh</v-icon>
       </v-btn>
-      <tab-toolbar-text-field class="ml-1" />
+      <toolbar-text-field class="ml-1" />
     </template>
   </v-toolbar>
 </template>
@@ -106,12 +106,12 @@ import { Vue, Component } from 'vue-property-decorator'
 import { shell } from 'electron'
 import { tabStore } from '~/store'
 import Favicon from '~/components/Favicon.vue'
-import TabToolbarTextField from '~/components/TabToolbarTextField.vue'
+import ToolbarTextField from '~/components/ToolbarTextField.vue'
 
 @Component({
   components: {
     Favicon,
-    TabToolbarTextField
+    ToolbarTextField
   }
 })
 export default class Toolbar extends Vue {

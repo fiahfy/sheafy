@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-webview d-none" />
+  <div class="webview d-none" />
 </template>
 
 <script lang="ts">

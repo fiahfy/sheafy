@@ -1,21 +1,11 @@
 <template>
-  <div class="app-content d-flex flex-column">
+  <div class="app-pane d-flex flex-column">
     <v-toolbar tile dense flat class="flex-grow-0" height="36">
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         apps
       </span>
       <badge class="ml-3" :num="apps.length" />
       <v-spacer />
-      <v-btn
-        icon
-        width="32"
-        height="32"
-        title="New Tab"
-        class="ml-1"
-        @click="onClickNewTab"
-      >
-        <v-icon size="20">mdi-tab-plus</v-icon>
-      </v-btn>
       <v-btn
         icon
         width="32"
@@ -56,7 +46,7 @@ import Badge from '~/components/Badge.vue'
     Badge
   }
 })
-export default class AppContent extends Vue {
+export default class AppPane extends Vue {
   @Ref() readonly container!: HTMLDivElement
 
   get apps() {
@@ -72,15 +62,8 @@ export default class AppContent extends Vue {
       return
     }
     this.$nextTick(() => {
-      // Disabled transform for vuedraggable
-      this.$el.querySelectorAll('.app-tab-list').forEach((el) => {
-        el.parentElement!.style.transform = 'none'
-        el.querySelectorAll('.app-tab-list-item').forEach((el) => {
-          el.parentElement!.style.transform = 'none'
-        })
-      })
       const tab = <HTMLElement>(
-        this.$el.querySelector('.app-tab-list-item.v-list-item--active')
+        this.$el.querySelector('.tab-list-item.v-list-item--active')
       )
       if (!tab) {
         return
@@ -98,9 +81,6 @@ export default class AppContent extends Vue {
     })
   }
 
-  onClickNewTab() {
-    tabStore.newTab()
-  }
   onClickExpand() {
     this.$eventBus.$emit('expandApps')
   }
@@ -109,3 +89,9 @@ export default class AppContent extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.app-pane > div {
+  position: relative;
+}
+</style>

@@ -1,7 +1,7 @@
 <template>
   <v-list-item
-    class="app-tab-list-item"
-    :class="{ 'sub-group': subGroup }"
+    class="tab-list-item"
+    :class="{ inset }"
     :title="title"
     :input-value="active"
     @click="onClick"
@@ -36,15 +36,16 @@ import Favicon from '~/components/Favicon.vue'
     Badge
   }
 })
-export default class AppTabListItem extends Vue {
+export default class TabListItem extends Vue {
   @Prop({ type: Object, required: true }) readonly tab!: Tab
-  @Prop({ type: Boolean, default: false }) readonly subGroup!: boolean
+  @Prop({ type: Boolean, default: false }) readonly app!: boolean
+  @Prop({ type: Boolean, default: false }) readonly inset!: boolean
 
   get active() {
     return tabStore.isActiveTab({ id: this.tab.id })
   }
   get title() {
-    return this.subGroup ? this.tab.title : this.tab.host
+    return this.app ? this.tab.host : this.tab.title
   }
   get badge() {
     return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
@@ -83,9 +84,9 @@ export default class AppTabListItem extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.app-tab-list-item {
+.tab-list-item {
   min-height: 36px;
-  &.sub-group {
+  &.inset {
     padding-left: 32px;
   }
   &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {

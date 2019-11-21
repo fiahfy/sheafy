@@ -5,11 +5,11 @@
     @drop.prevent="onDrop"
   >
     <div ref="content" :style="{ height: `${height}px` }">
-      <app-content class="fill-height" />
+      <tab-pane class="fill-height" />
     </div>
     <div ref="resizer" class="resizer" />
     <div class="flex-grow-1" style="min-height: 0; flex-basis: 0;">
-      <app-content class="fill-height" />
+      <app-pane class="fill-height" />
     </div>
   </div>
 </template>
@@ -18,11 +18,13 @@
 import { Vue, Component, Ref } from 'vue-property-decorator'
 import { layoutStore, settingsStore, tabStore } from '~/store'
 import TabUtils from '~/utils/tab'
-import AppContent from '~/components/AppContent.vue'
+import AppPane from '~/components/AppPane.vue'
+import TabPane from '~/components/TabPane.vue'
 
 @Component({
   components: {
-    AppContent
+    AppPane,
+    TabPane
   }
 })
 export default class AppPanel extends Vue {
