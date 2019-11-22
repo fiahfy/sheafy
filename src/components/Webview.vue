@@ -84,7 +84,7 @@ export default class Webview extends Vue {
     this.webview.src = this.tab.url
     this.webview.preload = this.preload
     this.webview.allowpopups = true
-    this.webview.webpreferences = 'nativeWindowOpen=yes'
+    this.webview.webpreferences = 'nativeWindowOpen, scrollBounce'
     this.webview.style.display = this.display
     this.$el.parentElement!.append(this.webview)
 

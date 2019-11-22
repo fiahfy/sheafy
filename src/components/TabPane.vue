@@ -26,6 +26,7 @@
 <script lang="ts">
 import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
 import { tabStore } from '~/store'
+import Tab from '~/models/tab'
 import Badge from '~/components/Badge.vue'
 import TabList from '~/components/TabList.vue'
 
@@ -39,7 +40,7 @@ export default class TabPane extends Vue {
   @Ref() readonly container!: HTMLDivElement
 
   get tabs() {
-    return tabStore.tabs
+    return tabStore.sortedTabs
   }
   get activeTab() {
     return tabStore.activeTab

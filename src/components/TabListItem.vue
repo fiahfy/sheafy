@@ -1,6 +1,6 @@
 <template>
   <v-list-item
-    class="tab-list-item"
+    class="tab-list-item pr-2"
     :class="{ inset }"
     :title="title"
     :input-value="active"

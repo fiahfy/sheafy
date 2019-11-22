@@ -20,13 +20,28 @@ const convertTab = (tab: Tab): Tab => {
 })
 export default class TabModule extends VuexModule {
   tabs: Tab[] = []
+  sortedIds: string[] = []
+  sortedHosts: string[] = []
+
   hosts: string[] = []
+
   activeId = ''
   history: string[] = []
   historyIndex = -1
 
   get activeTab() {
     return this.getTab({ id: this.activeId })
+  }
+  get sortedTabs() {
+    return this.tabs.slice().sort((a, b) => {
+      const aIndex = this.sortedIds.includes(a.id)
+        ? this.sortedIds.indexOf(a.id)
+        : Infinity
+      const bIndex = this.sortedIds.includes(b.id)
+        ? this.sortedIds.indexOf(b.id)
+        : Infinity
+      return aIndex > bIndex ? 1 : -1
+    })
   }
   get apps() {
     return Object.values(
@@ -102,6 +117,10 @@ export default class TabModule extends VuexModule {
   @Mutation
   setHistoryIndex({ historyIndex }: { historyIndex: number }) {
     this.historyIndex = historyIndex
+  }
+  @Mutation
+  setSortedIds({ sortedIds }: { sortedIds: string[] }) {
+    this.sortedIds = sortedIds
   }
 
   @Action
@@ -245,14 +264,7 @@ export default class TabModule extends VuexModule {
   }
   @Action
   sortTabs({ ids }: { ids: string[] }) {
-    const sortedTabs = <Tab[]>(
-      ids.map((id) => this.getTab({ id })).filter((tab) => !!tab)
-    )
-    const tabs = [
-      ...this.tabs.filter((tab) => !ids.includes(tab.id)),
-      ...sortedTabs
-    ]
-    this.setTabs({ tabs })
+    this.setSortedIds({ sortedIds: ids })
   }
   @Action
   closeApp({ host }: { host: string }) {

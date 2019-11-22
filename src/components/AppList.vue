@@ -25,15 +25,15 @@ export default class AppList extends Vue {
   get model() {
     return this.apps
   }
-  set model(apps) {
-    const hosts = apps.map((app) => app.host)
+  set model(value) {
+    const hosts = value.map((app) => app.host)
     tabStore.sortApps({ hosts })
   }
 
   onEnd() {
     // Remove ripples if stop sorting
     this.$el.querySelectorAll('.v-ripple__container').forEach((el) => {
-      el.remove()
+      ;(<HTMLSpanElement>el).style.display = 'none'
     })
   }
 }
