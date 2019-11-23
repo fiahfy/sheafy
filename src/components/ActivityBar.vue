@@ -41,7 +41,7 @@ export default class ActivityBar extends Vue {
   ]
 
   get right() {
-    return settingsStore.sideBarLocation === 'right'
+    return settingsStore.sidebarLocation === 'right'
   }
 
   isActive({ id }: { id: string }) {

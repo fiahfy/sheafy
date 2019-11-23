@@ -8,8 +8,8 @@ import { Module, VuexModule, Mutation } from 'vuex-module-decorators'
 export default class SettingsModule extends VuexModule {
   darkTheme = false
   swipeToNavigate = false
-  sideBarLocation = 'left'
-  sideBarWidth = 256
+  sidebarLocation = 'left'
+  sidebarWidth = 256
   topContentHeight = 256
 
   @Mutation
@@ -21,12 +21,12 @@ export default class SettingsModule extends VuexModule {
     this.swipeToNavigate = swipeToNavigate
   }
   @Mutation
-  setSideBarLocation({ sideBarLocation }: { sideBarLocation: string }) {
-    this.sideBarLocation = sideBarLocation
+  setSidebarLocation({ sidebarLocation }: { sidebarLocation: string }) {
+    this.sidebarLocation = sidebarLocation
   }
   @Mutation
-  setSideBarWidth({ sideBarWidth }: { sideBarWidth: number }) {
-    this.sideBarWidth = sideBarWidth
+  setSidebarWidth({ sidebarWidth }: { sidebarWidth: number }) {
+    this.sidebarWidth = sidebarWidth
   }
   @Mutation
   setTopContentHeight({ topContentHeight }: { topContentHeight: number }) {

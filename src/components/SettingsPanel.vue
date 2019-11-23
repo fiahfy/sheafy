@@ -10,9 +10,10 @@
       <div class="pa-5">
         <v-checkbox v-model="darkTheme" class="mt-0" label="Dark Theme" />
         <v-select
-          v-model="sideBarLocation"
-          :items="sideBarLocations"
-          label="Side Bar Location"
+          v-model="sidebarLocation"
+          :items="sidebarLocations"
+          label="Sidebar Location"
+          dense
         />
         <v-checkbox
           v-if="darwin"
@@ -32,7 +33,7 @@ import { settingsStore } from '~/store'
 
 @Component
 export default class SettingsPanel extends Vue {
-  sideBarLocations = [
+  sidebarLocations = [
     { text: 'Left', value: 'left' },
     { text: 'Right', value: 'right' }
   ]
@@ -46,11 +47,11 @@ export default class SettingsPanel extends Vue {
   set darkTheme(value) {
     settingsStore.setDarkTheme({ darkTheme: value })
   }
-  get sideBarLocation() {
-    return settingsStore.sideBarLocation
+  get sidebarLocation() {
+    return settingsStore.sidebarLocation
   }
-  set sideBarLocation(value) {
-    settingsStore.setSideBarLocation({ sideBarLocation: value })
+  set sidebarLocation(value) {
+    settingsStore.setSidebarLocation({ sidebarLocation: value })
   }
   get swipeToNavigate() {
     return settingsStore.swipeToNavigate

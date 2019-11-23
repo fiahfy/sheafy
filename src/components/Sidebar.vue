@@ -29,13 +29,13 @@ export default class Sidebar extends Vue {
     { id: 'settings', component: SettingsPanel }
   ]
   get width() {
-    return settingsStore.sideBarWidth
+    return settingsStore.sidebarWidth
   }
   set width(value) {
-    settingsStore.setSideBarWidth({ sideBarWidth: value })
+    settingsStore.setSidebarWidth({ sidebarWidth: value })
   }
   get classes() {
-    return settingsStore.sideBarLocation === 'right' ? 'resizer--right' : ''
+    return settingsStore.sidebarLocation === 'right' ? 'resizer--right' : ''
   }
   get panelId() {
     return layoutStore.panelId
@@ -54,7 +54,7 @@ export default class Sidebar extends Vue {
   mounted() {
     const resize = (e: MouseEvent) => {
       const width =
-        settingsStore.sideBarLocation === 'right'
+        settingsStore.sidebarLocation === 'right'
           ? -e.clientX + this.$el.getBoundingClientRect().right
           : e.clientX - this.$el.getBoundingClientRect().left
       if (width < 256 || width > window.innerWidth - 256) {
