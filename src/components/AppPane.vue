@@ -50,7 +50,7 @@ export default class AppPane extends Vue {
   @Ref() readonly container!: HTMLDivElement
 
   get apps() {
-    return tabStore.apps
+    return tabStore.sortedApps
   }
   get activeTab() {
     return tabStore.activeTab

@@ -51,7 +51,7 @@ export default class AppListItem extends Vue {
   }
   set model(value) {
     const ids = value.map((tab) => tab.id)
-    tabStore.sortTabs({ ids })
+    tabStore.sortTabsOnApp({ ids, host: this.app.host })
   }
   get activeTab() {
     return tabStore.activeTab
@@ -110,6 +110,7 @@ export default class AppListItem extends Vue {
   }
   ::v-deep .v-list-group__header {
     min-height: 36px;
+    padding-right: 8px;
     &:not(:hover) .v-list-item__action:not(:first-child) {
       display: none;
     }

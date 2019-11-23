@@ -13,6 +13,12 @@ const convertTab = (tab: Tab): Tab => {
   }
 }
 
+const sortNegativeToLast = (a: number, b: number) => {
+  const newA = a > -1 ? a : Infinity
+  const newB = b > -1 ? b : Infinity
+  return newA > newB ? 1 : -1
+}
+
 @Module({
   name: 'tab',
   stateFactory: true,
@@ -20,30 +26,28 @@ const convertTab = (tab: Tab): Tab => {
 })
 export default class TabModule extends VuexModule {
   tabs: Tab[] = []
-  sortedIds: string[] = []
-  sortedHosts: string[] = []
-
-  hosts: string[] = []
-
   activeId = ''
   history: string[] = []
   historyIndex = -1
+  sortedIds: string[] = []
+  sortedHosts: string[] = []
+  sortedIdsOnHost: { [host: string]: string[] } = {}
 
   get activeTab() {
     return this.getTab({ id: this.activeId })
   }
+  get activeIndex() {
+    return this.sortedTabs.findIndex((tab) => tab.id === this.activeId)
+  }
   get sortedTabs() {
     return this.tabs.slice().sort((a, b) => {
-      const aIndex = this.sortedIds.includes(a.id)
-        ? this.sortedIds.indexOf(a.id)
-        : Infinity
-      const bIndex = this.sortedIds.includes(b.id)
-        ? this.sortedIds.indexOf(b.id)
-        : Infinity
-      return aIndex > bIndex ? 1 : -1
+      return sortNegativeToLast(
+        this.sortedIds.indexOf(a.id),
+        this.sortedIds.indexOf(b.id)
+      )
     })
   }
-  get apps() {
+  get sortedApps() {
     return Object.values(
       this.tabs.slice().reduce((carry: { [key: string]: App }, tab) => {
         if (carry[tab.host]) {
@@ -64,15 +68,25 @@ export default class TabModule extends VuexModule {
           }
         }
       }, {})
-    ).sort((a, b) => {
-      const aIndex = this.hosts.includes(a.host)
-        ? this.hosts.indexOf(a.host)
-        : Infinity
-      const bIndex = this.hosts.includes(b.host)
-        ? this.hosts.indexOf(b.host)
-        : Infinity
-      return aIndex > bIndex ? 1 : -1
-    })
+    )
+      .sort((a, b) => {
+        return sortNegativeToLast(
+          this.sortedHosts.indexOf(a.host),
+          this.sortedHosts.indexOf(b.host)
+        )
+      })
+      .map((app) => {
+        return {
+          ...app,
+          tabs: app.tabs.sort((a, b) => {
+            const sortedIds = this.sortedIdsOnHost[app.host] || []
+            return sortNegativeToLast(
+              sortedIds.indexOf(a.id),
+              sortedIds.indexOf(b.id)
+            )
+          })
+        }
+      })
   }
   get canGoBackTab() {
     return !!this.history[this.historyIndex - 1]
@@ -103,10 +117,6 @@ export default class TabModule extends VuexModule {
     this.tabs = tabs
   }
   @Mutation
-  setHosts({ hosts }: { hosts: string[] }) {
-    this.hosts = hosts
-  }
-  @Mutation
   setActiveId({ activeId }: { activeId: string }) {
     this.activeId = activeId
   }
@@ -121,6 +131,18 @@ export default class TabModule extends VuexModule {
   @Mutation
   setSortedIds({ sortedIds }: { sortedIds: string[] }) {
     this.sortedIds = sortedIds
+  }
+  @Mutation
+  setSortedHosts({ sortedHosts }: { sortedHosts: string[] }) {
+    this.sortedHosts = sortedHosts
+  }
+  @Mutation
+  setSortedIdsOnHost({
+    sortedIdsOnHost
+  }: {
+    sortedIdsOnHost: { [host: string]: string[] }
+  }) {
+    this.sortedIdsOnHost = sortedIdsOnHost
   }
 
   @Action
@@ -169,16 +191,9 @@ export default class TabModule extends VuexModule {
 
     let index
     switch (position) {
-      case 'next': {
-        const srcIndex = this.tabs.findIndex((tab) => tab.id === srcId)
-        // new tab at last when host is different from host in src tab
-        if (srcIndex === -1 || tab.host !== this.tabs[srcIndex].host) {
-          index = this.tabs.length
-        } else {
-          index = srcIndex + 1
-        }
+      case 'next':
+        index = this.tabs.findIndex((tab) => tab.id === srcId) + 1
         break
-      }
       case 'last':
       default:
         index = this.tabs.length
@@ -210,25 +225,17 @@ export default class TabModule extends VuexModule {
   }
   @Action
   updateTab({ id, ...params }: Partial<Tab>) {
-    let hostChanged = false
-    let tabs = this.tabs.map((tab) => {
+    const tabs = this.tabs.map((tab) => {
       if (tab.id !== id) {
         return tab
       }
-      const newTab = convertTab({ ...tab, ...params })
-      hostChanged = tab.host !== newTab.host
-      return newTab
+      return convertTab({ ...tab, ...params })
     })
-    // move tab to last when host is changed
-    if (hostChanged) {
-      const index = tabs.findIndex((tab) => tab.id === id)
-      tabs = [...tabs.slice(0, index), ...tabs.slice(index + 1), tabs[index]]
-    }
     this.setTabs({ tabs })
   }
   @Action
   activateTab({ id }: { id: string }) {
-    if (this.activeId === id) {
+    if (id === this.activeId) {
       return
     }
     this.setActiveId({ activeId: id })
@@ -245,6 +252,43 @@ export default class TabModule extends VuexModule {
     }
   }
   @Action
+  activateTabIndex({ index }: { index: number }) {
+    const tab = this.sortedTabs[index]
+    if (!tab) {
+      return
+    }
+    this.activateTab({ id: tab.id })
+  }
+  @Action
+  closeTabs({ ids }: { ids: string[] }) {
+    const activeIndex = this.activeIndex
+
+    const tabs = this.tabs.filter((tab) => !ids.includes(tab.id))
+    this.setTabs({ tabs })
+
+    const existIds = tabs.map((tab) => tab.id)
+
+    if (!existIds.includes(this.activeId)) {
+      const index = Math.min(activeIndex, tabs.length - 1)
+      this.activateTabIndex({ index })
+    }
+
+    const history = this.history
+      .slice()
+      .filter((item) => existIds.includes(item))
+    const historyIndex =
+      this.historyIndex -
+      this.history
+        .slice(0, this.historyIndex)
+        .filter((item) => !existIds.includes(item)).length
+    this.setHistory({ history })
+    this.setHistoryIndex({ historyIndex })
+
+    if (!this.tabs.length) {
+      remote.getCurrentWindow().close()
+    }
+  }
+  @Action
   closeTab({ id }: { id: string }) {
     // back tab if prev tab is opener
     if (id === this.activeId) {
@@ -253,35 +297,30 @@ export default class TabModule extends VuexModule {
         this.goBackTab()
       }
     }
-
-    this.moveTabIfLost({ ids: [id] })
-
-    const tabs = this.tabs.filter((tab) => tab.id !== id)
-    this.setTabs({ tabs })
-
-    this.cleanHistory()
-    this.closeWindowIfEmpty()
+    this.closeTabs({ ids: [id] })
+  }
+  @Action
+  closeApp({ host }: { host: string }) {
+    const ids = this.tabs
+      .filter((tab) => tab.host !== host)
+      .map((tab) => tab.id)
+    this.closeTabs({ ids })
   }
   @Action
   sortTabs({ ids }: { ids: string[] }) {
     this.setSortedIds({ sortedIds: ids })
   }
   @Action
-  closeApp({ host }: { host: string }) {
-    const lostIds = this.tabs
-      .filter((tab) => tab.host === host)
-      .map((tab) => tab.id)
-    this.moveTabIfLost({ ids: lostIds })
-
-    const tabs = this.tabs.filter((tab) => !lostIds.includes(tab.id))
-    this.setTabs({ tabs })
-
-    this.cleanHistory()
-    this.closeWindowIfEmpty()
+  sortApps({ hosts }: { hosts: string[] }) {
+    this.setSortedHosts({ sortedHosts: hosts })
   }
   @Action
-  sortApps({ hosts }: { hosts: string[] }) {
-    this.setHosts({ hosts })
+  sortTabsOnApp({ ids, host }: { ids: string[]; host: string }) {
+    const sortedIdsOnHost = {
+      ...this.sortedIdsOnHost,
+      [host]: ids
+    }
+    this.setSortedIdsOnHost({ sortedIdsOnHost })
   }
   @Action
   goToOffsetTab({ offset }: { offset: number }) {
@@ -300,44 +339,5 @@ export default class TabModule extends VuexModule {
   @Action
   goForwardTab() {
     this.goToOffsetTab({ offset: 1 })
-  }
-  @Action
-  moveTabIfLost({ ids }: { ids: string[] }) {
-    if (!ids.includes(this.activeId)) {
-      return
-    }
-    const tabIds = this.apps
-      .reduce((carry: Tab[], app: App) => [...carry, ...app.tabs], [])
-      .map((tab) => tab.id)
-    const indexes = ids.map((id) => tabIds.indexOf(id))
-    const minIndex = Math.min.apply(null, indexes)
-    const maxIndex = Math.max.apply(null, indexes)
-    const nextTabId = tabIds[maxIndex + 1]
-    const previousTabId = tabIds[minIndex - 1]
-    if (nextTabId) {
-      this.activateTab({ id: nextTabId })
-    } else if (previousTabId) {
-      this.activateTab({ id: previousTabId })
-    } else {
-      this.activateTab({ id: '' })
-    }
-  }
-  @Action
-  cleanHistory() {
-    const ids = this.tabs.map((tab) => tab.id)
-    const history = this.history.slice().filter((item) => ids.includes(item))
-    const historyIndex =
-      this.historyIndex -
-      this.history
-        .slice(0, this.historyIndex)
-        .filter((item) => !ids.includes(item)).length
-    this.setHistory({ history })
-    this.setHistoryIndex({ historyIndex })
-  }
-  @Action
-  closeWindowIfEmpty() {
-    if (!this.tabs.length) {
-      remote.getCurrentWindow().close()
-    }
   }
 }
