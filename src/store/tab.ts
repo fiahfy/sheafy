@@ -88,6 +88,23 @@ export default class TabModule extends VuexModule {
         }
       })
   }
+  get recentTabs() {
+    const recentIds = this.history
+      .slice()
+      .reverse()
+      .reduce((carry: string[], id) => {
+        if (carry.includes(id)) {
+          return carry
+        }
+        return [...carry, id]
+      }, [])
+    return this.tabs.slice().sort((a, b) => {
+      return sortNegativeToLast(
+        recentIds.indexOf(a.id),
+        recentIds.indexOf(b.id)
+      )
+    })
+  }
   get canGoBackTab() {
     return !!this.history[this.historyIndex - 1]
   }

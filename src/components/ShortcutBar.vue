@@ -68,7 +68,7 @@ export default class ShortcutBar extends Vue {
     return layoutStore.shortcutBar
   }
   get tabs() {
-    return tabStore.tabs
+    return tabStore.recentTabs
   }
 
   @Watch('shortcutBar')

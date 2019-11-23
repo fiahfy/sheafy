@@ -6,7 +6,7 @@
     height="22"
   >
     <v-sheet tile class="fill-height flex-grow-1" @dblclick="onDoubleClick">
-      <div class="text-truncate text-center" v-text="title" />
+      <div class="text-truncate text-center">sheafy</div>
     </v-sheet>
   </v-system-bar>
 </template>
@@ -14,14 +14,10 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { remote } from 'electron'
-import { layoutStore, tabStore } from '~/store'
+import { layoutStore } from '~/store'
 
 @Component
 export default class TitleBar extends Vue {
-  get title() {
-    const tab = tabStore.activeTab
-    return tab ? tab.title : ''
-  }
   get titleBar() {
     return process.platform === 'darwin' && !layoutStore.fullScreen
   }
@@ -55,7 +51,7 @@ export default class TitleBar extends Vue {
     min-width: 0;
     -webkit-app-region: drag;
     > div {
-      margin-top: 6px;
+      margin-top: 3px;
     }
   }
 }

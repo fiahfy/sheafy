@@ -236,7 +236,10 @@ export default class Webview extends Vue {
           case 'search': {
             const [query] = args
             const url = TabUtils.getUrlWithQuery(query)
-            tabStore.newTab({ url, options: { position: 'next' } })
+            tabStore.newTab({
+              url,
+              options: { position: 'next', openerId: this.tab.id }
+            })
             break
           }
           case 'focus': {
