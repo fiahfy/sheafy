@@ -243,7 +243,7 @@ export default class TabModule extends VuexModule {
     if (tab) {
       this.newTab({
         url: tab.url,
-        options: { srcId: tab.id, position: 'next' }
+        options: { position: 'next', srcId: tab.id, openerId: tab.id }
       })
     }
   }
@@ -296,6 +296,9 @@ export default class TabModule extends VuexModule {
       const index = Math.min(activeIndex, tabs.length - 1)
       this.activateTabIndex({ index })
     }
+
+    const sortedIds = this.sortedIds.filter((id) => existIds.includes(id))
+    this.setSortedIds({ sortedIds })
 
     const history = this.history
       .slice()
