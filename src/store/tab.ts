@@ -192,7 +192,7 @@ export default class TabModule extends VuexModule {
     let index
     switch (position) {
       case 'next':
-        index = this.tabs.findIndex((tab) => tab.id === srcId) + 1
+        index = this.sortedTabs.findIndex((tab) => tab.id === srcId) + 1
         break
       case 'last':
       default:
@@ -200,8 +200,15 @@ export default class TabModule extends VuexModule {
         break
     }
 
-    const tabs = [...this.tabs.slice(0, index), tab, ...this.tabs.slice(index)]
+    const tabs = [...this.tabs, tab]
     this.setTabs({ tabs })
+
+    const sortedIds = [
+      ...this.sortedIds.slice(0, index),
+      tab.id,
+      ...this.sortedIds.slice(index)
+    ]
+    this.setSortedIds({ sortedIds })
 
     if (activate) {
       this.activateTab({ id })
