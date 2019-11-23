@@ -4,7 +4,7 @@
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         downloads
       </span>
-      <badge v-if="downloads.length" class="ml-3" :num="downloads.length" />
+      <chip v-if="downloads.length" class="ml-3" :num="downloads.length" />
       <v-spacer />
       <v-btn
         icon
@@ -28,12 +28,12 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { downloadStore } from '~/store'
-import Badge from '~/components/Badge.vue'
+import Chip from '~/components/Chip.vue'
 import DownloadList from '~/components/DownloadList.vue'
 
 @Component({
   components: {
-    Badge,
+    Chip,
     DownloadList
   }
 })

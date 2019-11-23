@@ -13,7 +13,7 @@
     <v-list-item-content>
       <v-list-item-title class="font-weight-regular caption" v-text="title" />
     </v-list-item-content>
-    <badge v-if="tab.badge" class="ml-3" :num="badge" color="error" />
+    <chip v-if="tab.badge" class="ml-3" :num="badge" color="error" />
     <v-list-item-action class="my-0">
       <v-btn icon small title="Close" @click.stop="onClickClose">
         <v-icon small>mdi-close</v-icon>
@@ -27,13 +27,13 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { shell } from 'electron'
 import { tabStore } from '~/store'
 import Tab from '~/models/tab'
-import Badge from '~/components/Badge.vue'
+import Chip from '~/components/Chip.vue'
 import Favicon from '~/components/Favicon.vue'
 
 @Component({
   components: {
     Favicon,
-    Badge
+    Chip
   }
 })
 export default class TabListItem extends Vue {

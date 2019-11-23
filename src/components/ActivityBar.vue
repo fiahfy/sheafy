@@ -17,7 +17,12 @@
         @click="() => onClickItem(item)"
       >
         <v-list-item-icon>
-          <v-icon v-text="item.icon" />
+          <v-badge color="red">
+            <template v-slot:badge>
+              <span v-if="hasBadge(item)">0</span>
+            </template>
+            <v-icon v-text="item.icon" />
+          </v-badge>
         </v-list-item-icon>
 
         <v-list-item-content>
@@ -30,7 +35,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { layoutStore, settingsStore } from '~/store'
+import { layoutStore, settingsStore, tabStore } from '~/store'
 
 @Component
 export default class ActivityBar extends Vue {
@@ -46,6 +51,12 @@ export default class ActivityBar extends Vue {
 
   isActive({ id }: { id: string }) {
     return id === layoutStore.panelId
+  }
+  hasBadge({ id }: { id: string }) {
+    if (id === 'apps') {
+      return !!tabStore.totalBadges
+    }
+    return false
   }
   onClickItem({ id }: { id: string }) {
     layoutStore.setPanelId({ panelId: id })
@@ -66,6 +77,13 @@ export default class ActivityBar extends Vue {
     }
     &:before {
       opacity: 0;
+    }
+    ::v-deep .v-badge__badge {
+      font-size: 0;
+      min-width: 8px;
+      right: -3px;
+      top: -1px;
+      height: 8px;
     }
   }
 }

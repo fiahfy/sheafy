@@ -4,7 +4,7 @@
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         tabs
       </span>
-      <badge class="ml-3" :num="tabs.length" />
+      <chip class="ml-3" :num="tabs.length" />
       <v-spacer />
       <v-btn
         icon
@@ -27,12 +27,12 @@
 import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
 import { tabStore } from '~/store'
 import Tab from '~/models/tab'
-import Badge from '~/components/Badge.vue'
+import Chip from '~/components/Chip.vue'
 import TabList from '~/components/TabList.vue'
 
 @Component({
   components: {
-    Badge,
+    Chip,
     TabList
   }
 })

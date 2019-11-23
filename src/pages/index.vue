@@ -47,7 +47,7 @@ export default class Index extends Vue {
     top: 0;
     left: 0;
     right: 0;
-    width: 512px;
+    width: 600px;
     max-width: 100%;
     margin: 0 auto;
     z-index: 1;

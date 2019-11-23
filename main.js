@@ -144,14 +144,14 @@ const createTemplate = () => {
         },
         { type: 'separator' },
         {
-          label: 'Back Tab',
-          accelerator: 'Alt+Left',
-          click: () => send('goBackTab')
+          label: 'Next Tab',
+          accelerator: 'Ctrl+Tab',
+          click: () => send('goNextTab')
         },
         {
-          label: 'Forward Tab',
-          accelerator: 'Alt+Right',
-          click: () => send('goForwardTab')
+          label: 'Previous Tab',
+          accelerator: 'Ctrl+Shift+Tab',
+          click: () => send('goPreviousTab')
         }
       ]
     },

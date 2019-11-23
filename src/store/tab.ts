@@ -103,6 +103,9 @@ export default class TabModule extends VuexModule {
       }, [])
     return this.tabs.slice().sort(createTabSort(recentIds))
   }
+  get totalBadges() {
+    return this.tabs.reduce((carry, tab) => carry + tab.badge, 0)
+  }
   get canGoBackTab() {
     return !!this.history[this.historyIndex - 1]
   }
@@ -357,6 +360,22 @@ export default class TabModule extends VuexModule {
     }
     this.setActiveId({ activeId: id })
     this.setHistoryIndex({ historyIndex: index })
+  }
+  @Action
+  goNextTab() {
+    let index = this.activeIndex + 1
+    if (index > this.tabs.length - 1) {
+      index = 0
+    }
+    this.activateTabIndex({ index })
+  }
+  @Action
+  goPreviousTab() {
+    let index = this.activeIndex - 1
+    if (index < 0) {
+      index = this.tabs.length - 1
+    }
+    this.activateTabIndex({ index })
   }
   @Action
   goBackTab() {

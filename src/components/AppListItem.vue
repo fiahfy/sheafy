@@ -9,7 +9,7 @@
         <v-list-item-content @contextmenu="onContextMenuItem">
           <v-list-item-title v-text="app.host" />
         </v-list-item-content>
-        <badge v-if="app.tabs.length" class="ml-3" :num="app.tabs.length" />
+        <chip v-if="app.tabs.length" class="ml-3" :num="app.tabs.length" />
         <v-list-item-action class="my-0 ml-4">
           <v-btn icon small title="Close App" @click.stop="onClickClose">
             <v-icon small>mdi-close</v-icon>
@@ -30,14 +30,14 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { tabStore } from '~/store'
 import App from '~/models/app'
 import Tab from '~/models/tab'
-import Badge from '~/components/Badge.vue'
+import Chip from '~/components/Chip.vue'
 import Favicon from '~/components/Favicon.vue'
 import TabListItem from '~/components/TabListItem.vue'
 
 @Component({
   components: {
     TabListItem,
-    Badge,
+    Chip,
     Favicon
   }
 })

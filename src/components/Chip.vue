@@ -1,6 +1,6 @@
 <template>
   <v-chip
-    class="badge caption px-2 user-select-none pointer-events-none"
+    class="chip caption px-2 user-select-none pointer-events-none"
     :color="color"
     v-text="num"
   />
@@ -17,8 +17,10 @@ export default class Badge extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.badge.v-chip {
-  height: 18px !important;
-  padding: 0 6px !important;
+.chip {
+  height: 17px !important;
+  line-height: 17px !important;
+  padding: 0 5.5px !important;
+  font-size: 0.66rem !important;
 }
 </style>

@@ -4,7 +4,7 @@
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         apps
       </span>
-      <badge class="ml-3" :num="apps.length" />
+      <chip class="ml-3" :num="apps.length" />
       <v-spacer />
       <v-btn
         icon
@@ -38,12 +38,12 @@ import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
 import { tabStore } from '~/store'
 import Tab from '~/models/tab'
 import AppList from '~/components/AppList.vue'
-import Badge from '~/components/Badge.vue'
+import Chip from '~/components/Chip.vue'
 
 @Component({
   components: {
     AppList,
-    Badge
+    Chip
   }
 })
 export default class AppPane extends Vue {
