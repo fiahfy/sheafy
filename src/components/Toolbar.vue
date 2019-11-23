@@ -9,13 +9,13 @@
   >
     <favicon
       class="mr-3"
-      :url="activeTab.favicon"
-      :loading="activeTab.loading"
+      :url="activeTab && activeTab.favicon"
+      :loading="activeTab && activeTab.loading"
     />
     <div
       class="caption text-truncate user-select-none"
       @contextmenu.stop="onContextMenu"
-      v-text="activeTab.title"
+      v-text="activeTab && activeTab.title"
     />
     <v-btn icon small class="ml-3" title="Close" @click="onClickClose">
       <v-icon small>mdi-close</v-icon>

@@ -57,10 +57,7 @@ export default class AppPane extends Vue {
   }
 
   @Watch('activeTab')
-  onActiveTabChanged(newValue: Tab, oldValue: Tab) {
-    if (newValue.id === oldValue.id && newValue.host === oldValue.host) {
-      return
-    }
+  onActiveTabChanged(_newValue: Tab, _oldValue: Tab) {
     this.$nextTick(() => {
       const tab = <HTMLElement>(
         this.$el.querySelector('.tab-list-item.v-list-item--active')

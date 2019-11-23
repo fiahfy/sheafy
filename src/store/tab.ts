@@ -2,7 +2,7 @@ import { remote } from 'electron'
 import nanoid from 'nanoid'
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 import TabUtils from '~/utils/tab'
-import Tab from '~/models/tab'
+import Tab, { homeUrl } from '~/models/tab'
 import App from '~/models/app'
 
 const convertTab = (tab: Tab): Tab => {
@@ -13,10 +13,27 @@ const convertTab = (tab: Tab): Tab => {
   }
 }
 
-const sortNegativeToLast = (a: number, b: number) => {
-  const newA = a > -1 ? a : Infinity
-  const newB = b > -1 ? b : Infinity
-  return newA > newB ? 1 : -1
+const createTabSort = (sortedIds: string[]) => {
+  return (a: Tab, b: Tab) => {
+    const aIndex = sortedIds.includes(a.id) ? sortedIds.indexOf(a.id) : Infinity
+    const bIndex = sortedIds.includes(b.id) ? sortedIds.indexOf(b.id) : Infinity
+    if (aIndex === bIndex) {
+      return a.createdAt > b.createdAt ? 1 : -1
+    }
+    return aIndex > bIndex ? 1 : -1
+  }
+}
+
+const createAppSort = (sortedHosts: string[]) => {
+  return (a: App, b: App) => {
+    const aIndex = sortedHosts.includes(a.host)
+      ? sortedHosts.indexOf(a.host)
+      : Infinity
+    const bIndex = sortedHosts.includes(b.host)
+      ? sortedHosts.indexOf(b.host)
+      : Infinity
+    return aIndex > bIndex ? 1 : -1
+  }
 }
 
 @Module({
@@ -40,12 +57,7 @@ export default class TabModule extends VuexModule {
     return this.sortedTabs.findIndex((tab) => tab.id === this.activeId)
   }
   get sortedTabs() {
-    return this.tabs.slice().sort((a, b) => {
-      return sortNegativeToLast(
-        this.sortedIds.indexOf(a.id),
-        this.sortedIds.indexOf(b.id)
-      )
-    })
+    return this.tabs.slice().sort(createTabSort(this.sortedIds))
   }
   get sortedApps() {
     return Object.values(
@@ -69,22 +81,13 @@ export default class TabModule extends VuexModule {
         }
       }, {})
     )
-      .sort((a, b) => {
-        return sortNegativeToLast(
-          this.sortedHosts.indexOf(a.host),
-          this.sortedHosts.indexOf(b.host)
-        )
-      })
+      .sort(createAppSort(this.sortedHosts))
       .map((app) => {
         return {
           ...app,
-          tabs: app.tabs.sort((a, b) => {
-            const sortedIds = this.sortedIdsOnHost[app.host] || []
-            return sortNegativeToLast(
-              sortedIds.indexOf(a.id),
-              sortedIds.indexOf(b.id)
-            )
-          })
+          tabs: app.tabs.sort(
+            createTabSort(this.sortedIdsOnHost[app.host] || [])
+          )
         }
       })
   }
@@ -98,12 +101,7 @@ export default class TabModule extends VuexModule {
         }
         return [...carry, id]
       }, [])
-    return this.tabs.slice().sort((a, b) => {
-      return sortNegativeToLast(
-        recentIds.indexOf(a.id),
-        recentIds.indexOf(b.id)
-      )
-    })
+    return this.tabs.slice().sort(createTabSort(recentIds))
   }
   get canGoBackTab() {
     return !!this.history[this.historyIndex - 1]
@@ -181,12 +179,12 @@ export default class TabModule extends VuexModule {
       openerId = ''
     } = options || {}
     const id = nanoid()
-    const url = 'https://www.google.com/?sheafy'
+    const url = homeUrl
     const tab = convertTab({
       id,
       url,
       host: '',
-      title: '',
+      title: 'Loading...',
       badge: 0,
       favicon: '',
       loading: false,
@@ -199,6 +197,7 @@ export default class TabModule extends VuexModule {
       foundMatches: 0,
       loaded: false,
       openerId,
+      createdAt: Date.now(),
       ...params
     })
     // Set url to query on new tab
@@ -329,7 +328,7 @@ export default class TabModule extends VuexModule {
   @Action
   closeApp({ host }: { host: string }) {
     const ids = this.tabs
-      .filter((tab) => tab.host !== host)
+      .filter((tab) => tab.host === host)
       .map((tab) => tab.id)
     this.closeTabs({ ids })
   }

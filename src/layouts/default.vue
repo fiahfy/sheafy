@@ -42,7 +42,9 @@ export default class Layout extends Vue {
   }
 
   created() {
-    tabStore.newTabIfEmpty()
+    ;(<any>window).onNuxtReady(() => {
+      tabStore.newTabIfEmpty()
+    })
   }
 
   onContextMenu() {

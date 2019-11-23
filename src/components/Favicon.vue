@@ -32,7 +32,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 
 @Component
 export default class Favicon extends Vue {
-  @Prop({ type: String, required: true }) readonly url!: string
+  @Prop({ type: String }) readonly url!: string
   @Prop({ type: Boolean, default: false }) readonly loading!: boolean
 
   error = false

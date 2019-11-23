@@ -7,7 +7,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { remote, WebviewTag } from 'electron'
 import { layoutStore, tabStore } from '~/store'
 import TabUtils from '~/utils/tab'
-import Tab from '~/models/tab'
+import Tab, { homeUrl } from '~/models/tab'
 
 const urlWithoutHash = (url: string) => {
   return url ? url.split('#')[0] : ''
@@ -112,7 +112,7 @@ export default class Webview extends Vue {
         if (isMainFrame) {
           const urlChanged =
             urlWithoutHash(url) !== urlWithoutHash(this.tab.url)
-          const home = url === 'https://www.google.com/?sheafy'
+          const home = url === homeUrl
           tabStore.updateTab({
             id: this.tab.id,
             url,
@@ -134,7 +134,7 @@ export default class Webview extends Vue {
         'did-navigate-in-page',
         ({ url, isMainFrame }) => {
           if (isMainFrame) {
-            const home = url === 'https://www.google.com/?sheafy'
+            const home = url === homeUrl
             if (!home) {
               tabStore.updateTab({
                 id: this.tab.id,
