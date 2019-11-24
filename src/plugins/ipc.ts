@@ -94,8 +94,8 @@ const ipcPlugin: Plugin = (ctx) => {
       document.execCommand('redo')
     }
   })
-  ipcRenderer.on('upsertDownload', (_e, download) => {
-    downloadStore.upsertDownload(download)
+  ipcRenderer.on('upsertDownloadItem', (_e, downloadItem) => {
+    downloadStore.upsertDownloadItem(downloadItem)
   })
 }
 

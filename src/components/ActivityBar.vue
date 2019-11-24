@@ -41,6 +41,7 @@ import { layoutStore, settingsStore, tabStore } from '~/store'
 export default class ActivityBar extends Vue {
   items = [
     { id: 'apps', title: 'Apps', icon: 'mdi-tab' },
+    { id: 'history', title: 'History', icon: 'mdi-history' },
     { id: 'downloads', title: 'Downloads', icon: 'mdi-download-outline' },
     { id: 'settings', title: 'Settings', icon: 'mdi-settings-outline' }
   ]

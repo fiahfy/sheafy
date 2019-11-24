@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { remote, WebviewTag } from 'electron'
-import { layoutStore, tabStore } from '~/store'
+import { layoutStore, tabStore, historyStore } from '~/store'
 import TabUtils from '~/utils/tab'
 import Tab, { homeUrl } from '~/models/tab'
 
@@ -123,6 +123,10 @@ export default class Webview extends Vue {
             this.$eventBus.$emit('focusLocation')
           } else if (urlChanged || this.needFocus) {
             tabStore.updateTab({ id: this.tab.id, query: url })
+            historyStore.upsertHistory({
+              url: this.tab.url,
+              host: this.tab.host
+            })
             this.needFocus = false
             // TODO: https://github.com/electron/electron/issues/14474
             this.webview.blur()
@@ -133,17 +137,15 @@ export default class Webview extends Vue {
       this.webview.addEventListener(
         'did-navigate-in-page',
         ({ url, isMainFrame }) => {
-          if (isMainFrame) {
-            const home = url === homeUrl
-            if (!home) {
-              tabStore.updateTab({
-                id: this.tab.id,
-                url,
-                query: url,
-                canGoBack: this.webview.canGoBack(),
-                canGoForward: this.webview.canGoForward()
-              })
-            }
+          const home = url === homeUrl
+          if (isMainFrame && !home) {
+            tabStore.updateTab({
+              id: this.tab.id,
+              url,
+              query: url,
+              canGoBack: this.webview.canGoBack(),
+              canGoForward: this.webview.canGoForward()
+            })
           }
         }
       )
@@ -157,10 +159,18 @@ export default class Webview extends Vue {
       )
       this.webview.addEventListener('page-title-updated', ({ title }) => {
         tabStore.updateTab({ id: this.tab.id, title })
+        historyStore.upsertHistory({
+          url: this.tab.url,
+          title
+        })
       })
       this.webview.addEventListener('page-favicon-updated', ({ favicons }) => {
         const favicon = favicons[favicons.length - 1]
         tabStore.updateTab({ id: this.tab.id, favicon })
+        historyStore.upsertHistory({
+          url: this.tab.url,
+          favicon
+        })
       })
       this.webview.addEventListener('did-start-loading', () => {
         tabStore.updateTab({ id: this.tab.id, loading: true, finding: false })

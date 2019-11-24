@@ -303,61 +303,61 @@ const createWindow = async () => {
         id,
         status: 'failed'
       }
-      send('upsertDownload', download)
+      send('upsertDownloadItem', download)
     }
   })
-  mainWindow.webContents.session.on('will-download', (_e, item) => {
+  mainWindow.webContents.session.on('will-download', (_e, downloadItem) => {
     const id = nanoid()
     downloadItems = {
       ...downloadItems,
-      [id]: item
+      [id]: downloadItem
     }
 
     const filepath = increment(
-      path.join(app.getPath('downloads'), item.getFilename()),
+      path.join(app.getPath('downloads'), downloadItem.getFilename()),
       { fs: true, platform: 'win32' }
     )
     const filename = path.basename(filepath)
-    const download = {
+    const item = {
       id,
       filepath,
       filename,
-      url: item.getURL(),
+      url: downloadItem.getURL(),
       receivedBytes: 0,
-      totalBytes: item.getTotalBytes(),
-      startTime: Math.floor(item.getStartTime() * 1000)
+      totalBytes: downloadItem.getTotalBytes(),
+      startTime: Math.floor(downloadItem.getStartTime() * 1000)
     }
-    send('upsertDownload', download)
+    send('upsertDownloadItem', item)
     send('showDownloads')
 
-    item.setSavePath(filepath)
-    item.on('updated', (_e, state) => {
+    downloadItem.setSavePath(filepath)
+    downloadItem.on('updated', (_e, state) => {
       let status
       if (state === 'interrupted') {
         status = 'interrupted'
       } else {
-        status = item.isPaused() ? 'paused' : 'progressing'
+        status = downloadItem.isPaused() ? 'paused' : 'progressing'
       }
-      const download = {
+      const item = {
         id,
         status,
-        receivedBytes: item.getReceivedBytes()
+        receivedBytes: downloadItem.getReceivedBytes()
       }
-      send('upsertDownload', download)
+      send('upsertDownloadItem', item)
     })
-    item.once('done', (_e, state) => {
+    downloadItem.once('done', (_e, state) => {
       let status
       if (state === 'interrupted') {
         status = 'failed'
       } else {
         status = state
       }
-      const download = {
+      const item = {
         id,
         status,
-        receivedBytes: item.getReceivedBytes()
+        receivedBytes: downloadItem.getReceivedBytes()
       }
-      send('upsertDownload', download)
+      send('upsertDownloadItem', item)
       delete downloadItems[id]
     })
   })

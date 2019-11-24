@@ -1,4 +1,4 @@
-export default interface Download {
+export default interface DownloadItem {
   id: string
   status: string
   filepath: string

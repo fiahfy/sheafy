@@ -1,7 +1,7 @@
 <template>
   <v-list-item
     class="download-list-item"
-    :title="download.filename"
+    :title="item.filename"
     @click="onClickItem"
     @contextmenu.stop="onContextMenu"
   >
@@ -11,7 +11,7 @@
 
     <v-list-item-content>
       <v-list-item-title class="d-flex">
-        <span class="text-truncate mr-3" v-text="download.filename" />
+        <span class="text-truncate mr-3" v-text="item.filename" />
         <v-spacer />
         <span class="secondary--text" v-text="startedAt" />
       </v-list-item-title>
@@ -99,14 +99,14 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { ipcRenderer, shell, MenuItemConstructorOptions } from 'electron'
 import prettyBytes from 'pretty-bytes'
 import { downloadStore } from '~/store'
-import Download from '~/models/download'
+import DownloadItem from '~/models/download-item'
 
 @Component
 export default class DownloadListItem extends Vue {
-  @Prop({ type: Object, required: true }) readonly download!: Download
+  @Prop({ type: Object, required: true }) readonly item!: DownloadItem
 
   get icon() {
-    switch (this.download.status) {
+    switch (this.item.status) {
       case 'progressing':
       case 'paused':
       case 'interrupted':
@@ -119,133 +119,131 @@ export default class DownloadListItem extends Vue {
     }
   }
   get startedAt() {
-    return new Date(this.download.startTime).toLocaleDateString()
+    return new Date(this.item.startTime).toLocaleDateString()
   }
   get sizeText() {
-    if (
-      ['progressing', 'paused', 'interrupted'].includes(this.download.status)
-    ) {
+    if (['progressing', 'paused', 'interrupted'].includes(this.item.status)) {
       return (
-        prettyBytes(this.download.receivedBytes || 0) +
+        prettyBytes(this.item.receivedBytes || 0) +
         ' of ' +
-        prettyBytes(this.download.totalBytes || 0)
+        prettyBytes(this.item.totalBytes || 0)
       )
     }
-    return prettyBytes(this.download.receivedBytes || 0)
+    return prettyBytes(this.item.receivedBytes || 0)
   }
   get statusText() {
     return ['paused', 'interrupted', 'cancelled', 'failed'].includes(
-      this.download.status
+      this.item.status
     )
-      ? this.download.status
+      ? this.item.status
       : ''
   }
   get canPause() {
-    return downloadStore.canPause({ id: this.download.id })
+    return downloadStore.canPause({ id: this.item.id })
   }
   get canResume() {
-    return downloadStore.canResume({ id: this.download.id })
+    return downloadStore.canResume({ id: this.item.id })
   }
   get canCancel() {
-    return downloadStore.canCancel({ id: this.download.id })
+    return downloadStore.canCancel({ id: this.item.id })
   }
   get canShowInFolder() {
-    return downloadStore.canShowInFolder({ id: this.download.id })
+    return downloadStore.canShowInFolder({ id: this.item.id })
   }
   get canRetry() {
-    return downloadStore.canRetry({ id: this.download.id })
+    return downloadStore.canRetry({ id: this.item.id })
   }
   get canDelete() {
-    return downloadStore.canDelete({ id: this.download.id })
+    return downloadStore.canDelete({ id: this.item.id })
   }
 
   onClickItem() {
-    if (this.download.status === 'completed') {
-      shell.openItem(this.download.filepath)
+    if (this.item.status === 'completed') {
+      shell.openItem(this.item.filepath)
     }
   }
   onClickPause() {
-    ipcRenderer.send('pauseDownload', this.download.id)
+    ipcRenderer.send('pauseDownload', this.item.id)
   }
   onClickResume() {
-    ipcRenderer.send('resumeDownload', this.download.id)
+    ipcRenderer.send('resumeDownload', this.item.id)
   }
   onClickCancel() {
-    ipcRenderer.send('cancelDownload', this.download.id)
+    ipcRenderer.send('cancelDownload', this.item.id)
   }
   onClickShowInFolder() {
-    shell.showItemInFolder(this.download.filepath)
+    shell.showItemInFolder(this.item.filepath)
   }
   onClickRetry() {
-    this.$eventBus.$emit('download', this.download.url)
+    this.$eventBus.$emit('download', this.item.url)
   }
   onClickDelete() {
-    downloadStore.deleteDownload({ id: this.download.id })
+    downloadStore.deleteDownloadItem({ id: this.item.id })
   }
   onContextMenu() {
     let template: MenuItemConstructorOptions[] = []
 
-    if (this.download.status === 'completed') {
+    if (this.item.status === 'completed') {
       template = [
         ...template,
         {
           label: 'Open File',
-          click: () => shell.openItem(this.download.filepath)
+          click: () => shell.openItem(this.item.filepath)
         }
       ]
     }
-    if (downloadStore.canPause({ id: this.download.id })) {
+    if (downloadStore.canPause({ id: this.item.id })) {
       template = [
         ...template,
         {
           label: 'Pause',
-          click: () => ipcRenderer.send('pauseDownload', this.download.id)
+          click: () => ipcRenderer.send('pauseDownload', this.item.id)
         }
       ]
     }
-    if (downloadStore.canResume({ id: this.download.id })) {
+    if (downloadStore.canResume({ id: this.item.id })) {
       template = [
         ...template,
         {
           label: 'Resume',
-          click: () => ipcRenderer.send('resumeDownload', this.download.id)
+          click: () => ipcRenderer.send('resumeDownload', this.item.id)
         }
       ]
     }
-    if (downloadStore.canCancel({ id: this.download.id })) {
+    if (downloadStore.canCancel({ id: this.item.id })) {
       template = [
         ...template,
         {
           label: 'Cancel',
-          click: () => ipcRenderer.send('cancelDownload', this.download.id)
+          click: () => ipcRenderer.send('cancelDownload', this.item.id)
         }
       ]
     }
-    if (downloadStore.canShowInFolder({ id: this.download.id })) {
+    if (downloadStore.canShowInFolder({ id: this.item.id })) {
       template = [
         ...template,
         {
           label: 'Show in Folder',
-          click: () => shell.showItemInFolder(this.download.filepath)
+          click: () => shell.showItemInFolder(this.item.filepath)
         }
       ]
     }
-    if (downloadStore.canRetry({ id: this.download.id })) {
+    if (downloadStore.canRetry({ id: this.item.id })) {
       template = [
         ...template,
         {
           label: 'Retry',
-          click: () => this.$eventBus.$emit('download', this.download.url)
+          click: () => this.$eventBus.$emit('download', this.item.url)
         }
       ]
     }
-    if (downloadStore.canDelete({ id: this.download.id })) {
+    if (downloadStore.canDelete({ id: this.item.id })) {
       template = [
         ...template,
         { type: 'separator' },
         {
           label: 'Delete',
-          click: () => downloadStore.deleteDownload({ id: this.download.id })
+          click: () => downloadStore.deleteDownloadItem({ id: this.item.id })
         }
       ]
     }

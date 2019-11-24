@@ -1,5 +1,5 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
-import Download from '~/models/download'
+import DownloadItem from '~/models/download-item'
 
 @Module({
   name: 'download',
@@ -7,86 +7,88 @@ import Download from '~/models/download'
   namespaced: true
 })
 export default class DownloadModule extends VuexModule {
-  downloads: Download[] = []
+  downloadItems: DownloadItem[] = []
 
-  get getDownload() {
+  get getDownloadItem() {
     return ({ id }: { id: string }) => {
-      return this.downloads.find((download) => download.id === id)
+      return this.downloadItems.find((item) => item.id === id)
     }
   }
   get canPause() {
     return ({ id }: { id: string }): boolean => {
-      return ['progressing'].includes(this.getDownload({ id })!.status)
+      return ['progressing'].includes(this.getDownloadItem({ id })!.status)
     }
   }
   get canResume() {
     return ({ id }: { id: string }): boolean => {
       return ['paused', 'interrupted'].includes(
-        this.getDownload({ id })!.status
+        this.getDownloadItem({ id })!.status
       )
     }
   }
   get canCancel() {
     return ({ id }: { id: string }): boolean => {
       return ['progressing', 'paused', 'interrupted'].includes(
-        this.getDownload({ id })!.status
+        this.getDownloadItem({ id })!.status
       )
     }
   }
   get canShowInFolder() {
     return ({ id }: { id: string }): boolean => {
-      return ['completed'].includes(this.getDownload({ id })!.status)
+      return ['completed'].includes(this.getDownloadItem({ id })!.status)
     }
   }
   get canRetry() {
     return ({ id }: { id: string }): boolean => {
-      return ['cancelled', 'failed'].includes(this.getDownload({ id })!.status)
+      return ['cancelled', 'failed'].includes(
+        this.getDownloadItem({ id })!.status
+      )
     }
   }
   get canDelete() {
     return ({ id }: { id: string }): boolean => {
       // also clear invalid object
       return !['progressing', 'paused', 'interrupted'].includes(
-        this.getDownload({ id })!.status
+        this.getDownloadItem({ id })!.status
       )
     }
   }
 
   @Mutation
-  setDownloads({ downloads }: { downloads: Download[] }) {
-    this.downloads = downloads
+  setDownloadItems({ downloadItems }: { downloadItems: DownloadItem[] }) {
+    this.downloadItems = downloadItems
   }
 
   @Action
-  upsertDownload({ id, ...params }: Partial<Download>) {
-    let downloads: Download[]
-    if (this.downloads.find((download) => download.id === id)) {
-      downloads = this.downloads.map((download) => {
-        if (download.id !== id) {
-          return download
+  upsertDownloadItem({ id, ...params }: Partial<DownloadItem>) {
+    let downloadItems: DownloadItem[]
+    if (this.downloadItems.find((item) => item.id === id)) {
+      downloadItems = this.downloadItems.map((item) => {
+        if (item.id !== id) {
+          return item
         }
         return {
-          ...download,
+          ...item,
           ...params
         }
       })
     } else {
-      downloads = [...this.downloads, { id, ...(<Download>params) }]
+      downloadItems = [...this.downloadItems, <DownloadItem>{ ...params, id }]
     }
-    this.setDownloads({ downloads })
+    this.setDownloadItems({ downloadItems })
   }
   @Action
-  deleteDownload({ id }: { id: string }) {
-    const downloads = this.downloads.filter(
-      (download) => download.id !== id || !this.canDelete({ id: download.id })
+  deleteDownloadItem({ id }: { id: string }) {
+    const downloadItems = this.downloadItems.filter(
+      (item) => item.id !== id || !this.canDelete({ id: item.id })
     )
-    this.setDownloads({ downloads })
+    this.setDownloadItems({ downloadItems })
   }
   @Action
   clearDownloads() {
-    const downloads = this.downloads.filter(
-      (download) => !this.canDelete({ id: download.id })
+    const downloadItems = this.downloadItems.filter(
+      (item) => !this.canDelete({ id: item.id })
     )
-    this.setDownloads({ downloads })
+    this.setDownloadItems({ downloadItems })
   }
 }
