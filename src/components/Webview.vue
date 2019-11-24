@@ -1,13 +1,13 @@
 <template>
-  <div class="tab-webview d-none" />
+  <div class="webview d-none" />
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { remote, WebviewTag } from 'electron'
-import { layoutStore, tabStore } from '~/store'
+import { layoutStore, tabStore, historyStore } from '~/store'
 import TabUtils from '~/utils/tab'
-import Tab from '~/models/tab'
+import Tab, { homeUrl } from '~/models/tab'
 
 const urlWithoutHash = (url: string) => {
   return url ? url.split('#')[0] : ''
@@ -84,7 +84,7 @@ export default class Webview extends Vue {
     this.webview.src = this.tab.url
     this.webview.preload = this.preload
     this.webview.allowpopups = true
-    this.webview.webpreferences = 'nativeWindowOpen=yes'
+    this.webview.webpreferences = 'nativeWindowOpen, scrollBounce'
     this.webview.style.display = this.display
     this.$el.parentElement!.append(this.webview)
 
@@ -112,7 +112,7 @@ export default class Webview extends Vue {
         if (isMainFrame) {
           const urlChanged =
             urlWithoutHash(url) !== urlWithoutHash(this.tab.url)
-          const home = url === 'https://www.google.com/?sheafy'
+          const home = url === homeUrl
           tabStore.updateTab({
             id: this.tab.id,
             url,
@@ -123,6 +123,10 @@ export default class Webview extends Vue {
             this.$eventBus.$emit('focusLocation')
           } else if (urlChanged || this.needFocus) {
             tabStore.updateTab({ id: this.tab.id, query: url })
+            historyStore.upsertHistory({
+              url: this.tab.url,
+              host: this.tab.host
+            })
             this.needFocus = false
             // TODO: https://github.com/electron/electron/issues/14474
             this.webview.blur()
@@ -133,17 +137,15 @@ export default class Webview extends Vue {
       this.webview.addEventListener(
         'did-navigate-in-page',
         ({ url, isMainFrame }) => {
-          if (isMainFrame) {
-            const home = url === 'https://www.google.com/?sheafy'
-            if (!home) {
-              tabStore.updateTab({
-                id: this.tab.id,
-                url,
-                query: url,
-                canGoBack: this.webview.canGoBack(),
-                canGoForward: this.webview.canGoForward()
-              })
-            }
+          const home = url === homeUrl
+          if (isMainFrame && !home) {
+            tabStore.updateTab({
+              id: this.tab.id,
+              url,
+              query: url,
+              canGoBack: this.webview.canGoBack(),
+              canGoForward: this.webview.canGoForward()
+            })
           }
         }
       )
@@ -157,10 +159,18 @@ export default class Webview extends Vue {
       )
       this.webview.addEventListener('page-title-updated', ({ title }) => {
         tabStore.updateTab({ id: this.tab.id, title })
+        historyStore.upsertHistory({
+          url: this.tab.url,
+          title
+        })
       })
       this.webview.addEventListener('page-favicon-updated', ({ favicons }) => {
         const favicon = favicons[favicons.length - 1]
         tabStore.updateTab({ id: this.tab.id, favicon })
+        historyStore.upsertHistory({
+          url: this.tab.url,
+          favicon
+        })
       })
       this.webview.addEventListener('did-start-loading', () => {
         tabStore.updateTab({ id: this.tab.id, loading: true, finding: false })
@@ -236,7 +246,10 @@ export default class Webview extends Vue {
           case 'search': {
             const [query] = args
             const url = TabUtils.getUrlWithQuery(query)
-            tabStore.newTab({ url, options: { position: 'next' } })
+            tabStore.newTab({
+              url,
+              options: { position: 'next', openerId: this.tab.id }
+            })
             break
           }
           case 'focus': {

@@ -1,7 +1,8 @@
 <template>
   <v-autocomplete
     v-if="shortcutBar"
-    class="tab-shortcut-bar body-2"
+    ref="autocomplete"
+    class="shortcut-bar body-2"
     name="shortcut"
     solo
     dense
@@ -31,7 +32,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator'
+import { VAutocomplete } from 'vuetify/lib'
+import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
 import { layoutStore, tabStore } from '~/store'
 import Tab from '~/models/tab'
 import Favicon from '~/components/Favicon.vue'
@@ -42,6 +44,8 @@ import Favicon from '~/components/Favicon.vue'
   }
 })
 export default class ShortcutBar extends Vue {
+  @Ref() readonly autocomplete!: typeof VAutocomplete
+
   width = 0
 
   get filter() {
@@ -57,7 +61,7 @@ export default class ShortcutBar extends Vue {
       closeOnClick: false,
       closeOnContentClick: false,
       openOnClick: false,
-      maxHeight: 300,
+      maxHeight: 480,
       offsetY: true,
       offsetOverflow: true,
       transition: false,
@@ -68,7 +72,7 @@ export default class ShortcutBar extends Vue {
     return layoutStore.shortcutBar
   }
   get tabs() {
-    return tabStore.tabs
+    return tabStore.recentTabs
   }
 
   @Watch('shortcutBar')
@@ -101,6 +105,7 @@ export default class ShortcutBar extends Vue {
         el.focus()
         el.select()
       }
+      ;(<any>this.autocomplete).isMenuActive = true
     })
   }
   onChange(value: string) {
@@ -111,7 +116,7 @@ export default class ShortcutBar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.tab-shortcut-bar {
+.shortcut-bar {
   border-radius: 0;
 }
 ::v-deep .v-list-item {

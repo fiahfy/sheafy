@@ -1,6 +1,6 @@
 <template>
   <v-toolbar
-    class="tab-toolbar"
+    class="toolbar"
     flat
     dense
     height="36"
@@ -9,13 +9,13 @@
   >
     <favicon
       class="mr-3"
-      :url="activeTab.favicon"
-      :loading="activeTab.loading"
+      :url="activeTab && activeTab.favicon"
+      :loading="activeTab && activeTab.loading"
     />
     <div
       class="caption text-truncate user-select-none"
       @contextmenu.stop="onContextMenu"
-      v-text="activeTab.title"
+      v-text="activeTab && activeTab.title"
     />
     <v-btn icon small class="ml-3" title="Close" @click="onClickClose">
       <v-icon small>mdi-close</v-icon>
@@ -96,7 +96,7 @@
       >
         <v-icon size="20">mdi-refresh</v-icon>
       </v-btn>
-      <tab-toolbar-text-field class="ml-1" />
+      <toolbar-text-field class="ml-1" />
     </template>
   </v-toolbar>
 </template>
@@ -106,12 +106,12 @@ import { Vue, Component } from 'vue-property-decorator'
 import { shell } from 'electron'
 import { tabStore } from '~/store'
 import Favicon from '~/components/Favicon.vue'
-import TabToolbarTextField from '~/components/TabToolbarTextField.vue'
+import ToolbarTextField from '~/components/ToolbarTextField.vue'
 
 @Component({
   components: {
     Favicon,
-    TabToolbarTextField
+    ToolbarTextField
   }
 })
 export default class Toolbar extends Vue {

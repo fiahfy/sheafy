@@ -1,12 +1,13 @@
 <template>
-  <v-container class="index" fluid pa-0 :class="{ resizing: resizing }">
+  <v-container class="index" fluid pa-0>
     <activity-bar v-if="!fullScreen" />
     <div
       class="d-flex flex-grow-1 overflow-hidden fill-height"
       :class="classes"
     >
-      <tab class="flex-grow-1 overflow-hidden" />
-      <sidebar v-if="!fullScreen" :resizing.sync="resizing" />
+      <tab-content class="flex-grow-1 overflow-hidden" />
+      <sidebar v-if="!fullScreen" />
+      <shortcut-bar />
     </div>
   </v-container>
 </template>
@@ -15,21 +16,21 @@
 import { Vue, Component } from 'vue-property-decorator'
 import { layoutStore, settingsStore } from '~/store'
 import ActivityBar from '~/components/ActivityBar.vue'
+import ShortcutBar from '~/components/ShortcutBar.vue'
 import Sidebar from '~/components/Sidebar.vue'
-import Tab from '~/components/Tab.vue'
+import TabContent from '~/components/TabContent.vue'
 
 @Component({
   components: {
     ActivityBar,
+    ShortcutBar,
     Sidebar,
-    Tab
+    TabContent
   }
 })
 export default class Index extends Vue {
-  resizing = false
-
   get classes() {
-    return settingsStore.sideBarLocation === 'right'
+    return settingsStore.sidebarLocation === 'right'
       ? 'flex-row'
       : 'flex-row-reverse'
   }
@@ -38,9 +39,18 @@ export default class Index extends Vue {
   }
 }
 </script>
-
 <style lang="scss" scoped>
-.index.resizing .tab {
-  pointer-events: none;
+.index > div {
+  position: relative;
+  .shortcut-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 600px;
+    max-width: 100%;
+    margin: 0 auto;
+    z-index: 1;
+  }
 }
 </style>

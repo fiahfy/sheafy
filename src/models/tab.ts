@@ -1,3 +1,5 @@
+export const homeUrl = 'https://www.google.com/?sheafy'
+
 export default interface Tab {
   id: string
   url: string
@@ -15,4 +17,5 @@ export default interface Tab {
   foundMatches: number
   loaded: boolean
   openerId: string
+  createdAt: number
 }

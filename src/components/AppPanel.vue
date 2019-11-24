@@ -4,102 +4,66 @@
     @dragover.prevent="onDragOver"
     @drop.prevent="onDrop"
   >
-    <v-toolbar tile dense flat class="flex-grow-0" height="36">
-      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
-        apps
-      </span>
-      <badge class="ml-3" :num="apps.length" />
-      <v-spacer />
-      <v-btn
-        icon
-        width="32"
-        height="32"
-        title="New Tab"
-        class="ml-1"
-        @click="onClickNewTab"
-      >
-        <v-icon size="20">mdi-tab-plus</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        width="32"
-        height="32"
-        title="Expand Apps"
-        class="ml-1"
-        @click="onClickExpand"
-      >
-        <v-icon size="20">mdi-expand-all</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        width="32"
-        height="32"
-        title="Collapse Apps"
-        class="ml-1"
-        @click="onClickCollapse"
-      >
-        <v-icon size="20">mdi-collapse-all</v-icon>
-      </v-btn>
-    </v-toolbar>
-    <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">
-      <app-list :apps="apps" />
+    <div ref="content" :style="{ height: `${height}px` }">
+      <tab-pane class="fill-height" />
+    </div>
+    <div ref="resizer" class="resizer" />
+    <div class="flex-grow-1" style="min-height: 0; flex-basis: 0;">
+      <app-pane class="fill-height" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
-import { tabStore } from '~/store'
+import { Vue, Component, Ref } from 'vue-property-decorator'
+import { layoutStore, settingsStore, tabStore } from '~/store'
 import TabUtils from '~/utils/tab'
-import Tab from '~/models/tab'
-import AppList from '~/components/AppList.vue'
-import Badge from '~/components/Badge.vue'
+import AppPane from '~/components/AppPane.vue'
+import TabPane from '~/components/TabPane.vue'
 
 @Component({
   components: {
-    AppList,
-    Badge
+    AppPane,
+    TabPane
   }
 })
 export default class AppPanel extends Vue {
-  @Ref() readonly container!: HTMLDivElement
+  @Ref() readonly content!: HTMLDivElement
+  @Ref() readonly resizer!: HTMLDivElement
 
-  get apps() {
-    return tabStore.apps
+  resizing = false
+  get height() {
+    return settingsStore.topContentHeight
   }
-  get activeTab() {
-    return tabStore.activeTab
+  set height(value) {
+    settingsStore.setTopContentHeight({ topContentHeight: value })
   }
 
-  @Watch('activeTab')
-  onActiveTabChanged(newValue: Tab, oldValue: Tab) {
-    if (newValue.id === oldValue.id && newValue.host === oldValue.host) {
-      return
-    }
-    this.$nextTick(() => {
-      // Disabled transform for vuedraggable
-      this.$el.querySelectorAll('.app-tab-list').forEach((el) => {
-        el.parentElement!.style.transform = 'none'
-        el.querySelectorAll('.app-tab-list-item').forEach((el) => {
-          el.parentElement!.style.transform = 'none'
-        })
-      })
-      const tab = <HTMLElement>(
-        this.$el.querySelector('.app-tab-list-item.v-list-item--active')
-      )
-      if (!tab) {
+  mounted() {
+    const resize = (e: MouseEvent) => {
+      const height = e.clientY - this.content.getBoundingClientRect().top
+      if (height < 256 || height > window.innerHeight - 256) {
         return
       }
-      if (this.container.scrollTop > tab.offsetTop) {
-        this.container.scrollTop = tab.offsetTop
+      this.content.style.height = height + 'px'
+    }
+
+    this.resizer.addEventListener('mousedown', () => {
+      this.resizing = true
+      layoutStore.setResizing({ resizing: true })
+      document.body.style.cursor = 'ns-resize'
+      document.addEventListener('mousemove', resize)
+    })
+
+    document.addEventListener('mouseup', () => {
+      if (!this.resizing) {
+        return
       }
-      if (
-        this.container.scrollTop + this.container.offsetHeight <
-        tab.offsetTop + tab.offsetHeight
-      ) {
-        this.container.scrollTop =
-          tab.offsetTop + tab.offsetHeight - this.container.offsetHeight
-      }
+      this.resizing = false
+      layoutStore.setResizing({ resizing: false })
+      this.height = Number(this.content.style.height!.slice(0, -2))
+      document.body.style.cursor = ''
+      document.removeEventListener('mousemove', resize)
     })
   }
 
@@ -118,20 +82,15 @@ export default class AppPanel extends Vue {
       tabStore.newTab({ url })
     }
   }
-  onClickNewTab() {
-    tabStore.newTab()
-  }
-  onClickExpand() {
-    this.$eventBus.$emit('expandApps')
-  }
-  onClickCollapse() {
-    this.$eventBus.$emit('collapseApps')
-  }
 }
 </script>
 
 <style lang="scss" scoped>
-.app-panel > div {
-  position: relative;
+.app-panel .resizer {
+  width: 100%;
+  padding: 1px 0;
+  margin: -1px 0;
+  z-index: 5;
+  cursor: ns-resize;
 }
 </style>

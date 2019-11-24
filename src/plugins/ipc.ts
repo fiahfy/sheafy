@@ -73,11 +73,11 @@ const ipcPlugin: Plugin = (ctx) => {
   ipcRenderer.on('goForward', () => {
     ctx.app.$eventBus.$emit('goForward')
   })
-  ipcRenderer.on('goBackTab', () => {
-    tabStore.goBackTab()
+  ipcRenderer.on('goNextTab', () => {
+    tabStore.goNextTab()
   })
-  ipcRenderer.on('goForwardTab', () => {
-    tabStore.goForwardTab()
+  ipcRenderer.on('goPreviousTab', () => {
+    tabStore.goPreviousTab()
   })
   // TODO: https://github.com/electron/electron/issues/15728
   ipcRenderer.on('undo', () => {
@@ -94,8 +94,8 @@ const ipcPlugin: Plugin = (ctx) => {
       document.execCommand('redo')
     }
   })
-  ipcRenderer.on('upsertDownload', (_e, download) => {
-    downloadStore.upsertDownload(download)
+  ipcRenderer.on('upsertDownloadItem', (_e, downloadItem) => {
+    downloadStore.upsertDownloadItem(downloadItem)
   })
 }
 

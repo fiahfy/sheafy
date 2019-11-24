@@ -1,10 +1,9 @@
 <template>
-  <div class="download-panel d-flex flex-column">
+  <div class="history-panel d-flex flex-column">
     <v-toolbar tile dense flat class="flex-grow-0 pr-2" height="36">
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
-        downloads
+        history
       </span>
-      <chip v-if="items.length" class="ml-3" :num="items.length" />
       <v-spacer />
       <v-btn
         icon
@@ -17,9 +16,9 @@
       </v-btn>
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">
-      <download-list v-if="items.length" :items="items" />
+      <history-list v-if="items.length" :items="items" />
       <div v-else class="d-flex justify-center caption py-5">
-        <div>No downloads</div>
+        <div>No history</div>
       </div>
     </div>
   </div>
@@ -27,23 +26,23 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { downloadStore } from '~/store'
+import { historyStore } from '~/store'
 import Chip from '~/components/Chip.vue'
-import DownloadList from '~/components/DownloadList.vue'
+import HistoryList from '~/components/HistoryList.vue'
 
 @Component({
   components: {
     Chip,
-    DownloadList
+    HistoryList
   }
 })
-export default class DownloadPanel extends Vue {
+export default class HistoryPanel extends Vue {
   get items() {
-    return downloadStore.downloadItems
+    return historyStore.sortedHistoryItems
   }
 
   onClickClearAll() {
-    downloadStore.clearDownloads()
+    historyStore.clearHistoryItems()
   }
 }
 </script>

@@ -1,33 +1,33 @@
 <template>
-  <div class="app-list">
+  <v-list class="tab-list primary--text py-0" dense>
     <draggable v-model="model" animation="150" @end="onEnd">
-      <v-sheet v-for="app in model" :key="app.host" tile>
-        <app-list-item :app="app" />
+      <v-sheet v-for="tab in tabs" :key="tab.id" tile>
+        <tab-list-item :tab="tab" />
       </v-sheet>
     </draggable>
-  </div>
+  </v-list>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { tabStore } from '~/store'
-import App from '~/models/app'
-import AppListItem from '~/components/AppListItem.vue'
+import Tab from '~/models/tab'
+import TabListItem from '~/components/TabListItem.vue'
 
 @Component({
   components: {
-    AppListItem
+    TabListItem
   }
 })
-export default class AppList extends Vue {
-  @Prop({ type: Array, default: () => [] }) readonly apps!: App[]
+export default class TabPane extends Vue {
+  @Prop({ type: Array, default: () => [] }) readonly tabs!: Tab[]
 
   get model() {
-    return this.apps
+    return this.tabs
   }
   set model(value) {
-    const hosts = value.map((app) => app.host)
-    tabStore.sortApps({ hosts })
+    const ids = value.map((tab) => tab.id)
+    tabStore.sortTabs({ ids })
   }
 
   onEnd() {
@@ -40,7 +40,7 @@ export default class AppList extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.app-list .v-sheet {
+.tab-list .v-sheet {
   color: inherit;
   &.sortable-ghost {
     opacity: 0;

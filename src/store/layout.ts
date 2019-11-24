@@ -7,12 +7,17 @@ import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 })
 export default class LayoutModule extends VuexModule {
   fullScreen = false
+  resizing = false
   panelId = 'apps'
   shortcutBar = false
 
   @Mutation
   setFullScreen({ fullScreen }: { fullScreen: boolean }) {
     this.fullScreen = fullScreen
+  }
+  @Mutation
+  setResizing({ resizing }: { resizing: boolean }) {
+    this.resizing = resizing
   }
   @Mutation
   setPanelId({ panelId }: { panelId: string }) {

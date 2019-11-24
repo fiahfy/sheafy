@@ -1,7 +1,7 @@
 <template>
   <v-list-item
-    class="app-tab-list-item"
-    :class="{ 'sub-group': subGroup }"
+    class="tab-list-item pr-2"
+    :class="{ inset }"
     :title="title"
     :input-value="active"
     @click="onClick"
@@ -13,7 +13,7 @@
     <v-list-item-content>
       <v-list-item-title class="font-weight-regular caption" v-text="title" />
     </v-list-item-content>
-    <badge v-if="tab.badge" class="ml-3" :num="badge" color="error" />
+    <chip v-if="tab.badge" class="ml-3" :num="badge" color="error" />
     <v-list-item-action class="my-0">
       <v-btn icon small title="Close" @click.stop="onClickClose">
         <v-icon small>mdi-close</v-icon>
@@ -27,24 +27,25 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { shell } from 'electron'
 import { tabStore } from '~/store'
 import Tab from '~/models/tab'
-import Badge from '~/components/Badge.vue'
+import Chip from '~/components/Chip.vue'
 import Favicon from '~/components/Favicon.vue'
 
 @Component({
   components: {
     Favicon,
-    Badge
+    Chip
   }
 })
-export default class AppTabListItem extends Vue {
+export default class TabListItem extends Vue {
   @Prop({ type: Object, required: true }) readonly tab!: Tab
-  @Prop({ type: Boolean, default: false }) readonly subGroup!: boolean
+  @Prop({ type: Boolean, default: false }) readonly app!: boolean
+  @Prop({ type: Boolean, default: false }) readonly inset!: boolean
 
   get active() {
     return tabStore.isActiveTab({ id: this.tab.id })
   }
   get title() {
-    return this.subGroup ? this.tab.title : this.tab.host
+    return this.app ? this.tab.host : this.tab.title
   }
   get badge() {
     return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
@@ -83,9 +84,9 @@ export default class AppTabListItem extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.app-tab-list-item {
+.tab-list-item {
   min-height: 36px;
-  &.sub-group {
+  &.inset {
     padding-left: 32px;
   }
   &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
