@@ -52,11 +52,11 @@ export default class AppPane extends Vue {
   get apps() {
     return tabStore.sortedApps
   }
-  get activeTab() {
-    return tabStore.activeTab
+  get activeId() {
+    return tabStore.activeId
   }
 
-  @Watch('activeTab')
+  @Watch('activeId')
   onActiveTabChanged(_newValue: Tab, _oldValue: Tab) {
     this.$nextTick(() => {
       const tab = <HTMLElement>(
