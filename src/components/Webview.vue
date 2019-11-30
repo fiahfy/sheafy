@@ -16,6 +16,7 @@ const urlWithoutHash = (url: string) => {
 @Component
 export default class Webview extends Vue {
   @Prop({ type: Object, required: true }) readonly tab!: Tab
+  @Prop({ type: Number, required: true }) readonly index!: number
 
   src = ''
   needFocus = false
@@ -25,7 +26,7 @@ export default class Webview extends Vue {
     return `file://${remote.app.getAppPath()}/preload.js`
   }
   get active() {
-    return tabStore.isActiveTab({ id: this.tab.id })
+    return tabStore.isActiveTab({ id: this.tab.id, index: this.index })
   }
   get display() {
     return this.active ? 'flex' : 'none'
@@ -120,7 +121,7 @@ export default class Webview extends Vue {
             canGoForward: this.webview.canGoForward()
           })
           if (home) {
-            this.$eventBus.$emit('focusLocation')
+            this.$eventBus.$emit('focusLocation', { index: this.index })
           } else if (urlChanged || this.needFocus) {
             tabStore.updateTab({ id: this.tab.id, query: url })
             historyStore.upsertHistory({
@@ -223,18 +224,15 @@ export default class Webview extends Vue {
             this.webview.inspectElement(x, y)
             break
           }
-          case 'undo': {
+          case 'undo':
             this.webview.undo()
             break
-          }
-          case 'redo': {
+          case 'redo':
             this.webview.redo()
             break
-          }
-          case 'lookUp': {
+          case 'lookUp':
             this.webview.showDefinitionForSelection()
             break
-          }
           case 'newTab': {
             const [url] = args
             tabStore.newTab({
@@ -252,11 +250,14 @@ export default class Webview extends Vue {
             })
             break
           }
-          case 'focus': {
-            tabStore.activateTab({ id: this.tab.id })
+          case 'activateView':
+            tabStore.activateView({ index: this.index })
             break
-          }
-          case 'keydown': {
+          case 'activateTab':
+            tabStore.activateView({ index: this.index })
+            tabStore.activateTab({ id: this.tab.id, viewIndex: this.index })
+            break
+          case 'onkeydown': {
             const [e] = args
             if (e.key === 'Escape') {
               layoutStore.hideShortcutBar()
@@ -268,62 +269,58 @@ export default class Webview extends Vue {
             remote.shell.openExternal(url)
             break
           }
-          case 'requestContextMenu': {
+          case 'requestContextMenu':
             this.webview.send('showContextMenu', {
               canGoBack: this.webview.canGoBack(),
               canGoForward: this.webview.canGoForward()
             })
             break
-          }
         }
       })
       this.webview.addEventListener('update-target-url', ({ url }) => {
-        this.$eventBus.$emit('updateTargetUrl', url)
-      })
-      this.webview.addEventListener('update-target-url', ({ url }) => {
-        this.$eventBus.$emit('updateTargetUrl', url)
+        this.$eventBus.$emit('updateTargetUrl', { index: this.index, url })
       })
     })
   }
-  undo() {
-    if (this.active) {
+  undo({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       this.webview.undo()
     }
   }
-  redo() {
-    if (this.active) {
+  redo({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       this.webview.redo()
     }
   }
-  goBack() {
-    if (this.active) {
+  goBack({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       this.webview.goBack()
     }
   }
-  goForward() {
-    if (this.active) {
+  goForward({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       this.webview.goForward()
     }
   }
-  goToOffset(offset: number) {
-    if (this.active) {
+  goToOffset({ index, offset }: { index: number; offset: number }) {
+    if (this.active && index === this.index) {
       this.webview.goToOffset(offset)
     }
   }
-  reload() {
-    if (this.active) {
+  reload({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       this.needFocus = true
       this.webview.reload()
     }
   }
-  forceReload() {
-    if (this.active) {
+  forceReload({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       this.needFocus = true
       this.webview.reloadIgnoringCache()
     }
   }
-  load() {
-    if (this.active) {
+  load({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       const query = this.tab.query
       const url = TabUtils.getUrlWithQuery(query)
       if (url) {
@@ -331,59 +328,66 @@ export default class Webview extends Vue {
       }
     }
   }
-  download(url: string) {
-    if (this.active) {
+  download({ index, url }: { index: number; url: string }) {
+    if (this.active && index === this.index) {
       this.webview.downloadURL(url)
     }
   }
-  findInPage(
-    text: string,
-    { forward, findNext }: { forward: boolean; findNext: boolean }
-  ) {
-    if (this.active) {
+  findInPage({
+    index,
+    text,
+    forward,
+    findNext
+  }: {
+    index: number
+    text: string
+    forward: boolean
+    findNext: boolean
+  }) {
+    if (this.active && index === this.index) {
       this.webview.findInPage(text, { forward, findNext })
     }
   }
-  stopFindInPage() {
-    if (this.active) {
+  stopFindInPage({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       this.webview.stopFindInPage('clearSelection')
     }
   }
-  resetZoom() {
-    if (this.active) {
+  resetZoom({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       this.webview.setZoomLevel(0)
     }
   }
-  zoomIn() {
-    if (this.active) {
+  zoomIn({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       const level = this.webview.getZoomLevel()
       if (level < 9) {
         this.webview.setZoomLevel(level + 1)
       }
     }
   }
-  zoomOut() {
-    if (this.active) {
+  zoomOut({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       const level = this.webview.getZoomLevel()
       if (level > -6) {
         this.webview.setZoomLevel(level - 1)
       }
     }
   }
-  requestBackHistory() {
-    if (this.active) {
+  requestBackHistory({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       const contents = <any>this.webview.getWebContents()
       const history = contents.history
         .slice(0, contents.getActiveIndex())
         .reverse()
-      this.$eventBus.$emit('showBackHistory', history)
+      this.$eventBus.$emit('showBackHistory', { index: this.index, history })
     }
   }
-  requestForwardHistory() {
-    if (this.active) {
+  requestForwardHistory({ index }: { index: number }) {
+    if (this.active && index === this.index) {
       const contents = <any>this.webview.getWebContents()
       const history = contents.history.slice(contents.getActiveIndex() + 1)
-      this.$eventBus.$emit('showForwardHistory', history)
+      this.$eventBus.$emit('showForwardHistory', { index: this.index, history })
     }
   }
 }

@@ -1,6 +1,7 @@
 <template>
   <v-toolbar
     class="toolbar"
+    :class="classes"
     flat
     dense
     height="36"
@@ -96,13 +97,13 @@
       >
         <v-icon size="20">mdi-refresh</v-icon>
       </v-btn>
-      <toolbar-text-field class="ml-1" />
+      <toolbar-text-field class="ml-1" :index="index" />
     </template>
   </v-toolbar>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { shell } from 'electron'
 import { tabStore } from '~/store'
 import Favicon from '~/components/Favicon.vue'
@@ -115,14 +116,21 @@ import ToolbarTextField from '~/components/ToolbarTextField.vue'
   }
 })
 export default class Toolbar extends Vue {
+  @Prop({ type: Number, required: true }) readonly index!: number
+
+  get classes() {
+    return {
+      active: tabStore.isActiveView({ index: this.index })
+    }
+  }
   get activeTab() {
-    return tabStore.activeTab
+    return tabStore.getActiveTab({ viewIndex: this.index })
   }
   get canGoBackTab() {
-    return tabStore.canGoBackTab
+    return tabStore.getCanGoBackTab({ viewIndex: this.index })
   }
   get canGoForwardTab() {
-    return tabStore.canGoForwardTab
+    return tabStore.getCanGoForwardTab({ viewIndex: this.index })
   }
 
   mounted() {
@@ -135,52 +143,64 @@ export default class Toolbar extends Vue {
     this.$eventBus.$off('showForwardHistory', this.showForwardHistory)
   }
 
-  showBackHistory(history: string[]) {
-    this.$contextMenu.show(
-      history.map((title, index) => {
-        return {
-          label: title,
-          click: () => this.$eventBus.$emit('goToOffset', -index - 1)
-        }
-      })
-    )
+  showBackHistory({ index, history }: { index: number; history: string[] }) {
+    if (this.index === index) {
+      this.$contextMenu.show(
+        history.map((title, index) => {
+          return {
+            label: title,
+            click: () =>
+              this.$eventBus.$emit('goToOffset', {
+                index: this.index,
+                offset: -index - 1
+              })
+          }
+        })
+      )
+    }
   }
-  showForwardHistory(history: string[]) {
-    this.$contextMenu.show(
-      history.map((history, index) => {
-        return {
-          label: history,
-          click: () => this.$eventBus.$emit('goToOffset', index + 1)
-        }
-      })
-    )
+  showForwardHistory({ index, history }: { index: number; history: string[] }) {
+    if (this.index === index) {
+      this.$contextMenu.show(
+        history.map((history, index) => {
+          return {
+            label: history,
+            click: () =>
+              this.$eventBus.$emit('goToOffset', {
+                index: this.index,
+                offset: index + 1
+              })
+          }
+        })
+      )
+    }
   }
   onClickGoBack() {
-    this.$eventBus.$emit('goBack')
+    this.$eventBus.$emit('goBack', { index: this.index })
   }
   onClickGoForward() {
-    this.$eventBus.$emit('goForward')
+    this.$eventBus.$emit('goForward', { index: this.index })
   }
   onClickReload() {
-    this.$eventBus.$emit('reload')
+    this.$eventBus.$emit('reload', { index: this.index })
   }
   onClickStop() {
-    this.$eventBus.$emit('stop')
+    this.$eventBus.$emit('stop', { index: this.index })
   }
   onClickClose() {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     if (tab) {
       tabStore.closeTab({ id: tab.id })
     }
   }
   onClickGoBackTab() {
-    tabStore.goBackTab()
+    tabStore.goBackTab({ viewIndex: this.index })
   }
   onClickGoForwardTab() {
-    tabStore.goForwardTab()
+    tabStore.goForwardTab({ viewIndex: this.index })
   }
   onContextMenu() {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     if (!tab) {
       return
     }
@@ -207,30 +227,48 @@ export default class Toolbar extends Vue {
     ])
   }
   onContextMenuBack() {
-    this.$eventBus.$emit('requestBackHistory')
+    this.$eventBus.$emit('requestBackHistory', { index: this.index })
   }
   onContextMenuForward() {
-    this.$eventBus.$emit('requestForwardHistory')
+    this.$eventBus.$emit('requestForwardHistory', { index: this.index })
   }
   onContextMenuBackTab() {
     this.$contextMenu.show(
-      tabStore.backTabHistory.map((history, index) => {
-        return {
-          label: history && history.title,
-          click: () => tabStore.goToOffsetTab({ offset: -index - 1 })
-        }
-      })
+      tabStore
+        .getBackTabHistory({ viewIndex: this.index })
+        .map((history, index) => {
+          return {
+            label: history && history.title,
+            click: () =>
+              tabStore.goToOffsetTab({
+                offset: -index - 1,
+                viewIndex: this.index
+              })
+          }
+        })
     )
   }
   onContextMenuForwardTab() {
     this.$contextMenu.show(
-      tabStore.forwardTabHistory.map((history, index) => {
-        return {
-          label: history && history.title,
-          click: () => tabStore.goToOffsetTab({ offset: index + 1 })
-        }
-      })
+      tabStore
+        .getForwardTabHistory({ viewIndex: this.index })
+        .map((history, index) => {
+          return {
+            label: history && history.title,
+            click: () =>
+              tabStore.goToOffsetTab({
+                offset: index + 1,
+                viewIndex: this.index
+              })
+          }
+        })
     )
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.toolbar:not(.active) .caption {
+  opacity: 0.5;
+}
+</style>

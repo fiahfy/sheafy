@@ -28,8 +28,8 @@ import TabPane from '~/components/TabPane.vue'
   }
 })
 export default class AppPanel extends Vue {
-  @Ref() readonly content!: HTMLDivElement
   @Ref() readonly resizer!: HTMLDivElement
+  @Ref() readonly content!: HTMLDivElement
 
   resizing = false
   get height() {

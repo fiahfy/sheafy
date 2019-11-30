@@ -51,8 +51,8 @@ export default class TabListItem extends Vue {
     return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
   }
 
-  onClick() {
-    tabStore.activateTab({ id: this.tab.id })
+  onClick(e: MouseEvent) {
+    tabStore.activateTab({ id: this.tab.id, viewIndex: e.altKey ? 1 : 0 })
   }
   onClickClose() {
     tabStore.closeTab({ id: this.tab.id })

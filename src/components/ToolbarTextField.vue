@@ -40,28 +40,30 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { tabStore } from '~/store'
 
 @Component
 export default class ToolbarTextField extends Vue {
+  @Prop({ type: Number, required: true }) readonly index!: number
+
   focusIn = false
 
+  get activeTab() {
+    return tabStore.getActiveTab({ viewIndex: this.index })
+  }
   get query() {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     return tab ? tab.query : ''
   }
   set query(value) {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     if (tab) {
       tabStore.updateTab({ id: tab.id, query: value })
     }
   }
-  get activeTab() {
-    return tabStore.activeTab
-  }
   get icon() {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     const url = tab ? tab.url : ''
     const match = url.match(/^http(s)?:\/\//)
     if (match) {
@@ -78,14 +80,16 @@ export default class ToolbarTextField extends Vue {
     this.$eventBus.$off('focusLocation', this.focus)
   }
 
-  focus() {
-    this.$nextTick(() => {
-      const el = this.$el.querySelector('input')
-      if (el) {
-        el.focus()
-        el.select()
-      }
-    })
+  focus({ index }: { index: number }) {
+    if (this.index === index) {
+      this.$nextTick(() => {
+        const el = this.$el.querySelector('input')
+        if (el) {
+          el.focus()
+          el.select()
+        }
+      })
+    }
   }
   onContextMenu() {
     this.$contextMenu.show([
@@ -112,10 +116,10 @@ export default class ToolbarTextField extends Vue {
   onKeyPressEnter(e: KeyboardEvent) {
     const input = <HTMLInputElement>e.target
     input.blur()
-    this.$eventBus.$emit('load')
+    this.$eventBus.$emit('load', { index: this.index })
   }
   onClickFind() {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     if (tab) {
       tabStore.updateTab({ id: tab.id, finding: false })
     }
