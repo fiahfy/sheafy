@@ -35,7 +35,7 @@ Download the app from [release page](https://github.com/fiahfy/sheafy/releases) 
 | New Tab | ⌘T |
 | Duplicate Tab | ⌘D |
 | Open Location | ⌘L |
-| Go to Tab | ⌘P |
+| Go to Tab | ⌘O |
 | Close Tab | ⌘W|
 
 ### Edit

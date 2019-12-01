@@ -98,7 +98,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { ipcRenderer, shell, MenuItemConstructorOptions } from 'electron'
 import prettyBytes from 'pretty-bytes'
-import { downloadStore } from '~/store'
+import { downloadStore, tabStore } from '~/store'
 import DownloadItem from '~/models/download-item'
 
 @Component
@@ -175,7 +175,10 @@ export default class DownloadListItem extends Vue {
     shell.showItemInFolder(this.item.filepath)
   }
   onClickRetry() {
-    this.$eventBus.$emit('download', this.item.url)
+    this.$eventBus.$emit('download', {
+      viewId: tabStore.activeViewId,
+      url: this.item.url
+    })
   }
   onClickDelete() {
     downloadStore.deleteDownloadItem({ id: this.item.id })
@@ -233,7 +236,11 @@ export default class DownloadListItem extends Vue {
         ...template,
         {
           label: 'Retry',
-          click: () => this.$eventBus.$emit('download', this.item.url)
+          click: () =>
+            this.$eventBus.$emit('download', {
+              viewId: tabStore.activeViewId,
+              url: this.item.url
+            })
         }
       ]
     }

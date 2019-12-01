@@ -1,18 +1,25 @@
 <template>
   <v-card
     v-if="url"
-    class="status-bar px-2 py-1 caption grey--text text--darken-1 text-truncate"
+    class="status-bar px-2 py-1 caption grey--text text-truncate"
+    :class="classes"
     tile
     v-text="url"
   />
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component
 export default class StatusBar extends Vue {
+  @Prop({ type: String, required: true }) readonly viewId!: string
+
   url = ''
+
+  get classes() {
+    return this.$vuetify.theme.dark ? 'text--lighten-2' : 'text--darken-1'
+  }
 
   mounted() {
     this.$eventBus.$on('updateTargetUrl', this.updateTargetUrl)
@@ -22,8 +29,10 @@ export default class StatusBar extends Vue {
     this.$eventBus.$off('updateTargetUrl', this.updateTargetUrl)
   }
 
-  updateTargetUrl(url: string) {
-    this.url = url
+  updateTargetUrl({ viewId, url }: { viewId: string; url: string }) {
+    if (this.viewId === viewId) {
+      this.url = url
+    }
   }
 }
 </script>

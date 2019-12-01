@@ -1,6 +1,7 @@
 <template>
   <v-toolbar
     class="toolbar"
+    :class="classes"
     flat
     dense
     height="36"
@@ -46,6 +47,17 @@
       @contextmenu.stop="onContextMenuForwardTab"
     >
       <v-icon size="20">mdi-chevron-right</v-icon>
+    </v-btn>
+    <v-btn
+      v-if="canCloseView"
+      icon
+      width="32"
+      height="32"
+      class="ml-1"
+      title="Close View"
+      @click="onClickCloseView"
+    >
+      <v-icon size="20">mdi-close</v-icon>
     </v-btn>
     <template slot="extension">
       <v-btn
@@ -96,13 +108,13 @@
       >
         <v-icon size="20">mdi-refresh</v-icon>
       </v-btn>
-      <toolbar-text-field class="ml-1" />
+      <toolbar-text-field class="ml-1" :view-id="viewId" />
     </template>
   </v-toolbar>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { shell } from 'electron'
 import { tabStore } from '~/store'
 import Favicon from '~/components/Favicon.vue'
@@ -115,14 +127,24 @@ import ToolbarTextField from '~/components/ToolbarTextField.vue'
   }
 })
 export default class Toolbar extends Vue {
+  @Prop({ type: String, required: true }) readonly viewId!: string
+
+  get classes() {
+    return {
+      active: tabStore.isActiveView({ id: this.viewId })
+    }
+  }
   get activeTab() {
-    return tabStore.activeTab
+    return tabStore.getActiveTab({ viewId: this.viewId })
+  }
+  get canCloseView() {
+    return tabStore.canCloseView
   }
   get canGoBackTab() {
-    return tabStore.canGoBackTab
+    return tabStore.getCanGoBackTab({ viewId: this.viewId })
   }
   get canGoForwardTab() {
-    return tabStore.canGoForwardTab
+    return tabStore.getCanGoForwardTab({ viewId: this.viewId })
   }
 
   mounted() {
@@ -135,52 +157,75 @@ export default class Toolbar extends Vue {
     this.$eventBus.$off('showForwardHistory', this.showForwardHistory)
   }
 
-  showBackHistory(history: string[]) {
+  showBackHistory({ viewId, history }: { viewId: string; history: string[] }) {
+    if (this.viewId !== viewId) {
+      return
+    }
     this.$contextMenu.show(
       history.map((title, index) => {
         return {
           label: title,
-          click: () => this.$eventBus.$emit('goToOffset', -index - 1)
+          click: () =>
+            this.$eventBus.$emit('goToOffset', {
+              viewId: this.viewId,
+              offset: -index - 1
+            })
         }
       })
     )
   }
-  showForwardHistory(history: string[]) {
+  showForwardHistory({
+    viewId,
+    history
+  }: {
+    viewId: string
+    history: string[]
+  }) {
+    if (this.viewId !== viewId) {
+      return
+    }
     this.$contextMenu.show(
       history.map((history, index) => {
         return {
           label: history,
-          click: () => this.$eventBus.$emit('goToOffset', index + 1)
+          click: () =>
+            this.$eventBus.$emit('goToOffset', {
+              viewId: this.viewId,
+              offset: index + 1
+            })
         }
       })
     )
   }
   onClickGoBack() {
-    this.$eventBus.$emit('goBack')
+    this.$eventBus.$emit('goBack', { viewId: this.viewId })
   }
   onClickGoForward() {
-    this.$eventBus.$emit('goForward')
+    this.$eventBus.$emit('goForward', { viewId: this.viewId })
   }
   onClickReload() {
-    this.$eventBus.$emit('reload')
+    this.$eventBus.$emit('reload', { viewId: this.viewId })
   }
   onClickStop() {
-    this.$eventBus.$emit('stop')
+    this.$eventBus.$emit('stop', { viewId: this.viewId })
   }
   onClickClose() {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     if (tab) {
       tabStore.closeTab({ id: tab.id })
     }
   }
+  onClickCloseView() {
+    tabStore.closeView({ id: this.viewId })
+  }
   onClickGoBackTab() {
-    tabStore.goBackTab()
+    tabStore.goBackTab({ viewId: this.viewId })
   }
   onClickGoForwardTab() {
-    tabStore.goForwardTab()
+    tabStore.goForwardTab({ viewId: this.viewId })
   }
   onContextMenu() {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     if (!tab) {
       return
     }
@@ -207,30 +252,48 @@ export default class Toolbar extends Vue {
     ])
   }
   onContextMenuBack() {
-    this.$eventBus.$emit('requestBackHistory')
+    this.$eventBus.$emit('requestBackHistory', { viewId: this.viewId })
   }
   onContextMenuForward() {
-    this.$eventBus.$emit('requestForwardHistory')
+    this.$eventBus.$emit('requestForwardHistory', { viewId: this.viewId })
   }
   onContextMenuBackTab() {
     this.$contextMenu.show(
-      tabStore.backTabHistory.map((history, index) => {
-        return {
-          label: history && history.title,
-          click: () => tabStore.goToOffsetTab({ offset: -index - 1 })
-        }
-      })
+      tabStore
+        .getBackTabHistory({ viewId: this.viewId })
+        .map((history, index) => {
+          return {
+            label: history && history.title,
+            click: () =>
+              tabStore.goToOffsetTab({
+                viewId: this.viewId,
+                offset: -index - 1
+              })
+          }
+        })
     )
   }
   onContextMenuForwardTab() {
     this.$contextMenu.show(
-      tabStore.forwardTabHistory.map((history, index) => {
-        return {
-          label: history && history.title,
-          click: () => tabStore.goToOffsetTab({ offset: index + 1 })
-        }
-      })
+      tabStore
+        .getForwardTabHistory({ viewId: this.viewId })
+        .map((history, index) => {
+          return {
+            label: history && history.title,
+            click: () =>
+              tabStore.goToOffsetTab({
+                viewId: this.viewId,
+                offset: index + 1
+              })
+          }
+        })
     )
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.toolbar:not(.active) .caption {
+  opacity: 0.5;
+}
+</style>

@@ -34,9 +34,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
+import { Vue, Component, Ref } from 'vue-property-decorator'
 import { tabStore } from '~/store'
-import Tab from '~/models/tab'
 import AppList from '~/components/AppList.vue'
 import Chip from '~/components/Chip.vue'
 
@@ -51,31 +50,6 @@ export default class AppPane extends Vue {
 
   get apps() {
     return tabStore.sortedApps
-  }
-  get activeId() {
-    return tabStore.activeId
-  }
-
-  @Watch('activeId')
-  onActiveTabChanged(_newValue: Tab, _oldValue: Tab) {
-    this.$nextTick(() => {
-      const tab = <HTMLElement>(
-        this.$el.querySelector('.tab-list-item.v-list-item--active')
-      )
-      if (!tab) {
-        return
-      }
-      if (this.container.scrollTop > tab.offsetTop) {
-        this.container.scrollTop = tab.offsetTop
-      }
-      if (
-        this.container.scrollTop + this.container.offsetHeight <
-        tab.offsetTop + tab.offsetHeight
-      ) {
-        this.container.scrollTop =
-          tab.offsetTop + tab.offsetHeight - this.container.offsetHeight
-      }
-    })
   }
 
   onClickExpand() {
