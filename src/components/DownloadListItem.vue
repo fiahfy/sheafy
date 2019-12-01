@@ -18,7 +18,7 @@
       <v-list-item-subtitle>
         <span class="text--primary">{{ sizeText }}</span>
         <span v-if="statusText" class="text-capitalize">
-          &mdash; {{ statusText }}
+          — {{ statusText }}
         </span>
       </v-list-item-subtitle>
     </v-list-item-content>

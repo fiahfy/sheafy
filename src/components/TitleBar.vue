@@ -24,7 +24,7 @@ export default class TitleBar extends Vue {
   get title() {
     const viewId = tabStore.activeViewId
     const tab = tabStore.getActiveTab({ viewId })
-    return tab ? tab.title : ''
+    return tab ? `${tab.title} — ${tab.host}` : ''
   }
 
   // @see https://github.com/electron/electron/issues/16385
