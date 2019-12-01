@@ -109,7 +109,7 @@ export default class ShortcutBar extends Vue {
     })
   }
   onChange(value: string) {
-    tabStore.activateTab({ id: value, viewIndex: 0 })
+    tabStore.activateTab({ id: value, viewId: tabStore.activeViewId })
     layoutStore.hideShortcutBar()
   }
 }

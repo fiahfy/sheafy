@@ -61,7 +61,7 @@ export default class AppPanel extends Vue {
       }
       this.resizing = false
       layoutStore.setResizing({ resizing: false })
-      this.height = Number(this.content.style.height!.slice(0, -2))
+      this.height = this.content.offsetHeight
       document.body.style.cursor = ''
       document.removeEventListener('mousemove', resize)
     })

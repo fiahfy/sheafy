@@ -55,10 +55,10 @@ import { tabStore } from '~/store'
 
 @Component
 export default class FindingBar extends Vue {
-  @Prop({ type: Number, required: true }) readonly index!: number
+  @Prop({ type: String, required: true }) readonly viewId!: string
 
   get activeTab() {
-    return tabStore.getActiveTab({ viewIndex: this.index })
+    return tabStore.getActiveTab({ viewId: this.viewId })
   }
   get findingText() {
     const tab = this.activeTab
@@ -72,13 +72,13 @@ export default class FindingBar extends Vue {
     tabStore.updateTab({ id: tab.id, findingText: value })
     if (value) {
       this.$eventBus.$emit('findInPage', {
-        index: this.index,
+        viewId: this.viewId,
         text: value,
         forward: true,
         findNext: false
       })
     } else {
-      this.$eventBus.$emit('stopFindInPage', { index: this.index })
+      this.$eventBus.$emit('stopFindInPage', { viewId: this.viewId })
       tabStore.updateTab({
         id: tab.id,
         foundActiveMatchOrdinal: 0,
@@ -95,39 +95,42 @@ export default class FindingBar extends Vue {
     this.$eventBus.$off('focusFinding', this.focus)
   }
 
-  focus({ index }: { index: number }) {
-    if (this.index === index) {
-      this.$nextTick(() => {
-        const el = this.$el.querySelector('input')
-        if (el) {
-          el.focus()
-          el.select()
-        }
-      })
+  focus({ viewId }: { viewId: string }) {
+    if (this.viewId !== viewId) {
+      return
     }
+    this.$nextTick(() => {
+      const el = this.$el.querySelector('input')
+      if (el) {
+        el.focus()
+        el.select()
+      }
+    })
   }
   onFocus() {
-    if (this.findingText) {
-      this.$eventBus.$emit('findInPage', {
-        index: this.index,
-        text: this.findingText,
-        forward: true,
-        findNext: false
-      })
+    if (!this.findingText) {
+      return
     }
+    this.$eventBus.$emit('findInPage', {
+      viewId: this.viewId,
+      text: this.findingText,
+      forward: true,
+      findNext: false
+    })
   }
   onKeyDownEnter(e: KeyboardEvent) {
-    if (this.findingText) {
-      this.$eventBus.$emit('findInPage', {
-        index: this.index,
-        text: this.findingText,
-        forward: !e.shiftKey,
-        findNext: true
-      })
+    if (!this.findingText) {
+      return
     }
+    this.$eventBus.$emit('findInPage', {
+      viewId: this.viewId,
+      text: this.findingText,
+      forward: !e.shiftKey,
+      findNext: true
+    })
   }
   onKeyDownEsc() {
-    this.$eventBus.$emit('stopFindInPage', { index: this.index })
+    this.$eventBus.$emit('stopFindInPage', { viewId: this.viewId })
     const tab = this.activeTab
     if (tab) {
       tabStore.updateTab({ id: tab.id, finding: false })
@@ -141,27 +144,29 @@ export default class FindingBar extends Vue {
     ])
   }
   onClickUp() {
-    if (this.findingText) {
-      this.$eventBus.$emit('findInPage', {
-        index: this.index,
-        text: this.findingText,
-        forward: false,
-        findNext: true
-      })
+    if (!this.findingText) {
+      return
     }
+    this.$eventBus.$emit('findInPage', {
+      viewId: this.viewId,
+      text: this.findingText,
+      forward: false,
+      findNext: true
+    })
   }
   onClickDown() {
-    if (this.findingText) {
-      this.$eventBus.$emit('findInPage', {
-        index: this.index,
-        text: this.findingText,
-        forward: true,
-        findNext: true
-      })
+    if (!this.findingText) {
+      return
     }
+    this.$eventBus.$emit('findInPage', {
+      viewId: this.viewId,
+      text: this.findingText,
+      forward: true,
+      findNext: true
+    })
   }
   onClickClose() {
-    this.$eventBus.$emit('stopFindInPage', { index: this.index })
+    this.$eventBus.$emit('stopFindInPage', { viewId: this.viewId })
     const tab = this.activeTab
     if (tab) {
       tabStore.updateTab({ id: tab.id, finding: false })

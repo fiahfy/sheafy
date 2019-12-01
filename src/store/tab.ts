@@ -2,8 +2,9 @@ import { remote } from 'electron'
 import nanoid from 'nanoid'
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 import TabUtils from '~/utils/tab'
-import Tab, { homeUrl } from '~/models/tab'
 import App from '~/models/app'
+import Tab, { homeUrl } from '~/models/tab'
+import TabHistoryItem from '~/models/tab-history-item'
 
 const convertTab = (tab: Tab): Tab => {
   return {
@@ -43,14 +44,23 @@ const createAppSort = (sortedHosts: string[]) => {
 })
 export default class TabModule extends VuexModule {
   tabs: Tab[] = []
-  activeViewIndex = 0
-  activeIds: string[] = []
-  histories: string[][] = []
-  historyIndexes: number[] = []
+  activeViewId = 'primary'
+  activeTabIds: { [viewId: string]: string } = {}
+  tabHistories: { [viewId: string]: TabHistoryItem[] } = {}
+  tabHistoryIndexes: { [viewId: string]: number } = {}
   sortedIds: string[] = []
   sortedHosts: string[] = []
   sortedIdsOnHost: { [host: string]: string[] } = {}
 
+  get secondaryView() {
+    return !!this.activeTabIds.secondary
+  }
+  get canCloseView() {
+    return !!this.activeTabIds.primary && !!this.activeTabIds.secondary
+  }
+  get totalBadges() {
+    return this.tabs.reduce((carry, tab) => carry + tab.badge, 0)
+  }
   get sortedTabs() {
     return this.tabs.slice().sort(createTabSort(this.sortedIds))
   }
@@ -87,78 +97,97 @@ export default class TabModule extends VuexModule {
       })
   }
   get recentTabs() {
-    return this.tabs.slice()
-    // const recentIds = this.history
-    //   .slice()
-    //   .reverse()
-    //   .reduce((carry: string[], id) => {
-    //     if (carry.includes(id)) {
-    //       return carry
-    //     }
-    //     return [...carry, id]
-    //   }, [])
-    // return this.tabs.slice().sort(createTabSort(recentIds))
-  }
-  get totalBadges() {
-    return this.tabs.reduce((carry, tab) => carry + tab.badge, 0)
+    const recentIds = Object.keys(this.tabHistories)
+      .reduce((carry: TabHistoryItem[], viewId) => {
+        return [...carry, ...this.tabHistories[viewId]]
+      }, [])
+      .sort((a, b) => {
+        return a.createdAt > b.createdAt ? -1 : 1
+      })
+      .map((item) => item.id)
+      .reduce((carry: string[], id) => {
+        if (carry.includes(id)) {
+          return carry
+        }
+        return [...carry, id]
+      }, [])
+    return this.tabs.slice().sort(createTabSort(recentIds))
   }
   get getTab() {
     return ({ id }: { id: string }) => this.tabs.find((tab) => tab.id === id)
   }
+  get getTabWithIndex() {
+    return ({ index }: { index: number }): Tab | undefined =>
+      this.sortedTabs[index]
+  }
+  get getTabIndex() {
+    return ({ id }: { id: string }) =>
+      this.sortedTabs.findIndex((tab) => tab.id === id)
+  }
   get getActiveTab() {
-    return ({ viewIndex }: { viewIndex: number }) =>
-      this.getTab({ id: this.activeIds[viewIndex] })
-  }
-  get activeIndex() {
-    return this.sortedTabs.findIndex((tab) => tab.id === this.activeIds[0])
-  }
-
-  get isActiveView() {
-    return ({ index }: { index: number }) => index === this.activeViewIndex
-  }
-  get isActiveTab() {
-    return ({ id, index }: { id: string; index?: number }) => {
-      return index === undefined
-        ? this.activeIds.includes(id)
-        : this.activeIds[index] === id
+    return ({ viewId }: { viewId: string }) => {
+      const id = this.activeTabIds[viewId]
+      return this.getTab({ id })
     }
   }
-  get getHistory() {
-    return ({ viewIndex }: { viewIndex: number }) =>
-      this.histories[viewIndex] || []
+  get getActiveTabIndex() {
+    return ({ viewId }: { viewId: string }) => {
+      const id = this.activeTabIds[viewId]
+      return this.getTabIndex({ id })
+    }
   }
-  get getHistoryIndex() {
-    return ({ viewIndex }: { viewIndex: number }) =>
-      this.historyIndexes[viewIndex] || -1
+  get isActiveView() {
+    return ({ id }: { id: string }) => id === this.activeViewId
+  }
+  get isActiveTab() {
+    return ({ id, viewId }: { id: string; viewId?: string }) => {
+      return viewId === undefined
+        ? Object.values(this.activeTabIds).includes(id)
+        : this.activeTabIds[viewId] === id
+    }
+  }
+  get getTabHistory() {
+    return ({ viewId }: { viewId: string }) => {
+      const history = this.tabHistories[viewId]
+      return history === undefined ? [] : history
+    }
+  }
+  get getTabHistoryIndex() {
+    return ({ viewId }: { viewId: string }) => {
+      const index = this.tabHistoryIndexes[viewId]
+      return index === undefined ? -1 : index
+    }
   }
   get getBackTabHistory() {
-    return ({ viewIndex }: { viewIndex: number }) => {
-      const history = this.getHistory({ viewIndex })
-      const index = this.getHistoryIndex({ viewIndex })
+    return ({ viewId }: { viewId: string }) => {
+      const history = this.getTabHistory({ viewId })
+      const index = this.getTabHistoryIndex({ viewId })
       return history
         .slice(0, index)
-        .map((id) => this.getTab({ id }))
+        .map((item) => this.getTab({ id: item.id }))
         .reverse()
     }
   }
   get getForwardTabHistory() {
-    return ({ viewIndex }: { viewIndex: number }) => {
-      const history = this.getHistory({ viewIndex })
-      const index = this.getHistoryIndex({ viewIndex })
-      return history.slice(index + 1).map((id) => this.getTab({ id }))
+    return ({ viewId }: { viewId: string }) => {
+      const history = this.getTabHistory({ viewId })
+      const index = this.getTabHistoryIndex({ viewId })
+      return history
+        .slice(index + 1)
+        .map((item) => this.getTab({ id: item.id }))
     }
   }
   get getCanGoBackTab() {
-    return ({ viewIndex }: { viewIndex: number }) => {
-      const history = this.getHistory({ viewIndex })
-      const index = this.getHistoryIndex({ viewIndex }) - 1
+    return ({ viewId }: { viewId: string }) => {
+      const history = this.getTabHistory({ viewId })
+      const index = this.getTabHistoryIndex({ viewId }) - 1
       return !!history[index]
     }
   }
   get getCanGoForwardTab() {
-    return ({ viewIndex }: { viewIndex: number }) => {
-      const history = this.getHistory({ viewIndex })
-      const index = this.getHistoryIndex({ viewIndex }) + 1
+    return ({ viewId }: { viewId: string }) => {
+      const history = this.getTabHistory({ viewId })
+      const index = this.getTabHistoryIndex({ viewId }) + 1
       return !!history[index]
     }
   }
@@ -168,42 +197,47 @@ export default class TabModule extends VuexModule {
     this.tabs = tabs
   }
   @Mutation
-  setActiveViewIndex({ activeViewIndex }: { activeViewIndex: number }) {
-    this.activeViewIndex = activeViewIndex
+  setActiveViewId({ activeViewId }: { activeViewId: string }) {
+    this.activeViewId = activeViewId
   }
   @Mutation
-  setActiveId({
-    activeId,
-    viewIndex
+  setActiveTabId({
+    activeTabId,
+    viewId
   }: {
-    activeId: string
-    viewIndex: number
+    activeTabId: string
+    viewId: string
   }) {
-    const size = viewIndex - this.activeIds.length + 1
-    if (size > 0) {
-      this.activeIds = [...this.activeIds, ...Array(size).fill('')]
+    this.activeTabIds = {
+      ...this.activeTabIds,
+      [viewId]: activeTabId
     }
-    this.activeIds = this.activeIds.map((current, index) => {
-      return index === viewIndex ? activeId : current
-    })
   }
   @Mutation
-  setHistory({ history, viewIndex }: { history: string[]; viewIndex: number }) {
-    this.histories = this.histories.map((current, index) => {
-      return index === viewIndex ? history : current
-    })
-  }
-  @Mutation
-  setHistoryIndex({
-    historyIndex,
-    viewIndex
+  setTabHistory({
+    tabHistory,
+    viewId
   }: {
-    historyIndex: number
-    viewIndex: number
+    tabHistory: TabHistoryItem[]
+    viewId: string
   }) {
-    this.historyIndexes = this.historyIndexes.map((current, index) => {
-      return index === viewIndex ? historyIndex : current
-    })
+    this.tabHistories = {
+      ...this.tabHistories,
+      [viewId]: tabHistory
+    }
+  }
+  @Mutation
+  setTabHistoryIndex({
+    tabHistoryIndex,
+    viewId
+  }: {
+    tabHistoryIndex: number
+    viewId: string
+  }) {
+    this.tabHistoryIndexes = {
+      ...this.tabHistoryIndexes,
+      [viewId]: tabHistoryIndex
+    }
   }
   @Mutation
   setSortedIds({ sortedIds }: { sortedIds: string[] }) {
@@ -232,15 +266,15 @@ export default class TabModule extends VuexModule {
       position?: string
       srcId?: string
       openerId?: string
-      viewIndex?: number
+      viewId?: string
     }
   } = {}) {
     const {
       activate = true,
       position = 'last',
-      srcId = this.activeIds[this.activeViewIndex],
+      srcId = this.activeTabIds[this.activeViewId],
       openerId = '',
-      viewIndex = this.activeViewIndex
+      viewId = this.activeViewId
     } = options || {}
     const id = nanoid()
     const url = homeUrl
@@ -272,7 +306,7 @@ export default class TabModule extends VuexModule {
     let index
     switch (position) {
       case 'next':
-        index = this.sortedTabs.findIndex((tab) => tab.id === srcId) + 1
+        index = this.getTabIndex({ id: srcId }) + 1
         break
       case 'last':
       default:
@@ -291,7 +325,7 @@ export default class TabModule extends VuexModule {
     this.setSortedIds({ sortedIds })
 
     if (activate) {
-      this.activateTab({ id, viewIndex })
+      this.activateTab({ id, viewId })
     }
   }
   @Action
@@ -321,32 +355,30 @@ export default class TabModule extends VuexModule {
     this.setTabs({ tabs })
   }
   @Action
-  activateTab({ id, viewIndex }: { id: string; viewIndex: number }) {
-    if (id === this.activeIds[viewIndex]) {
-    }
-    this.setActiveId({ activeId: id, viewIndex })
-    // if (id) {
-    //   const history = [
-    //     ...this.history.slice(0, this.historyIndex + 1),
-    //     id
-    //   ].slice(-1001)
-    //   this.setHistory({ history })
-    //   this.setHistoryIndex({ historyIndex: history.length - 1 })
-    // } else {
-    //   this.setHistory({ history: [] })
-    //   this.setHistoryIndex({ historyIndex: -1 })
-    // }
-  }
-  @Action
-  activateTabIndex({ index, viewIndex }: { index: number; viewIndex: number }) {
-    const tab = this.sortedTabs[index]
-    if (!tab) {
+  activateTab({ id, viewId }: { id: string; viewId: string }) {
+    if (id === this.activeTabIds[viewId]) {
       return
     }
-    this.activateTab({ id: tab.id, viewIndex })
+    this.setActiveTabId({ activeTabId: id, viewId })
+
+    const history = this.getTabHistory({ viewId })
+    const index = this.getTabHistoryIndex({ viewId })
+    const newHistory = [
+      ...history.slice(0, index + 1),
+      {
+        id,
+        createdAt: Date.now()
+      }
+    ].slice(-1001)
+    this.setTabHistory({ tabHistory: newHistory, viewId })
+    this.setTabHistoryIndex({
+      tabHistoryIndex: newHistory.length - 1,
+      viewId
+    })
   }
   @Action
   closeTabs({ ids }: { ids: string[] }) {
+    // TODO: MV
     // const activeIndex = this.activeIndex
 
     const tabs = this.tabs.filter((tab) => !ids.includes(tab.id))
@@ -354,24 +386,30 @@ export default class TabModule extends VuexModule {
 
     const existIds = tabs.map((tab) => tab.id)
 
-    // if (!existIds.includes(this.activeId)) {
-    //   const index = Math.min(activeIndex, tabs.length - 1)
-    //   this.activateTabIndex({ index })
-    // }
+      // if (!existIds.includes(this.activeId)) {
+      //   const index = Math.min(activeIndex, tabs.length - 1)
+      //   this.activateTabIndex({ index })
+      // }
+    ;['primary', 'secondary'].forEach((viewId) => {
+      if (!existIds.includes(this.activeTabIds[viewId])) {
+        const tab = this.getTabWithIndex({ index: 0 })
+        if (tab) {
+          this.activateTab({ id: tab.id, viewId })
+        }
+      }
 
-    const sortedIds = this.sortedIds.filter((id) => existIds.includes(id))
-    this.setSortedIds({ sortedIds })
-
-    // const history = this.history
-    //   .slice()
-    //   .filter((item) => existIds.includes(item))
-    // const historyIndex =
-    //   this.historyIndex -
-    //   this.history
-    //     .slice(0, this.historyIndex)
-    //     .filter((item) => !existIds.includes(item)).length
-    // this.setHistory({ history })
-    // this.setHistoryIndex({ historyIndex })
+      const history = this.getTabHistory({ viewId })
+      const index = this.getTabHistoryIndex({ viewId })
+      const newHistory = history
+        .slice()
+        .filter((item) => existIds.includes(item.id))
+      const newIndex =
+        index -
+        history.slice(0, index).filter((item) => !existIds.includes(item.id))
+          .length
+      this.setTabHistory({ tabHistory: newHistory, viewId })
+      this.setTabHistoryIndex({ tabHistoryIndex: newIndex, viewId })
+    })
 
     if (!this.tabs.length) {
       remote.getCurrentWindow().close()
@@ -379,6 +417,7 @@ export default class TabModule extends VuexModule {
   }
   @Action
   closeTab({ id }: { id: string }) {
+    // TODO: MV
     // back tab if prev tab is opener
     // if (id === this.activeId) {
     //   const tab = this.getTab({ id })
@@ -386,6 +425,11 @@ export default class TabModule extends VuexModule {
     //     this.goBackTab()
     //   }
     // }
+    ;['primary', 'secondary'].forEach((viewId) => {
+      if (id === this.activeTabIds[viewId]) {
+        this.goBackTab({ viewId })
+      }
+    })
     this.closeTabs({ ids: [id] })
   }
   @Action
@@ -394,6 +438,31 @@ export default class TabModule extends VuexModule {
       .filter((tab) => tab.host === host)
       .map((tab) => tab.id)
     this.closeTabs({ ids })
+  }
+  @Action
+  activateView({ id }: { id: string }) {
+    this.setActiveViewId({ activeViewId: id })
+  }
+  @Action
+  closeView({ id }: { id: string }) {
+    if (id === 'primary') {
+      this.setActiveTabId({
+        activeTabId: this.activeTabIds.secondary,
+        viewId: 'primary'
+      })
+      this.setTabHistory({
+        tabHistory: this.tabHistories.secondary,
+        viewId: 'primary'
+      })
+      this.setTabHistoryIndex({
+        tabHistoryIndex: this.tabHistoryIndexes.secondary,
+        viewId: 'primary'
+      })
+      this.setActiveTabId({ activeTabId: '', viewId: 'secondary' })
+      this.setTabHistory({ tabHistory: [], viewId: 'secondary' })
+      this.setTabHistoryIndex({ tabHistoryIndex: -1, viewId: 'secondary' })
+    }
+    this.setActiveTabId({ activeTabId: '', viewId: 'secondary' })
   }
   @Action
   sortTabs({ ids }: { ids: string[] }) {
@@ -412,41 +481,46 @@ export default class TabModule extends VuexModule {
     this.setSortedIdsOnHost({ sortedIdsOnHost })
   }
   @Action
-  goToOffsetTab({ offset, viewIndex }: { offset: number; viewIndex: number }) {
-    const index = this.historyIndexes[viewIndex] + offset
-    const id = this.histories[viewIndex][index]
-    if (!id) {
+  goToOffsetTab({ offset, viewId }: { offset: number; viewId: string }) {
+    const index = this.getTabHistoryIndex({ viewId }) + offset
+    const history = this.getTabHistory({ viewId })
+    const historyItem = history[index]
+    if (!historyItem) {
       return
     }
-    this.setActiveId({ activeId: id, viewIndex })
-    this.setHistoryIndex({ historyIndex: index, viewIndex })
+    this.setActiveTabId({ activeTabId: historyItem.id, viewId })
+    this.setTabHistoryIndex({ tabHistoryIndex: index, viewId })
   }
   @Action
-  goNextTab({ viewIndex }: { viewIndex: number }) {
-    let index = this.activeIndex + 1
+  goBackTab({ viewId }: { viewId: string }) {
+    this.goToOffsetTab({ offset: -1, viewId })
+  }
+  @Action
+  goForwardTab({ viewId }: { viewId: string }) {
+    this.goToOffsetTab({ offset: 1, viewId })
+  }
+  @Action
+  goNextTab({ viewId }: { viewId: string }) {
+    let index = this.getActiveTabIndex({ viewId }) + 1
     if (index > this.tabs.length - 1) {
       index = 0
     }
-    this.activateTabIndex({ index, viewIndex })
+    const tab = this.getTabWithIndex({ index })
+    if (!tab) {
+      return
+    }
+    this.activateTab({ id: tab.id, viewId })
   }
   @Action
-  goPreviousTab({ viewIndex }: { viewIndex: number }) {
-    let index = this.activeIndex - 1
+  goPreviousTab({ viewId }: { viewId: string }) {
+    let index = this.getActiveTabIndex({ viewId }) - 1
     if (index < 0) {
       index = this.tabs.length - 1
     }
-    this.activateTabIndex({ index, viewIndex })
-  }
-  @Action
-  goBackTab({ viewIndex }: { viewIndex: number }) {
-    this.goToOffsetTab({ offset: -1, viewIndex })
-  }
-  @Action
-  goForwardTab({ viewIndex }: { viewIndex: number }) {
-    this.goToOffsetTab({ offset: 1, viewIndex })
-  }
-  @Action
-  activateView({ index }: { index: number }) {
-    this.setActiveViewIndex({ activeViewIndex: index })
+    const tab = this.getTabWithIndex({ index })
+    if (!tab) {
+      return
+    }
+    this.activateTab({ id: tab.id, viewId })
   }
 }

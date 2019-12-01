@@ -41,12 +41,24 @@ export default class HistoryListItem extends Vue {
     return new Date(this.item.updatedAt).toLocaleString()
   }
 
-  onClickItem() {
-    tabStore.newTab({ url: this.item.url })
+  onClickItem(e: MouseEvent) {
+    tabStore.newTab({
+      url: this.item.url,
+      options: { viewId: e.altKey ? 'secondary' : 'primary' }
+    })
   }
 
   onContextMenu() {
     const template: MenuItemConstructorOptions[] = [
+      {
+        label: 'Open to the Secondary View',
+        click: () =>
+          tabStore.newTab({
+            url: this.item.url,
+            options: { viewId: 'secondary' }
+          })
+      },
+      { type: 'separator' },
       {
         label: 'Delete',
         click: () => historyStore.deleteHistoryItem({ id: this.item.id })

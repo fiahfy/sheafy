@@ -48,6 +48,17 @@
     >
       <v-icon size="20">mdi-chevron-right</v-icon>
     </v-btn>
+    <v-btn
+      v-if="canCloseView"
+      icon
+      width="32"
+      height="32"
+      class="ml-1"
+      title="Close View"
+      @click="onClickCloseView"
+    >
+      <v-icon size="20">mdi-close</v-icon>
+    </v-btn>
     <template slot="extension">
       <v-btn
         v-long-press="onContextMenuBack"
@@ -97,7 +108,7 @@
       >
         <v-icon size="20">mdi-refresh</v-icon>
       </v-btn>
-      <toolbar-text-field class="ml-1" :index="index" />
+      <toolbar-text-field class="ml-1" :view-id="viewId" />
     </template>
   </v-toolbar>
 </template>
@@ -116,21 +127,24 @@ import ToolbarTextField from '~/components/ToolbarTextField.vue'
   }
 })
 export default class Toolbar extends Vue {
-  @Prop({ type: Number, required: true }) readonly index!: number
+  @Prop({ type: String, required: true }) readonly viewId!: string
 
   get classes() {
     return {
-      active: tabStore.isActiveView({ index: this.index })
+      active: tabStore.isActiveView({ id: this.viewId })
     }
   }
   get activeTab() {
-    return tabStore.getActiveTab({ viewIndex: this.index })
+    return tabStore.getActiveTab({ viewId: this.viewId })
+  }
+  get canCloseView() {
+    return tabStore.canCloseView
   }
   get canGoBackTab() {
-    return tabStore.getCanGoBackTab({ viewIndex: this.index })
+    return tabStore.getCanGoBackTab({ viewId: this.viewId })
   }
   get canGoForwardTab() {
-    return tabStore.getCanGoForwardTab({ viewIndex: this.index })
+    return tabStore.getCanGoForwardTab({ viewId: this.viewId })
   }
 
   mounted() {
@@ -143,49 +157,57 @@ export default class Toolbar extends Vue {
     this.$eventBus.$off('showForwardHistory', this.showForwardHistory)
   }
 
-  showBackHistory({ index, history }: { index: number; history: string[] }) {
-    if (this.index === index) {
-      this.$contextMenu.show(
-        history.map((title, index) => {
-          return {
-            label: title,
-            click: () =>
-              this.$eventBus.$emit('goToOffset', {
-                index: this.index,
-                offset: -index - 1
-              })
-          }
-        })
-      )
+  showBackHistory({ viewId, history }: { viewId: string; history: string[] }) {
+    if (this.viewId !== viewId) {
+      return
     }
+    this.$contextMenu.show(
+      history.map((title, index) => {
+        return {
+          label: title,
+          click: () =>
+            this.$eventBus.$emit('goToOffset', {
+              viewId: this.viewId,
+              offset: -index - 1
+            })
+        }
+      })
+    )
   }
-  showForwardHistory({ index, history }: { index: number; history: string[] }) {
-    if (this.index === index) {
-      this.$contextMenu.show(
-        history.map((history, index) => {
-          return {
-            label: history,
-            click: () =>
-              this.$eventBus.$emit('goToOffset', {
-                index: this.index,
-                offset: index + 1
-              })
-          }
-        })
-      )
+  showForwardHistory({
+    viewId,
+    history
+  }: {
+    viewId: string
+    history: string[]
+  }) {
+    if (this.viewId !== viewId) {
+      return
     }
+    this.$contextMenu.show(
+      history.map((history, index) => {
+        return {
+          label: history,
+          click: () =>
+            this.$eventBus.$emit('goToOffset', {
+              viewId: this.viewId,
+              offset: index + 1
+            })
+        }
+      })
+    )
   }
   onClickGoBack() {
-    this.$eventBus.$emit('goBack', { index: this.index })
+    this.$eventBus.$emit('goBack', { viewId: this.viewId })
   }
   onClickGoForward() {
-    this.$eventBus.$emit('goForward', { index: this.index })
+    this.$eventBus.$emit('goForward', { viewId: this.viewId })
   }
   onClickReload() {
-    this.$eventBus.$emit('reload', { index: this.index })
+    this.$eventBus.$emit('reload', { viewId: this.viewId })
   }
   onClickStop() {
-    this.$eventBus.$emit('stop', { index: this.index })
+    this.$eventBus.$emit('stop', { viewId: this.viewId })
   }
   onClickClose() {
     const tab = this.activeTab
@@ -193,11 +215,14 @@ export default class Toolbar extends Vue {
       tabStore.closeTab({ id: tab.id })
     }
   }
+  onClickCloseView() {
+    tabStore.closeView({ id: this.viewId })
+  }
   onClickGoBackTab() {
-    tabStore.goBackTab({ viewIndex: this.index })
+    tabStore.goBackTab({ viewId: this.viewId })
   }
   onClickGoForwardTab() {
-    tabStore.goForwardTab({ viewIndex: this.index })
+    tabStore.goForwardTab({ viewId: this.viewId })
   }
   onContextMenu() {
     const tab = this.activeTab
@@ -227,22 +252,22 @@ export default class Toolbar extends Vue {
     ])
   }
   onContextMenuBack() {
-    this.$eventBus.$emit('requestBackHistory', { index: this.index })
+    this.$eventBus.$emit('requestBackHistory', { viewId: this.viewId })
   }
   onContextMenuForward() {
-    this.$eventBus.$emit('requestForwardHistory', { index: this.index })
+    this.$eventBus.$emit('requestForwardHistory', { viewId: this.viewId })
   }
   onContextMenuBackTab() {
     this.$contextMenu.show(
       tabStore
-        .getBackTabHistory({ viewIndex: this.index })
+        .getBackTabHistory({ viewId: this.viewId })
         .map((history, index) => {
           return {
             label: history && history.title,
             click: () =>
               tabStore.goToOffsetTab({
-                offset: -index - 1,
-                viewIndex: this.index
+                viewId: this.viewId,
+                offset: -index - 1
               })
           }
         })
@@ -251,14 +276,14 @@ export default class Toolbar extends Vue {
   onContextMenuForwardTab() {
     this.$contextMenu.show(
       tabStore
-        .getForwardTabHistory({ viewIndex: this.index })
+        .getForwardTabHistory({ viewId: this.viewId })
         .map((history, index) => {
           return {
             label: history && history.title,
             click: () =>
               tabStore.goToOffsetTab({
-                offset: index + 1,
-                viewIndex: this.index
+                viewId: this.viewId,
+                offset: index + 1
               })
           }
         })

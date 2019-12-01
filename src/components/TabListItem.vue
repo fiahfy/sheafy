@@ -52,13 +52,22 @@ export default class TabListItem extends Vue {
   }
 
   onClick(e: MouseEvent) {
-    tabStore.activateTab({ id: this.tab.id, viewIndex: e.altKey ? 1 : 0 })
+    tabStore.activateTab({
+      id: this.tab.id,
+      viewId: e.altKey ? 'secondary' : 'primary'
+    })
   }
   onClickClose() {
     tabStore.closeTab({ id: this.tab.id })
   }
   onContextMenu() {
     this.$contextMenu.show([
+      {
+        label: 'Open to the Secondary View',
+        click: () =>
+          tabStore.activateTab({ id: this.tab.id, viewId: 'secondary' })
+      },
+      { type: 'separator' },
       {
         label: 'New Tab',
         click: () =>

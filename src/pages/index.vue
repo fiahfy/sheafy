@@ -6,18 +6,21 @@
       :class="classes"
     >
       <sidebar v-if="!fullScreen" />
-      <tab-view
-        class="flex-grow-1 overflow-hidden"
-        style="min-height: 0; flex-basis: 0;"
-        :index="0"
-      />
-      <div ref="resizer" class="resizer" vertical />
-      <tab-view
-        ref="content"
-        class="flex-grow-0 overflow-hidden"
-        :index="1"
-        :style="{ width: `${width}px` }"
-      />
+      <div ref="wrapper" class="d-flex flex-grow-1 overflow-hidden fill-height">
+        <tab-view
+          view-id="primary"
+          class="flex-grow-1 overflow-hidden"
+          style="min-height: 0; flex-basis: 0;"
+        />
+        <div v-show="secondaryView" ref="resizer" class="resizer" vertical />
+        <tab-view
+          v-if="secondaryView"
+          ref="view"
+          view-id="secondary"
+          class="flex-grow-0 overflow-hidden"
+          :style="{ width: `${width * 100}%` }"
+        />
+      </div>
       <shortcut-bar />
     </div>
   </v-container>
@@ -25,7 +28,7 @@
 
 <script lang="ts">
 import { Vue, Component, Ref } from 'vue-property-decorator'
-import { layoutStore, settingsStore } from '~/store'
+import { layoutStore, settingsStore, tabStore } from '~/store'
 import ActivityBar from '~/components/ActivityBar.vue'
 import ShortcutBar from '~/components/ShortcutBar.vue'
 import Sidebar from '~/components/Sidebar.vue'
@@ -40,8 +43,9 @@ import TabView from '~/components/TabView.vue'
   }
 })
 export default class Index extends Vue {
+  @Ref() readonly wrapper!: HTMLDivElement
   @Ref() readonly resizer!: HTMLDivElement
-  @Ref() readonly content!: TabView
+  @Ref() readonly view!: TabView
 
   resizing = false
 
@@ -53,26 +57,29 @@ export default class Index extends Vue {
   get fullScreen() {
     return layoutStore.fullScreen
   }
+  get secondaryView() {
+    return tabStore.secondaryView
+  }
   get width() {
-    return settingsStore.secondaryTabWidth
+    return settingsStore.secondaryTabWidthRatio
   }
   set width(value) {
-    settingsStore.setSecondaryTabWidth({ secondaryTabWidth: value })
+    settingsStore.setSecondaryTabWidthRatio({ secondaryTabWidthRatio: value })
   }
 
   mounted() {
     const resize = (e: MouseEvent) => {
       const width =
         settingsStore.sidebarLocation === 'right'
-          ? e.clientX - this.content.$el.getBoundingClientRect().left
-          : -e.clientX + this.content.$el.getBoundingClientRect().right
+          ? e.clientX - this.view.$el.getBoundingClientRect().left
+          : -e.clientX + this.view.$el.getBoundingClientRect().right
       if (
         width < 256 ||
         width > window.innerWidth - 256 - settingsStore.sidebarWidth
       ) {
         return
       }
-      ;(<HTMLElement>this.content.$el).style.width = width + 'px'
+      ;(<HTMLElement>this.view.$el).style.width = width + 'px'
     }
 
     this.resizer.addEventListener('mousedown', () => {
@@ -88,9 +95,8 @@ export default class Index extends Vue {
       }
       this.resizing = false
       layoutStore.setResizing({ resizing: false })
-      this.width = Number(
-        (<HTMLElement>this.content.$el).style.width!.slice(0, -2)
-      )
+      this.width =
+        (<HTMLElement>this.view.$el).offsetWidth / this.wrapper.offsetWidth
       document.body.style.cursor = ''
       document.removeEventListener('mousemove', resize)
     })

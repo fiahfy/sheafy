@@ -16,11 +16,11 @@ const ipcPlugin: Plugin = (ctx) => {
     switch (direction) {
       case 'left':
         ctx.app.$eventBus.$emit('goForward', {
-          index: tabStore.activeViewIndex
+          viewId: tabStore.activeViewId
         })
         break
       case 'right':
-        ctx.app.$eventBus.$emit('goBack', { index: tabStore.activeViewIndex })
+        ctx.app.$eventBus.$emit('goBack', { viewId: tabStore.activeViewId })
         break
     }
   })
@@ -29,18 +29,18 @@ const ipcPlugin: Plugin = (ctx) => {
   })
   ipcRenderer.on('duplicateTab', () => {
     const tab = tabStore.getActiveTab({
-      viewIndex: tabStore.activeViewIndex
+      viewId: tabStore.activeViewId
     })
     if (tab) {
       tabStore.duplicateTab({ id: tab.id })
     }
   })
   ipcRenderer.on('closeTab', () => {
-    tabStore.closeTab({ id: tabStore.activeIds[tabStore.activeViewIndex] })
+    tabStore.closeTab({ id: tabStore.activeTabIds[tabStore.activeViewId] })
   })
   ipcRenderer.on('openLocation', () => {
     ctx.app.$eventBus.$emit('focusLocation', {
-      index: tabStore.activeViewIndex
+      viewId: tabStore.activeViewId
     })
   })
   ipcRenderer.on('goToTab', () => {
@@ -48,9 +48,9 @@ const ipcPlugin: Plugin = (ctx) => {
     ctx.app.$eventBus.$emit('focusShortcut')
   })
   ipcRenderer.on('find', () => {
-    const id = tabStore.activeIds[tabStore.activeViewIndex]
+    const id = tabStore.activeTabIds[tabStore.activeViewId]
     tabStore.updateTab({ id, finding: true })
-    ctx.app.$eventBus.$emit('focusFinding', { index: tabStore.activeViewIndex })
+    ctx.app.$eventBus.$emit('focusFinding', { viewId: tabStore.activeViewId })
   })
   ipcRenderer.on('showSettings', () => {
     layoutStore.setPanelId({ panelId: 'settings' })
@@ -61,44 +61,47 @@ const ipcPlugin: Plugin = (ctx) => {
   ipcRenderer.on('showDownloads', () => {
     layoutStore.setPanelId({ panelId: 'downloads' })
   })
+  ipcRenderer.on('openSecondaryView', () => {
+    tabStore.newTab({ options: { viewId: 'secondary' } })
+  })
   ipcRenderer.on('reload', () => {
-    ctx.app.$eventBus.$emit('reload', { index: tabStore.activeViewIndex })
+    ctx.app.$eventBus.$emit('reload', { viewId: tabStore.activeViewId })
   })
   ipcRenderer.on('forceReload', () => {
-    ctx.app.$eventBus.$emit('forceReload', { index: tabStore.activeViewIndex })
+    ctx.app.$eventBus.$emit('forceReload', { viewId: tabStore.activeViewId })
   })
   ipcRenderer.on('resetZoom', () => {
-    ctx.app.$eventBus.$emit('resetZoom', { index: tabStore.activeViewIndex })
+    ctx.app.$eventBus.$emit('resetZoom', { viewId: tabStore.activeViewId })
   })
   ipcRenderer.on('zoomIn', () => {
-    ctx.app.$eventBus.$emit('zoomIn', { index: tabStore.activeViewIndex })
+    ctx.app.$eventBus.$emit('zoomIn', { viewId: tabStore.activeViewId })
   })
   ipcRenderer.on('zoomOut', () => {
-    ctx.app.$eventBus.$emit('zoomOut', { index: tabStore.activeViewIndex })
+    ctx.app.$eventBus.$emit('zoomOut', { viewId: tabStore.activeViewId })
   })
   ipcRenderer.on('goBack', () => {
-    ctx.app.$eventBus.$emit('goBack', { index: tabStore.activeViewIndex })
+    ctx.app.$eventBus.$emit('goBack', { viewId: tabStore.activeViewId })
   })
   ipcRenderer.on('goForward', () => {
-    ctx.app.$eventBus.$emit('goForward', { index: tabStore.activeViewIndex })
+    ctx.app.$eventBus.$emit('goForward', { viewId: tabStore.activeViewId })
   })
   ipcRenderer.on('goNextTab', () => {
-    tabStore.goNextTab({ viewIndex: tabStore.activeViewIndex })
+    tabStore.goNextTab({ viewId: tabStore.activeViewId })
   })
   ipcRenderer.on('goPreviousTab', () => {
-    tabStore.goPreviousTab({ viewIndex: tabStore.activeViewIndex })
+    tabStore.goPreviousTab({ viewId: tabStore.activeViewId })
   })
   // TODO: https://github.com/electron/electron/issues/15728
   ipcRenderer.on('undo', () => {
     if (document.activeElement!.tagName.toLocaleLowerCase() === 'webview') {
-      ctx.app.$eventBus.$emit('undo', { index: tabStore.activeViewIndex })
+      ctx.app.$eventBus.$emit('undo', { viewId: tabStore.activeViewId })
     } else {
       document.execCommand('undo')
     }
   })
   ipcRenderer.on('redo', () => {
     if (document.activeElement!.tagName.toLocaleLowerCase() === 'webview') {
-      ctx.app.$eventBus.$emit('redo', { index: tabStore.activeViewIndex })
+      ctx.app.$eventBus.$emit('redo', { viewId: tabStore.activeViewId })
     } else {
       document.execCommand('redo')
     }

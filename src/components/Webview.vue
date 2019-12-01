@@ -16,7 +16,7 @@ const urlWithoutHash = (url: string) => {
 @Component
 export default class Webview extends Vue {
   @Prop({ type: Object, required: true }) readonly tab!: Tab
-  @Prop({ type: Number, required: true }) readonly index!: number
+  @Prop({ type: String, required: true }) readonly viewId!: string
 
   src = ''
   needFocus = false
@@ -26,7 +26,7 @@ export default class Webview extends Vue {
     return `file://${remote.app.getAppPath()}/preload.js`
   }
   get active() {
-    return tabStore.isActiveTab({ id: this.tab.id, index: this.index })
+    return tabStore.isActiveTab({ id: this.tab.id, viewId: this.viewId })
   }
   get display() {
     return this.active ? 'flex' : 'none'
@@ -50,7 +50,10 @@ export default class Webview extends Vue {
   }
 
   mounted() {
-    if (this.active || !this.tab.loaded) {
+    if (
+      this.active ||
+      (!this.tab.loaded && tabStore.isActiveView({ id: this.viewId }))
+    ) {
       this.init()
     }
   }
@@ -121,7 +124,7 @@ export default class Webview extends Vue {
             canGoForward: this.webview.canGoForward()
           })
           if (home) {
-            this.$eventBus.$emit('focusLocation', { index: this.index })
+            this.$eventBus.$emit('focusLocation', { viewId: this.viewId })
           } else if (urlChanged || this.needFocus) {
             tabStore.updateTab({ id: this.tab.id, query: url })
             historyStore.upsertHistory({
@@ -251,11 +254,11 @@ export default class Webview extends Vue {
             break
           }
           case 'activateView':
-            tabStore.activateView({ index: this.index })
+            tabStore.activateView({ id: this.viewId })
             break
           case 'activateTab':
-            tabStore.activateView({ index: this.index })
-            tabStore.activateTab({ id: this.tab.id, viewIndex: this.index })
+            tabStore.activateView({ id: this.viewId })
+            tabStore.activateTab({ id: this.tab.id, viewId: this.viewId })
             break
           case 'onkeydown': {
             const [e] = args
@@ -278,49 +281,49 @@ export default class Webview extends Vue {
         }
       })
       this.webview.addEventListener('update-target-url', ({ url }) => {
-        this.$eventBus.$emit('updateTargetUrl', { index: this.index, url })
+        this.$eventBus.$emit('updateTargetUrl', { viewId: this.viewId, url })
       })
     })
   }
-  undo({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  undo({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       this.webview.undo()
     }
   }
-  redo({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  redo({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       this.webview.redo()
     }
   }
-  goBack({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  goBack({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       this.webview.goBack()
     }
   }
-  goForward({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  goForward({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       this.webview.goForward()
     }
   }
-  goToOffset({ index, offset }: { index: number; offset: number }) {
-    if (this.active && index === this.index) {
+  goToOffset({ viewId, offset }: { viewId: string; offset: number }) {
+    if (this.active && this.viewId === viewId) {
       this.webview.goToOffset(offset)
     }
   }
-  reload({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  reload({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       this.needFocus = true
       this.webview.reload()
     }
   }
-  forceReload({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  forceReload({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       this.needFocus = true
       this.webview.reloadIgnoringCache()
     }
   }
-  load({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  load({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       const query = this.tab.query
       const url = TabUtils.getUrlWithQuery(query)
       if (url) {
@@ -328,66 +331,69 @@ export default class Webview extends Vue {
       }
     }
   }
-  download({ index, url }: { index: number; url: string }) {
-    if (this.active && index === this.index) {
+  download({ viewId, url }: { viewId: string; url: string }) {
+    if (this.active && this.viewId === viewId) {
       this.webview.downloadURL(url)
     }
   }
   findInPage({
-    index,
+    viewId,
     text,
     forward,
     findNext
   }: {
-    index: number
+    viewId: string
     text: string
     forward: boolean
     findNext: boolean
   }) {
-    if (this.active && index === this.index) {
+    if (this.active && this.viewId === viewId) {
       this.webview.findInPage(text, { forward, findNext })
     }
   }
-  stopFindInPage({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  stopFindInPage({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       this.webview.stopFindInPage('clearSelection')
     }
   }
-  resetZoom({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  resetZoom({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       this.webview.setZoomLevel(0)
     }
   }
-  zoomIn({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  zoomIn({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       const level = this.webview.getZoomLevel()
       if (level < 9) {
         this.webview.setZoomLevel(level + 1)
       }
     }
   }
-  zoomOut({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  zoomOut({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       const level = this.webview.getZoomLevel()
       if (level > -6) {
         this.webview.setZoomLevel(level - 1)
       }
     }
   }
-  requestBackHistory({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  requestBackHistory({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       const contents = <any>this.webview.getWebContents()
       const history = contents.history
         .slice(0, contents.getActiveIndex())
         .reverse()
-      this.$eventBus.$emit('showBackHistory', { index: this.index, history })
+      this.$eventBus.$emit('showBackHistory', { viewId: this.viewId, history })
     }
   }
-  requestForwardHistory({ index }: { index: number }) {
-    if (this.active && index === this.index) {
+  requestForwardHistory({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
       const contents = <any>this.webview.getWebContents()
       const history = contents.history.slice(contents.getActiveIndex() + 1)
-      this.$eventBus.$emit('showForwardHistory', { index: this.index, history })
+      this.$eventBus.$emit('showForwardHistory', {
+        viewId: this.viewId,
+        history
+      })
     }
   }
 }

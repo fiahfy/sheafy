@@ -210,7 +210,7 @@ document.addEventListener = ((func) => {
       if (
         type === 'keydown' &&
         ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) &&
-        e.key === 'p'
+        e.key === 'o'
       ) {
         e.stopPropagation()
         return

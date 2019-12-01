@@ -45,12 +45,12 @@ import { tabStore } from '~/store'
 
 @Component
 export default class ToolbarTextField extends Vue {
-  @Prop({ type: Number, required: true }) readonly index!: number
+  @Prop({ type: String, required: true }) readonly viewId!: string
 
   focusIn = false
 
   get activeTab() {
-    return tabStore.getActiveTab({ viewIndex: this.index })
+    return tabStore.getActiveTab({ viewId: this.viewId })
   }
   get query() {
     const tab = this.activeTab
@@ -80,16 +80,17 @@ export default class ToolbarTextField extends Vue {
     this.$eventBus.$off('focusLocation', this.focus)
   }
 
-  focus({ index }: { index: number }) {
-    if (this.index === index) {
-      this.$nextTick(() => {
-        const el = this.$el.querySelector('input')
-        if (el) {
-          el.focus()
-          el.select()
-        }
-      })
+  focus({ viewId }: { viewId: string }) {
+    if (this.viewId !== viewId) {
+      return
     }
+    this.$nextTick(() => {
+      const el = this.$el.querySelector('input')
+      if (el) {
+        el.focus()
+        el.select()
+      }
+    })
   }
   onContextMenu() {
     this.$contextMenu.show([
@@ -116,7 +117,7 @@ export default class ToolbarTextField extends Vue {
   onKeyPressEnter(e: KeyboardEvent) {
     const input = <HTMLInputElement>e.target
     input.blur()
-    this.$eventBus.$emit('load', { index: this.index })
+    this.$eventBus.$emit('load', { viewId: this.viewId })
   }
   onClickFind() {
     const tab = this.activeTab

@@ -176,7 +176,7 @@ export default class DownloadListItem extends Vue {
   }
   onClickRetry() {
     this.$eventBus.$emit('download', {
-      index: tabStore.activeViewIndex,
+      viewId: tabStore.activeViewId,
       url: this.item.url
     })
   }
@@ -238,7 +238,7 @@ export default class DownloadListItem extends Vue {
           label: 'Retry',
           click: () =>
             this.$eventBus.$emit('download', {
-              index: tabStore.activeViewIndex,
+              viewId: tabStore.activeViewId,
               url: this.item.url
             })
         }

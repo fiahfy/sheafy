@@ -13,7 +13,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component
 export default class StatusBar extends Vue {
-  @Prop({ type: Number, required: true }) readonly index!: number
+  @Prop({ type: String, required: true }) readonly viewId!: string
 
   url = ''
 
@@ -29,8 +29,8 @@ export default class StatusBar extends Vue {
     this.$eventBus.$off('updateTargetUrl', this.updateTargetUrl)
   }
 
-  updateTargetUrl({ index, url }: { index: number; url: string }) {
-    if (this.index === index) {
+  updateTargetUrl({ viewId, url }: { viewId: string; url: string }) {
+    if (this.viewId === viewId) {
       this.url = url
     }
   }

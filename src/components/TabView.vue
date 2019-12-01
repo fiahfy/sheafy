@@ -1,10 +1,10 @@
 <template>
   <div class="tab-content d-flex flex-column white" @click="onClick">
-    <toolbar v-if="!fullScreen" class="flex-grow-0" :index="index" />
+    <toolbar v-if="!fullScreen" class="flex-grow-0" :view-id="viewId" />
     <div class="wrapper flex-grow-1 overflow-hidden">
-      <webview v-for="tab in tabs" :key="tab.id" :tab="tab" :index="index" />
-      <finding-bar :index="index" />
-      <status-bar :index="index" />
+      <webview v-for="tab in tabs" :key="tab.id" :tab="tab" :view-id="viewId" />
+      <finding-bar :view-id="viewId" />
+      <status-bar :view-id="viewId" />
     </div>
   </div>
 </template>
@@ -26,7 +26,7 @@ import Webview from '~/components/Webview.vue'
   }
 })
 export default class TabContent extends Vue {
-  @Prop({ type: Number, required: true }) readonly index!: number
+  @Prop({ type: String, required: true }) readonly viewId!: string
 
   get fullScreen() {
     return layoutStore.fullScreen
@@ -36,7 +36,7 @@ export default class TabContent extends Vue {
   }
 
   onClick() {
-    tabStore.activateView({ index: this.index })
+    tabStore.activateView({ id: this.viewId })
   }
 }
 </script>
