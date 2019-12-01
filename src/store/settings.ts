@@ -10,6 +10,7 @@ export default class SettingsModule extends VuexModule {
   swipeToNavigate = false
   sidebarLocation = 'left'
   sidebarWidth = 256
+  secondaryTabWidthRatio = 0.5
   topContentHeight = 256
 
   @Mutation
@@ -27,6 +28,14 @@ export default class SettingsModule extends VuexModule {
   @Mutation
   setSidebarWidth({ sidebarWidth }: { sidebarWidth: number }) {
     this.sidebarWidth = sidebarWidth
+  }
+  @Mutation
+  setSecondaryTabWidthRatio({
+    secondaryTabWidthRatio
+  }: {
+    secondaryTabWidthRatio: number
+  }) {
+    this.secondaryTabWidthRatio = secondaryTabWidthRatio
   }
   @Mutation
   setTopContentHeight({ topContentHeight }: { topContentHeight: number }) {

@@ -68,7 +68,7 @@ export default class Sidebar extends Vue {
       }
       this.resizing = false
       layoutStore.setResizing({ resizing: false })
-      this.width = Number((<HTMLElement>this.$el).style.width!.slice(0, -2))
+      this.width = (<HTMLElement>this.$el).offsetWidth
       document.body.style.cursor = ''
       document.removeEventListener('mousemove', resize)
     })

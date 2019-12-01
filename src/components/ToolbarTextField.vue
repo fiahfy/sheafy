@@ -40,28 +40,30 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { tabStore } from '~/store'
 
 @Component
 export default class ToolbarTextField extends Vue {
+  @Prop({ type: String, required: true }) readonly viewId!: string
+
   focusIn = false
 
+  get activeTab() {
+    return tabStore.getActiveTab({ viewId: this.viewId })
+  }
   get query() {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     return tab ? tab.query : ''
   }
   set query(value) {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     if (tab) {
       tabStore.updateTab({ id: tab.id, query: value })
     }
   }
-  get activeTab() {
-    return tabStore.activeTab
-  }
   get icon() {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     const url = tab ? tab.url : ''
     const match = url.match(/^http(s)?:\/\//)
     if (match) {
@@ -78,7 +80,10 @@ export default class ToolbarTextField extends Vue {
     this.$eventBus.$off('focusLocation', this.focus)
   }
 
-  focus() {
+  focus({ viewId }: { viewId: string }) {
+    if (this.viewId !== viewId) {
+      return
+    }
     this.$nextTick(() => {
       const el = this.$el.querySelector('input')
       if (el) {
@@ -112,10 +117,10 @@ export default class ToolbarTextField extends Vue {
   onKeyPressEnter(e: KeyboardEvent) {
     const input = <HTMLInputElement>e.target
     input.blur()
-    this.$eventBus.$emit('load')
+    this.$eventBus.$emit('load', { viewId: this.viewId })
   }
   onClickFind() {
-    const tab = tabStore.activeTab
+    const tab = this.activeTab
     if (tab) {
       tabStore.updateTab({ id: tab.id, finding: false })
     }

@@ -36,7 +36,7 @@ const createTemplate = () => {
         },
         {
           label: 'Go to Tab...',
-          accelerator: 'CmdOrCtrl+P',
+          accelerator: 'CmdOrCtrl+O',
           click: () => send('goToTab')
         },
         { type: 'separator' },
@@ -88,6 +88,11 @@ const createTemplate = () => {
           label: 'Downloads',
           accelerator: 'CmdOrCtrl+Shift+D',
           click: () => send('showDownloads')
+        },
+        { type: 'separator' },
+        {
+          label: 'Open Secondary View',
+          click: () => send('openSecondaryView')
         },
         { type: 'separator' },
         {

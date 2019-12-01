@@ -26,10 +26,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { tabStore } from '~/store'
 import App from '~/models/app'
-import Tab from '~/models/tab'
 import Chip from '~/components/Chip.vue'
 import Favicon from '~/components/Favicon.vue'
 import TabListItem from '~/components/TabListItem.vue'
@@ -52,16 +51,6 @@ export default class AppListItem extends Vue {
   set model(value) {
     const ids = value.map((tab) => tab.id)
     tabStore.sortTabsOnApp({ ids, host: this.app.host })
-  }
-  get activeTab() {
-    return tabStore.activeTab
-  }
-
-  @Watch('activeTab')
-  onActiveTabChanged(value: Tab) {
-    if (this.app.host === value.host) {
-      this.expand = true
-    }
   }
 
   mounted() {

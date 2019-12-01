@@ -24,9 +24,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
+import { Vue, Component, Ref } from 'vue-property-decorator'
 import { tabStore } from '~/store'
-import Tab from '~/models/tab'
 import Chip from '~/components/Chip.vue'
 import TabList from '~/components/TabList.vue'
 
@@ -41,31 +40,6 @@ export default class TabPane extends Vue {
 
   get tabs() {
     return tabStore.sortedTabs
-  }
-  get activeTab() {
-    return tabStore.activeTab
-  }
-
-  @Watch('activeTab')
-  onActiveTabChanged(_newValue: Tab, _oldValue: Tab) {
-    this.$nextTick(() => {
-      const tab = <HTMLElement>(
-        this.$el.querySelector('.tab-list-item.v-list-item--active')
-      )
-      if (!tab) {
-        return
-      }
-      if (this.container.scrollTop > tab.offsetTop) {
-        this.container.scrollTop = tab.offsetTop
-      }
-      if (
-        this.container.scrollTop + this.container.offsetHeight <
-        tab.offsetTop + tab.offsetHeight
-      ) {
-        this.container.scrollTop =
-          tab.offsetTop + tab.offsetHeight - this.container.offsetHeight
-      }
-    })
   }
 
   onClickNewTab() {
