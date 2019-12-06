@@ -52,7 +52,7 @@ export default class TabModule extends VuexModule {
   sortedHosts: string[] = []
   sortedIdsOnHost: { [host: string]: string[] } = {}
 
-  get secondaryView() {
+  get multiView() {
     return !!this.activeTabIds.secondary
   }
   get canCloseView() {
@@ -140,10 +140,21 @@ export default class TabModule extends VuexModule {
     return ({ id }: { id: string }) => id === this.activeViewId
   }
   get isActiveTab() {
-    return ({ id, viewId }: { id: string; viewId?: string }) => {
-      return viewId === undefined
-        ? Object.values(this.activeTabIds).includes(id)
-        : this.activeTabIds[viewId] === id
+    return ({ id }: { id: string }) => {
+      return Object.values(this.activeTabIds).includes(id)
+    }
+  }
+  get getViewId() {
+    return ({ tabId }: { tabId: string }) => {
+      return Object.entries(this.activeTabIds).reduce(
+        (carry: { [tabId: string]: string }, [key, value]) => {
+          return {
+            ...carry,
+            [value]: key
+          }
+        },
+        {}
+      )[tabId]
     }
   }
   get getTabHistory() {

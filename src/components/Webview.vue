@@ -16,7 +16,6 @@ const urlWithoutHash = (url: string) => {
 @Component
 export default class Webview extends Vue {
   @Prop({ type: Object, required: true }) readonly tab!: Tab
-  @Prop({ type: String, required: true }) readonly viewId!: string
 
   src = ''
   needFocus = false
@@ -26,10 +25,13 @@ export default class Webview extends Vue {
     return `file://${remote.app.getAppPath()}/preload.js`
   }
   get active() {
-    return tabStore.isActiveTab({ id: this.tab.id, viewId: this.viewId })
+    return tabStore.isActiveTab({ id: this.tab.id })
   }
-  get display() {
-    return this.active ? 'flex' : 'none'
+  get viewId() {
+    return tabStore.getViewId({ tabId: this.tab.id })
+  }
+  get id() {
+    return this.viewId ? `${this.viewId}-webview` : ''
   }
 
   @Watch('active')
@@ -38,7 +40,7 @@ export default class Webview extends Vue {
       this.init()
     }
     this.$nextTick(() => {
-      this.webview.style.display = this.display
+      this.webview.id = this.id
       // TODO: the accelerator is not worked if the active tab is changed
       this.webview.blur()
       if (value) {
@@ -85,11 +87,11 @@ export default class Webview extends Vue {
 
     this.webview = document.createElement('webview')
     this.webview.classList.add('fill-height')
+    this.webview.id = this.id
     this.webview.src = this.tab.url
     this.webview.preload = this.preload
     this.webview.allowpopups = true
     this.webview.webpreferences = 'nativeWindowOpen, scrollBounce'
-    this.webview.style.display = this.display
     this.$el.parentElement!.append(this.webview)
 
     this.needFocus = true
