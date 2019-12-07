@@ -478,6 +478,7 @@ export default class TabModule extends VuexModule {
       this.setTabHistory({ tabHistory: [], viewId: 'secondary' })
       this.setTabHistoryIndex({ tabHistoryIndex: -1, viewId: 'secondary' })
     }
+    this.setActiveViewId({ activeViewId: 'primary' })
     this.setActiveTabId({ activeTabId: '', viewId: 'secondary' })
   }
   @Action

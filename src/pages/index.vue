@@ -15,6 +15,7 @@
           ref="primaryView"
           class="d-flex flex-column white flex-grow-1 overflow-hidden"
           style="min-height: 0; flex-basis: 0;"
+          @click="onClickPrimaryView"
         >
           <toolbar v-if="!fullScreen" class="flex-grow-0" view-id="primary" />
           <div ref="primaryInner" class="inner flex-grow-1 overflow-hidden">
@@ -28,6 +29,7 @@
           ref="secondaryView"
           class="d-flex flex-column white flex-grow-0 overflow-hidden"
           :style="{ width: `${width * 100}%` }"
+          @click="onClickSecondaryView"
         >
           <toolbar v-if="!fullScreen" class="flex-grow-0" view-id="secondary" />
           <div
@@ -174,6 +176,14 @@ export default class Index extends Vue {
   destroyed() {
     const el = this.$el.querySelector('.inner')
     el && this.observer.unobserve(el)
+  }
+
+  onClickPrimaryView() {
+    tabStore.activateView({ id: 'primary' })
+  }
+
+  onClickSecondaryView() {
+    tabStore.activateView({ id: 'secondary' })
   }
 
   async resize() {
