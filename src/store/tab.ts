@@ -404,7 +404,10 @@ export default class TabModule extends VuexModule {
       //   this.activateTabIndex({ index })
       // }
     ;['primary', 'secondary'].forEach((viewId) => {
-      if (!existIds.includes(this.activeTabIds[viewId])) {
+      if (
+        this.activeTabIds[viewId] &&
+        !existIds.includes(this.activeTabIds[viewId])
+      ) {
         const tab = this.getTabWithIndex({ index: 0 })
         if (tab) {
           this.activateTab({ id: tab.id, viewId })
