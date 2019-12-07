@@ -5,7 +5,7 @@
     @click="onClickItem"
     @contextmenu.stop="onContextMenu"
   >
-    <v-list-item-icon class="mr-3 align-self-center">
+    <v-list-item-icon class="mr-3 align-center">
       <favicon :url="item.favicon" />
     </v-list-item-icon>
 

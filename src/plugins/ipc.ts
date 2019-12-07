@@ -53,13 +53,16 @@ const ipcPlugin: Plugin = (ctx) => {
     ctx.app.$eventBus.$emit('focusFinding', { viewId: tabStore.activeViewId })
   })
   ipcRenderer.on('showSettings', () => {
-    layoutStore.setPanelId({ panelId: 'settings' })
+    layoutStore.selectPanel({ id: 'settings' })
   })
   ipcRenderer.on('showApps', () => {
-    layoutStore.setPanelId({ panelId: 'apps' })
+    layoutStore.selectPanel({ id: 'apps' })
+  })
+  ipcRenderer.on('showHistory', () => {
+    layoutStore.selectPanel({ id: 'history' })
   })
   ipcRenderer.on('showDownloads', () => {
-    layoutStore.setPanelId({ panelId: 'downloads' })
+    layoutStore.selectPanel({ id: 'downloads' })
   })
   ipcRenderer.on('openSecondaryView', () => {
     tabStore.newTab({ options: { viewId: 'secondary' } })

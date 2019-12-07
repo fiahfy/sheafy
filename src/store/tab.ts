@@ -74,11 +74,11 @@ export default class TabModule extends VuexModule {
 
   get sortedApps() {
     return Object.values(
-      this.tabs.slice().reduce((carry: { [key: string]: App }, tab) => {
+      this.tabs.slice().reduce((carry: { [host: string]: App }, tab) => {
         if (carry[tab.host]) {
           return {
             ...carry,
-            [tab.host]: <App>{
+            [tab.host]: {
               ...carry[tab.host],
               tabs: [...carry[tab.host].tabs, tab]
             }
@@ -86,7 +86,7 @@ export default class TabModule extends VuexModule {
         }
         return {
           ...carry,
-          [tab.host]: <App>{
+          [tab.host]: {
             host: tab.host,
             favicon: tab.favicon,
             tabs: [tab]

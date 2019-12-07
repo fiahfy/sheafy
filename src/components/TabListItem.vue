@@ -7,7 +7,7 @@
     @click="onClick"
     @contextmenu.stop="onContextMenu"
   >
-    <v-list-item-icon class="mr-3 align-self-center">
+    <v-list-item-icon class="mr-3 align-center">
       <favicon :url="tab.favicon" :loading="tab.loading" />
     </v-list-item-icon>
     <v-list-item-content>

@@ -5,7 +5,9 @@
       class="d-flex flex-grow-1 overflow-hidden fill-height"
       :class="classes"
     >
-      <sidebar v-if="!fullScreen" />
+      <div v-show="sidebar">
+        <sidebar class="fill-height" />
+      </div>
       <div
         id="wrapper"
         ref="wrapper"
@@ -112,12 +114,8 @@ export default class Index extends Vue {
     return layoutStore.fullScreen
   }
 
-  get width() {
-    return settingsStore.secondaryTabWidthRatio
-  }
-
-  set width(value) {
-    settingsStore.setSecondaryTabWidthRatio({ secondaryTabWidthRatio: value })
+  get sidebar() {
+    return !this.fullScreen && layoutStore.panelId
   }
 
   get multiView() {
@@ -136,6 +134,14 @@ export default class Index extends Vue {
     return tabStore.activeTabIds
   }
 
+  get width() {
+    return settingsStore.secondaryTabWidthRatio
+  }
+
+  set width(value) {
+    settingsStore.setSecondaryTabWidthRatio({ secondaryTabWidthRatio: value })
+  }
+
   @Watch('activeTabIds')
   onChanged() {
     this.debounced()
@@ -143,10 +149,7 @@ export default class Index extends Vue {
 
   mounted() {
     const resize = (e: MouseEvent) => {
-      const width =
-        settingsStore.sidebarLocation === 'right'
-          ? e.clientX - this.secondaryView.getBoundingClientRect().left
-          : -e.clientX + this.secondaryView.getBoundingClientRect().right
+      const width = this.secondaryView.getBoundingClientRect().right - e.clientX
       if (
         width < 256 ||
         width > window.innerWidth - 256 - settingsStore.sidebarWidth

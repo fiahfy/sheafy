@@ -32,6 +32,15 @@ export default class LayoutModule extends VuexModule {
   }
 
   @Action
+  selectPanel({ id }: { id: string }) {
+    if (id === this.panelId) {
+      this.setPanelId({ panelId: '' })
+    } else {
+      this.setPanelId({ panelId: id })
+    }
+  }
+
+  @Action
   showShortcutBar() {
     this.setShortcutBar({ shortcutBar: true })
   }

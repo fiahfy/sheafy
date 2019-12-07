@@ -85,6 +85,11 @@ const createTemplate = () => {
           click: () => send('showApps')
         },
         {
+          label: 'History',
+          accelerator: 'CmdOrCtrl+Shift+H',
+          click: () => send('showHistory')
+        },
+        {
           label: 'Downloads',
           accelerator: 'CmdOrCtrl+Shift+D',
           click: () => send('showDownloads')

@@ -62,7 +62,7 @@ export default class ActivityBar extends Vue {
   }
 
   onClickItem({ id }: { id: string }) {
-    layoutStore.setPanelId({ panelId: id })
+    layoutStore.selectPanel({ id })
   }
 }
 </script>
