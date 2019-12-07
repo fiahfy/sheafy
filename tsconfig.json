@@ -20,10 +20,14 @@
       "~~/*": ["./*"],
       "@@/*": ["./*"]
     },
+    "typeRoots": [
+      "node_modules/@types",
+      "src/@types"
+    ],
     "types": [
       "@types/node",
       "@nuxt/types",
-      "@nuxtjs/vuetify"
+      "@nuxtjs/vuetify",
     ],
     "experimentalDecorators": true
   },
