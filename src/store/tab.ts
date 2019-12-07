@@ -55,6 +55,9 @@ export default class TabModule extends VuexModule {
   get multiView() {
     return !!this.activeTabIds.secondary
   }
+  get duplicatedView() {
+    return this.activeTabIds.primary === this.activeTabIds.secondary
+  }
   get canCloseView() {
     return !!this.activeTabIds.primary && !!this.activeTabIds.secondary
   }
@@ -146,15 +149,14 @@ export default class TabModule extends VuexModule {
   }
   get getViewId() {
     return ({ tabId }: { tabId: string }) => {
-      return Object.entries(this.activeTabIds).reduce(
-        (carry: { [tabId: string]: string }, [key, value]) => {
+      return Object.entries(this.activeTabIds)
+        .reverse()
+        .reduce((carry: { [tabId: string]: string }, [key, value]) => {
           return {
             ...carry,
             [value]: key
           }
-        },
-        {}
-      )[tabId]
+        }, {})[tabId]
     }
   }
   get getTabHistory() {

@@ -30,7 +30,17 @@
           :style="{ width: `${width * 100}%` }"
         >
           <toolbar v-if="!fullScreen" class="flex-grow-0" view-id="secondary" />
-          <div ref="secondaryInner" class="inner flex-grow-1 overflow-hidden">
+          <div
+            ref="secondaryInner"
+            class="inner flex-grow-1 overflow-hidden d-flex align-center justify-center"
+          >
+            <div v-if="duplicatedView" class="text-center">
+              <v-icon size="160" class="grey--text">mdi-tab</v-icon>
+              <p class="title black--text">Duplicated tab</p>
+              <p class="subheading black--text">
+                This tab is duplicated and shown in the opposite view.
+              </p>
+            </div>
             <finding-bar view-id="secondary" />
             <status-bar view-id="secondary" />
           </div>
@@ -106,6 +116,9 @@ export default class Index extends Vue {
   }
   get multiView() {
     return tabStore.multiView
+  }
+  get duplicatedView() {
+    return tabStore.duplicatedView
   }
   get tabs() {
     return tabStore.tabs

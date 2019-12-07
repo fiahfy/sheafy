@@ -52,10 +52,20 @@ export default class TabListItem extends Vue {
   }
 
   onClick(e: MouseEvent) {
-    tabStore.activateTab({
-      id: this.tab.id,
-      viewId: e.altKey ? 'secondary' : 'primary'
+    const activeViewId = tabStore.activeViewId
+    const inactiveViewId =
+      activeViewId === 'secondary' ? 'primary' : 'secondary'
+    const tab = tabStore.getActiveTab({
+      viewId: e.altKey ? activeViewId : inactiveViewId
     })
+    if (tab && tab.id === this.tab.id) {
+      tabStore.activateView({ id: e.altKey ? activeViewId : inactiveViewId })
+    } else {
+      tabStore.activateTab({
+        id: this.tab.id,
+        viewId: e.altKey ? inactiveViewId : activeViewId
+      })
+    }
   }
   onClickClose() {
     tabStore.closeTab({ id: this.tab.id })
