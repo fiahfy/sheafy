@@ -167,20 +167,24 @@ export default class Index extends Vue {
     const primaryWebview = <HTMLDivElement>(
       await waitUntil(() => this.$el.querySelector('#primary-webview'))
     )
-    primaryWebview.style.top = this.primaryInner.offsetTop + 'px'
-    primaryWebview.style.left = this.primaryInner.offsetLeft + 'px'
-    primaryWebview.style.width = this.primaryInner.offsetWidth + 'px'
-    primaryWebview.style.height = this.primaryInner.offsetHeight + 'px'
+    if (primaryWebview) {
+      primaryWebview.style.top = this.primaryInner.offsetTop + 'px'
+      primaryWebview.style.left = this.primaryInner.offsetLeft + 'px'
+      primaryWebview.style.width = this.primaryInner.offsetWidth + 'px'
+      primaryWebview.style.height = this.primaryInner.offsetHeight + 'px'
+    }
     if (!this.multiView) {
       return
     }
     const secondaryWebview = <HTMLDivElement>(
       await waitUntil(() => this.$el.querySelector('#secondary-webview'))
     )
-    secondaryWebview.style.top = this.secondaryInner.offsetTop + 'px'
-    secondaryWebview.style.left = this.secondaryInner.offsetLeft + 'px'
-    secondaryWebview.style.width = this.secondaryInner.offsetWidth + 'px'
-    secondaryWebview.style.height = this.secondaryInner.offsetHeight + 'px'
+    if (secondaryWebview) {
+      secondaryWebview.style.top = this.secondaryInner.offsetTop + 'px'
+      secondaryWebview.style.left = this.secondaryInner.offsetLeft + 'px'
+      secondaryWebview.style.width = this.secondaryInner.offsetWidth + 'px'
+      secondaryWebview.style.height = this.secondaryInner.offsetHeight + 'px'
+    }
   }
 }
 </script>
