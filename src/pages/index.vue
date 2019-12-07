@@ -22,24 +22,19 @@
             <status-bar view-id="primary" />
           </div>
         </div>
-        <template v-if="multiView">
-          <div ref="resizer" class="resizer" vertical />
-          <div
-            ref="secondaryView"
-            class="d-flex flex-column white flex-grow-0 overflow-hidden"
-            :style="{ width: `${width * 100}%` }"
-          >
-            <toolbar
-              v-if="!fullScreen"
-              class="flex-grow-0"
-              view-id="secondary"
-            />
-            <div ref="secondaryInner" class="inner flex-grow-1 overflow-hidden">
-              <finding-bar view-id="secondary" />
-              <status-bar view-id="secondary" />
-            </div>
+        <div v-show="multiView" ref="resizer" class="resizer" vertical />
+        <div
+          v-if="multiView"
+          ref="secondaryView"
+          class="d-flex flex-column white flex-grow-0 overflow-hidden"
+          :style="{ width: `${width * 100}%` }"
+        >
+          <toolbar v-if="!fullScreen" class="flex-grow-0" view-id="secondary" />
+          <div ref="secondaryInner" class="inner flex-grow-1 overflow-hidden">
+            <finding-bar view-id="secondary" />
+            <status-bar view-id="secondary" />
           </div>
-        </template>
+        </div>
         <webview v-for="tab in tabs" :key="tab.id" :tab="tab" />
       </div>
       <shortcut-bar />
@@ -77,7 +72,7 @@ const waitUntil = (callback: Function, timeout = 1000) => {
         clearInterval(timer)
         resolve(el)
       }
-    }, 100)
+    }, 10)
   })
 }
 

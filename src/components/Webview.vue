@@ -34,8 +34,8 @@ export default class Webview extends Vue {
     return this.viewId ? `${this.viewId}-webview` : ''
   }
 
-  @Watch('active')
-  onActiveChanged(value: boolean) {
+  @Watch('viewId')
+  onViewIdChanged(value: boolean) {
     if (value) {
       this.init()
     }
@@ -52,10 +52,7 @@ export default class Webview extends Vue {
   }
 
   mounted() {
-    if (
-      this.active ||
-      (!this.tab.loaded && tabStore.isActiveView({ id: this.viewId }))
-    ) {
+    if (this.active || !this.tab.loaded) {
       this.init()
     }
   }
