@@ -3,7 +3,7 @@
     <tab-list-item v-if="app.tabs.length < 2" :tab="app.tabs[0]" app />
     <v-list-group v-else v-model="expand">
       <template v-slot:activator>
-        <v-list-item-icon class="mr-3 align-center">
+        <v-list-item-icon class="mr-3 align-self-center">
           <favicon :url="app.favicon" />
         </v-list-item-icon>
         <v-list-item-content @contextmenu="onContextMenuItem">
@@ -117,6 +117,7 @@ export default class AppListItem extends Vue {
       min-width: unset;
     }
     .v-list-item__icon {
+      height: unset;
       min-width: unset;
     }
   }

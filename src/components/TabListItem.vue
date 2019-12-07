@@ -7,7 +7,7 @@
     @click="onClick"
     @contextmenu.stop="onContextMenu"
   >
-    <v-list-item-icon class="mr-3 align-center">
+    <v-list-item-icon class="my-0 mr-3 align-self-center">
       <favicon :url="tab.favicon" :loading="tab.loading" />
     </v-list-item-icon>
     <v-list-item-content>
@@ -110,6 +110,7 @@ export default class TabListItem extends Vue {
     opacity: 0;
   }
   .v-list-item__icon {
+    height: unset;
     min-width: unset;
   }
 }
