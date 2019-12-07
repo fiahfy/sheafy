@@ -44,6 +44,7 @@
 
 <script lang="ts">
 import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
+import { debounce } from 'debounce'
 import { layoutStore, settingsStore, tabStore } from '~/store'
 import ActivityBar from '~/components/ActivityBar.vue'
 import ShortcutBar from '~/components/ShortcutBar.vue'
@@ -52,16 +53,6 @@ import FindingBar from '~/components/FindingBar.vue'
 import StatusBar from '~/components/StatusBar.vue'
 import Toolbar from '~/components/Toolbar.vue'
 import Webview from '~/components/Webview.vue'
-
-const debounce = (callback: Function, milli: number) => {
-  let timer: number
-  return (...args: any[]) => {
-    clearTimeout(timer)
-    timer = window.setTimeout(() => {
-      callback(...args) // eslint-disable-line standard/no-callback-literal
-    }, milli)
-  }
-}
 
 const waitUntil = (callback: Function, timeout = 1000) => {
   return new Promise((resolve) => {

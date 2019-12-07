@@ -46,7 +46,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Watch } from 'vue-property-decorator'
+import { debounce } from 'debounce'
 import { historyStore } from '~/store'
 import Chip from '~/components/Chip.vue'
 import HistoryList from '~/components/HistoryList.vue'
@@ -59,13 +60,15 @@ import HistoryList from '~/components/HistoryList.vue'
 })
 export default class HistoryPanel extends Vue {
   searchText = ''
+  lazySearchText = ''
+  debounced = debounce(this.lazySearch, 500)
 
   get items() {
     const items = historyStore.sortedHistoryItems
-    if (!this.searchText) {
+    if (!this.lazySearchText) {
       return items
     }
-    const words = this.searchText.replace(/\s+/, ' ').split(' ')
+    const words = this.lazySearchText.replace(/\s+/, ' ').split(' ')
     return items.filter((item) => {
       return words.every((word) => {
         return (
@@ -75,8 +78,17 @@ export default class HistoryPanel extends Vue {
     })
   }
 
+  @Watch('searchText')
+  onSearchTextChanged() {
+    this.debounced()
+  }
+
   onClickClearAll() {
     historyStore.clearHistoryItems()
+  }
+
+  lazySearch() {
+    this.lazySearchText = this.searchText
   }
 }
 </script>
