@@ -107,24 +107,31 @@ export default class Index extends Vue {
       ? 'flex-row-reverse'
       : 'flex-row'
   }
+
   get fullScreen() {
     return layoutStore.fullScreen
   }
+
   get width() {
     return settingsStore.secondaryTabWidthRatio
   }
+
   set width(value) {
     settingsStore.setSecondaryTabWidthRatio({ secondaryTabWidthRatio: value })
   }
+
   get multiView() {
     return tabStore.multiView
   }
+
   get duplicatedView() {
     return tabStore.duplicatedView
   }
+
   get tabs() {
     return tabStore.tabs
   }
+
   get activeTabIds() {
     return tabStore.activeTabIds
   }
@@ -187,9 +194,10 @@ export default class Index extends Vue {
   }
 
   async resize() {
-    const primaryWebview = <HTMLDivElement>(
-      await waitUntil(() => this.$el.querySelector('#primary-webview'))
-    )
+    const primaryWebview = (await waitUntil(() =>
+      this.$el.querySelector('#primary-webview')
+    )) as HTMLDivElement
+
     if (primaryWebview) {
       primaryWebview.style.top = this.primaryInner.offsetTop + 'px'
       primaryWebview.style.left = this.primaryInner.offsetLeft + 'px'
@@ -199,9 +207,9 @@ export default class Index extends Vue {
     if (!this.multiView) {
       return
     }
-    const secondaryWebview = <HTMLDivElement>(
-      await waitUntil(() => this.$el.querySelector('#secondary-webview'))
-    )
+    const secondaryWebview = (await waitUntil(() =>
+      this.$el.querySelector('#secondary-webview')
+    )) as HTMLDivElement
     if (secondaryWebview) {
       secondaryWebview.style.top = this.secondaryInner.offsetTop + 'px'
       secondaryWebview.style.left = this.secondaryInner.offsetLeft + 'px'
@@ -222,6 +230,24 @@ export default class Index extends Vue {
       &#primary-webview,
       &#secondary-webview {
         display: flex !important;
+      }
+    }
+    .inner {
+      position: relative;
+      .finding-bar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 384px;
+        max-width: 100%;
+        z-index: 1;
+      }
+      .status-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        max-width: 100%;
+        z-index: 1;
       }
     }
     .resizer {

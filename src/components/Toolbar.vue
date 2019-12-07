@@ -134,15 +134,19 @@ export default class Toolbar extends Vue {
       active: tabStore.isActiveView({ id: this.viewId })
     }
   }
+
   get activeTab() {
     return tabStore.getActiveTab({ viewId: this.viewId })
   }
+
   get canCloseView() {
     return tabStore.canCloseView
   }
+
   get canGoBackTab() {
     return tabStore.getCanGoBackTab({ viewId: this.viewId })
   }
+
   get canGoForwardTab() {
     return tabStore.getCanGoForwardTab({ viewId: this.viewId })
   }
@@ -174,6 +178,7 @@ export default class Toolbar extends Vue {
       })
     )
   }
+
   showForwardHistory({
     viewId,
     history
@@ -197,33 +202,42 @@ export default class Toolbar extends Vue {
       })
     )
   }
+
   onClickGoBack() {
     this.$eventBus.$emit('goBack', { viewId: this.viewId })
   }
+
   onClickGoForward() {
     this.$eventBus.$emit('goForward', { viewId: this.viewId })
   }
+
   onClickReload() {
     this.$eventBus.$emit('reload', { viewId: this.viewId })
   }
+
   onClickStop() {
     this.$eventBus.$emit('stop', { viewId: this.viewId })
   }
+
   onClickClose() {
     const tab = this.activeTab
     if (tab) {
       tabStore.closeTab({ id: tab.id })
     }
   }
+
   onClickCloseView() {
     tabStore.closeView({ id: this.viewId })
   }
+
   onClickGoBackTab() {
     tabStore.goBackTab({ viewId: this.viewId })
   }
+
   onClickGoForwardTab() {
     tabStore.goForwardTab({ viewId: this.viewId })
   }
+
   onContextMenu() {
     const tab = this.activeTab
     if (!tab) {
@@ -251,12 +265,15 @@ export default class Toolbar extends Vue {
       }
     ])
   }
+
   onContextMenuBack() {
     this.$eventBus.$emit('requestBackHistory', { viewId: this.viewId })
   }
+
   onContextMenuForward() {
     this.$eventBus.$emit('requestForwardHistory', { viewId: this.viewId })
   }
+
   onContextMenuBackTab() {
     this.$contextMenu.show(
       tabStore
@@ -273,6 +290,7 @@ export default class Toolbar extends Vue {
         })
     )
   }
+
   onContextMenuForwardTab() {
     this.$contextMenu.show(
       tabStore

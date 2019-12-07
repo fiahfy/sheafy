@@ -52,16 +52,19 @@ export default class ToolbarTextField extends Vue {
   get activeTab() {
     return tabStore.getActiveTab({ viewId: this.viewId })
   }
+
   get query() {
     const tab = this.activeTab
     return tab ? tab.query : ''
   }
+
   set query(value) {
     const tab = this.activeTab
     if (tab) {
       tabStore.updateTab({ id: tab.id, query: value })
     }
   }
+
   get icon() {
     const tab = this.activeTab
     const url = tab ? tab.url : ''
@@ -92,6 +95,7 @@ export default class ToolbarTextField extends Vue {
       }
     })
   }
+
   onContextMenu() {
     this.$contextMenu.show([
       { role: 'cut' },
@@ -99,26 +103,30 @@ export default class ToolbarTextField extends Vue {
       { role: 'paste' }
     ])
   }
+
   onMouseDown(e: MouseEvent) {
     const input = e.target
     if (input === document.activeElement) {
       return
     }
-    ;(<Window>window).getSelection()!.empty()
+    ;(window as Window).getSelection()!.empty()
     this.focusIn = true
   }
+
   onMouseUp(e: MouseEvent) {
-    const input = <HTMLInputElement>e.target
-    if (this.focusIn && !(<Window>window).getSelection()!.toString()) {
+    const input = e.target as HTMLInputElement
+    if (this.focusIn && !(window as Window).getSelection()!.toString()) {
       input.select()
     }
     this.focusIn = false
   }
+
   onKeyPressEnter(e: KeyboardEvent) {
-    const input = <HTMLInputElement>e.target
+    const input = e.target as HTMLInputElement
     input.blur()
     this.$eventBus.$emit('load', { viewId: this.viewId })
   }
+
   onClickFind() {
     const tab = this.activeTab
     if (tab) {

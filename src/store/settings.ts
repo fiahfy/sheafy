@@ -17,18 +17,22 @@ export default class SettingsModule extends VuexModule {
   setDarkTheme({ darkTheme }: { darkTheme: boolean }) {
     this.darkTheme = darkTheme
   }
+
   @Mutation
   setSwipeToNavigate({ swipeToNavigate }: { swipeToNavigate: boolean }) {
     this.swipeToNavigate = swipeToNavigate
   }
+
   @Mutation
   setSidebarLocation({ sidebarLocation }: { sidebarLocation: string }) {
     this.sidebarLocation = sidebarLocation
   }
+
   @Mutation
   setSidebarWidth({ sidebarWidth }: { sidebarWidth: number }) {
     this.sidebarWidth = sidebarWidth
   }
+
   @Mutation
   setSecondaryTabWidthRatio({
     secondaryTabWidthRatio
@@ -37,6 +41,7 @@ export default class SettingsModule extends VuexModule {
   }) {
     this.secondaryTabWidthRatio = secondaryTabWidthRatio
   }
+
   @Mutation
   setTopContentHeight({ topContentHeight }: { topContentHeight: number }) {
     this.topContentHeight = topContentHeight

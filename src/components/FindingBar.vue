@@ -60,10 +60,12 @@ export default class FindingBar extends Vue {
   get activeTab() {
     return tabStore.getActiveTab({ viewId: this.viewId })
   }
+
   get findingText() {
     const tab = this.activeTab
     return tab ? tab.findingText : ''
   }
+
   set findingText(value) {
     const tab = this.activeTab
     if (!tab) {
@@ -107,6 +109,7 @@ export default class FindingBar extends Vue {
       }
     })
   }
+
   onFocus() {
     if (!this.findingText) {
       return
@@ -118,6 +121,7 @@ export default class FindingBar extends Vue {
       findNext: false
     })
   }
+
   onKeyDownEnter(e: KeyboardEvent) {
     if (!this.findingText) {
       return
@@ -129,6 +133,7 @@ export default class FindingBar extends Vue {
       findNext: true
     })
   }
+
   onKeyDownEsc() {
     this.$eventBus.$emit('stopFindInPage', { viewId: this.viewId })
     const tab = this.activeTab
@@ -136,6 +141,7 @@ export default class FindingBar extends Vue {
       tabStore.updateTab({ id: tab.id, finding: false })
     }
   }
+
   onContextMenu() {
     this.$contextMenu.show([
       { role: 'cut' },
@@ -143,6 +149,7 @@ export default class FindingBar extends Vue {
       { role: 'paste' }
     ])
   }
+
   onClickUp() {
     if (!this.findingText) {
       return
@@ -154,6 +161,7 @@ export default class FindingBar extends Vue {
       findNext: true
     })
   }
+
   onClickDown() {
     if (!this.findingText) {
       return
@@ -165,6 +173,7 @@ export default class FindingBar extends Vue {
       findNext: true
     })
   }
+
   onClickClose() {
     this.$eventBus.$emit('stopFindInPage', { viewId: this.viewId })
     const tab = this.activeTab

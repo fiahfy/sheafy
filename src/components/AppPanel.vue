@@ -35,6 +35,7 @@ export default class AppPanel extends Vue {
   get height() {
     return settingsStore.topContentHeight
   }
+
   set height(value) {
     settingsStore.setTopContentHeight({ topContentHeight: value })
   }
@@ -70,6 +71,7 @@ export default class AppPanel extends Vue {
   onDragOver(e: DragEvent) {
     e.dataTransfer!.dropEffect = 'link'
   }
+
   onDrop(e: DragEvent) {
     const effectAllowed = e.dataTransfer!.effectAllowed
     // Prevent for sorting tabs

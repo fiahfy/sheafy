@@ -24,12 +24,15 @@ export default class Webview extends Vue {
   get preload() {
     return `file://${remote.app.getAppPath()}/preload.js`
   }
+
   get active() {
     return tabStore.isActiveTab({ id: this.tab.id })
   }
+
   get viewId() {
     return tabStore.getViewId({ tabId: this.tab.id })
   }
+
   get id() {
     return this.viewId ? `${this.viewId}-webview` : ''
   }
@@ -284,43 +287,51 @@ export default class Webview extends Vue {
       })
     })
   }
+
   undo({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.undo()
     }
   }
+
   redo({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.redo()
     }
   }
+
   goBack({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.goBack()
     }
   }
+
   goForward({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.goForward()
     }
   }
+
   goToOffset({ viewId, offset }: { viewId: string; offset: number }) {
     if (this.active && this.viewId === viewId) {
       this.webview.goToOffset(offset)
     }
   }
+
   reload({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.needFocus = true
       this.webview.reload()
     }
   }
+
   forceReload({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.needFocus = true
       this.webview.reloadIgnoringCache()
     }
   }
+
   load({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       const query = this.tab.query
@@ -330,11 +341,13 @@ export default class Webview extends Vue {
       }
     }
   }
+
   download({ viewId, url }: { viewId: string; url: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.downloadURL(url)
     }
   }
+
   findInPage({
     viewId,
     text,
@@ -350,16 +363,19 @@ export default class Webview extends Vue {
       this.webview.findInPage(text, { forward, findNext })
     }
   }
+
   stopFindInPage({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.stopFindInPage('clearSelection')
     }
   }
+
   resetZoom({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.setZoomLevel(0)
     }
   }
+
   zoomIn({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       const level = this.webview.getZoomLevel()
@@ -368,6 +384,7 @@ export default class Webview extends Vue {
       }
     }
   }
+
   zoomOut({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       const level = this.webview.getZoomLevel()
@@ -376,18 +393,20 @@ export default class Webview extends Vue {
       }
     }
   }
+
   requestBackHistory({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
-      const contents = <any>this.webview.getWebContents()
+      const contents = this.webview.getWebContents() as any
       const history = contents.history
         .slice(0, contents.getActiveIndex())
         .reverse()
       this.$eventBus.$emit('showBackHistory', { viewId: this.viewId, history })
     }
   }
+
   requestForwardHistory({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
-      const contents = <any>this.webview.getWebContents()
+      const contents = this.webview.getWebContents() as any
       const history = contents.history.slice(contents.getActiveIndex() + 1)
       this.$eventBus.$emit('showForwardHistory', {
         viewId: this.viewId,

@@ -41,21 +41,27 @@ export default class SettingsPanel extends Vue {
   get darwin() {
     return process.platform === 'darwin'
   }
+
   get darkTheme() {
     return settingsStore.darkTheme
   }
+
   set darkTheme(value) {
     settingsStore.setDarkTheme({ darkTheme: value })
   }
+
   get sidebarLocation() {
     return settingsStore.sidebarLocation
   }
+
   set sidebarLocation(value) {
     settingsStore.setSidebarLocation({ sidebarLocation: value })
   }
+
   get swipeToNavigate() {
     return settingsStore.swipeToNavigate
   }
+
   set swipeToNavigate(value) {
     settingsStore.setSwipeToNavigate({ swipeToNavigate: value })
   }

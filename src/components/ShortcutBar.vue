@@ -56,6 +56,7 @@ export default class ShortcutBar extends Vue {
       )
     }
   }
+
   get menuProps() {
     return {
       closeOnClick: false,
@@ -68,9 +69,11 @@ export default class ShortcutBar extends Vue {
       maxWidth: this.width
     }
   }
+
   get shortcutBar() {
     return layoutStore.shortcutBar
   }
+
   get tabs() {
     return tabStore.recentTabs
   }
@@ -84,13 +87,13 @@ export default class ShortcutBar extends Vue {
             layoutStore.hideShortcutBar()
           }
         })
-        this.width = (<HTMLElement>this.$el).offsetWidth
+        this.width = (this.$el as HTMLElement).offsetWidth
       })
     }
   }
 
   mounted() {
-    this.width = (<HTMLElement>this.$el).offsetWidth
+    this.width = (this.$el as HTMLElement).offsetWidth
     this.$eventBus.$on('focusShortcut', this.focus)
   }
 
@@ -105,9 +108,10 @@ export default class ShortcutBar extends Vue {
         el.focus()
         el.select()
       }
-      ;(<any>this.autocomplete).isMenuActive = true
+      ;(this.autocomplete as any).isMenuActive = true
     })
   }
+
   onChange(value: string) {
     tabStore.activateTab({ id: value, viewId: tabStore.activeViewId })
     layoutStore.hideShortcutBar()

@@ -44,9 +44,11 @@ export default class TabListItem extends Vue {
   get active() {
     return tabStore.isActiveTab({ id: this.tab.id })
   }
+
   get title() {
     return this.app ? this.tab.host : this.tab.title
   }
+
   get badge() {
     return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
   }
@@ -61,9 +63,11 @@ export default class TabListItem extends Vue {
     })
     tabStore.activateView({ id: e.altKey ? inactiveViewId : activeViewId })
   }
+
   onClickClose() {
     tabStore.closeTab({ id: this.tab.id })
   }
+
   onContextMenu() {
     this.$contextMenu.show([
       {

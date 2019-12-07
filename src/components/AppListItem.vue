@@ -48,6 +48,7 @@ export default class AppListItem extends Vue {
   get model() {
     return this.app.tabs
   }
+
   set model(value) {
     const ids = value.map((tab) => tab.id)
     tabStore.sortTabsOnApp({ ids, host: this.app.host })
@@ -66,12 +67,15 @@ export default class AppListItem extends Vue {
   expandApps() {
     this.expand = true
   }
+
   collapseApps() {
     this.expand = false
   }
+
   onClickClose() {
     tabStore.closeApp({ host: this.app.host })
   }
+
   onContextMenuItem() {
     this.$contextMenu.show([
       {
@@ -80,10 +84,11 @@ export default class AppListItem extends Vue {
       }
     ])
   }
+
   onEnd() {
     // Remove ripples if stop sorting
     this.$el.querySelectorAll('.v-ripple__container').forEach((el) => {
-      ;(<HTMLSpanElement>el).style.display = 'none'
+      ;(el as HTMLSpanElement).style.display = 'none'
     })
   }
 }

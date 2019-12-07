@@ -53,12 +53,14 @@ export default class ActivityBar extends Vue {
   isActive({ id }: { id: string }) {
     return id === layoutStore.panelId
   }
+
   hasBadge({ id }: { id: string }) {
     if (id === 'apps') {
       return !!tabStore.totalBadges
     }
     return false
   }
+
   onClickItem({ id }: { id: string }) {
     layoutStore.setPanelId({ panelId: id })
   }

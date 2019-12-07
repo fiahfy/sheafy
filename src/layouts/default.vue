@@ -21,6 +21,7 @@ export default class Layout extends Vue {
   get darkTheme() {
     return settingsStore.darkTheme
   }
+
   get classes() {
     return {
       resizing: layoutStore.resizing
@@ -42,7 +43,7 @@ export default class Layout extends Vue {
   }
 
   created() {
-    ;(<any>window).onNuxtReady(() => {
+    ;(window as any).onNuxtReady(() => {
       tabStore.newTabIfEmpty()
     })
   }

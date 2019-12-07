@@ -55,6 +55,7 @@ export default class AppPane extends Vue {
   onClickExpand() {
     this.$eventBus.$emit('expandApps')
   }
+
   onClickCollapse() {
     this.$eventBus.$emit('collapseApps')
   }

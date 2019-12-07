@@ -21,6 +21,7 @@ export default class TitleBar extends Vue {
   get titleBar() {
     return process.platform === 'darwin' && !layoutStore.fullScreen
   }
+
   get title() {
     const viewId = tabStore.activeViewId
     const tab = tabStore.getActiveTab({ viewId })

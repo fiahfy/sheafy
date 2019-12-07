@@ -106,7 +106,7 @@ export default class DownloadPanel extends Vue {
   }
 
   onScroll(e: Event) {
-    const top = (<HTMLDivElement>e.target).scrollTop
+    const top = (e.target as HTMLDivElement).scrollTop
     if (
       top + this.container.offsetHeight >
         this.container.scrollHeight - this.container.offsetHeight / 2 &&

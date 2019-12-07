@@ -52,11 +52,13 @@ export default class HistoryModule extends VuexModule {
     }
     this.setHistoryItems({ historyItems })
   }
+
   @Action
   deleteHistoryItem({ id }: { id: string }) {
     const historyItems = this.historyItems.filter((item) => item.id !== id)
     this.setHistoryItems({ historyItems })
   }
+
   @Action
   clearHistoryItems() {
     this.setHistoryItems({ historyItems: [] })
