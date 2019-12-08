@@ -68,6 +68,7 @@ export default class Webview extends Vue {
     this.$eventBus.$off('goToOffset', this.goToOffset)
     this.$eventBus.$off('reload', this.reload)
     this.$eventBus.$off('forceReload', this.forceReload)
+    this.$eventBus.$off('stop', this.stop)
     this.$eventBus.$off('load', this.load)
     this.$eventBus.$off('download', this.download)
     this.$eventBus.$off('findInPage', this.findInPage)
@@ -104,6 +105,7 @@ export default class Webview extends Vue {
       this.$eventBus.$on('goToOffset', this.goToOffset)
       this.$eventBus.$on('reload', this.reload)
       this.$eventBus.$on('forceReload', this.forceReload)
+      this.$eventBus.$on('stop', this.stop)
       this.$eventBus.$on('load', this.load)
       this.$eventBus.$on('download', this.download)
       this.$eventBus.$on('findInPage', this.findInPage)
@@ -331,6 +333,12 @@ export default class Webview extends Vue {
     if (this.active && this.viewId === viewId) {
       this.needFocus = true
       this.webview.reloadIgnoringCache()
+    }
+  }
+
+  stop({ viewId }: { viewId: string }) {
+    if (this.active && this.viewId === viewId) {
+      this.webview.stop()
     }
   }
 
