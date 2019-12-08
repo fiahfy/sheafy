@@ -12,7 +12,9 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: macOS-latest
+        # TODO: hang in the case of windows
+        # os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
       - run: git config --global core.autocrlf false
@@ -23,7 +25,6 @@ jobs:
       - run: yarn
       - run: yarn test
       - run: yarn build
-      - run: yarn release
-        shell: bash
+      - run: yarn release -mwl
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
