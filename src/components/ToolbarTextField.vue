@@ -16,6 +16,7 @@
     :filter="filter"
     :menu-props="menuProps"
     @change="onChange"
+    @focus="onFocus"
     @mousedown="onMouseDown"
     @mouseup="onMouseUp"
     @contextmenu.stop="onContextMenu"
@@ -175,10 +176,11 @@ export default class ToolbarTextField extends Vue {
     })
   }
 
-  onMouseDown(e: MouseEvent) {
-    // adjust menu width
+  onFocus() {
     this.width = (this.$el as HTMLElement).offsetWidth
+  }
 
+  onMouseDown(e: MouseEvent) {
     const input = e.target
     if (input === document.activeElement) {
       return
