@@ -12,6 +12,7 @@
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         history
       </span>
+      <chip v-if="items.length" class="ml-3" :num="items.length" />
       <v-spacer />
       <v-btn
         icon
@@ -36,8 +37,16 @@
         />
       </template>
     </v-toolbar>
-    <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">
-      <history-list v-if="items.length" :items="items" />
+    <div
+      id="scroll-target"
+      ref="container"
+      class="flex-grow-1 overflow-y-scroll scrollbar"
+    >
+      <history-list
+        v-if="pagingItems.length"
+        v-scroll:#scroll-target="onScroll"
+        :items="pagingItems"
+      />
       <div v-else class="d-flex justify-center caption py-5">
         <div>No history</div>
       </div>
@@ -46,7 +55,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
+import { debounce } from 'debounce'
 import { historyStore } from '~/store'
 import Chip from '~/components/Chip.vue'
 import HistoryList from '~/components/HistoryList.vue'
@@ -58,14 +68,20 @@ import HistoryList from '~/components/HistoryList.vue'
   }
 })
 export default class HistoryPanel extends Vue {
+  @Ref() readonly container!: HTMLDivElement
+
   searchText = ''
+  lazySearchText = ''
+  debounced = debounce(this.lazySearch, 500)
+  page = 1
+  perPage = 100
 
   get items() {
     const items = historyStore.sortedHistoryItems
-    if (!this.searchText) {
+    if (!this.lazySearchText) {
       return items
     }
-    const words = this.searchText.replace(/\s+/, ' ').split(' ')
+    const words = this.lazySearchText.replace(/\s+/, ' ').split(' ')
     return items.filter((item) => {
       return words.every((word) => {
         return (
@@ -75,8 +91,34 @@ export default class HistoryPanel extends Vue {
     })
   }
 
+  get pagingItems() {
+    return this.items.slice(0, this.page * this.perPage)
+  }
+
+  @Watch('searchText')
+  onSearchTextChanged() {
+    this.debounced()
+  }
+
   onClickClearAll() {
     historyStore.clearHistoryItems()
+  }
+
+  onScroll(e: Event) {
+    const top = (e.target as HTMLDivElement).scrollTop
+    if (
+      top + this.container.offsetHeight >
+        this.container.scrollHeight - this.container.offsetHeight / 2 &&
+      this.page <= Math.ceil(this.items.length / this.perPage)
+    ) {
+      this.page++
+    }
+  }
+
+  lazySearch() {
+    this.lazySearchText = this.searchText
+    this.container.scrollTop = 0
+    this.page = 1
   }
 }
 </script>

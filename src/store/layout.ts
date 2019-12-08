@@ -15,23 +15,36 @@ export default class LayoutModule extends VuexModule {
   setFullScreen({ fullScreen }: { fullScreen: boolean }) {
     this.fullScreen = fullScreen
   }
+
   @Mutation
   setResizing({ resizing }: { resizing: boolean }) {
     this.resizing = resizing
   }
+
   @Mutation
   setPanelId({ panelId }: { panelId: string }) {
     this.panelId = panelId
   }
+
   @Mutation
   setShortcutBar({ shortcutBar }: { shortcutBar: boolean }) {
     this.shortcutBar = shortcutBar
   }
 
   @Action
+  selectPanel({ id }: { id: string }) {
+    if (id === this.panelId) {
+      this.setPanelId({ panelId: '' })
+    } else {
+      this.setPanelId({ panelId: id })
+    }
+  }
+
+  @Action
   showShortcutBar() {
     this.setShortcutBar({ shortcutBar: true })
   }
+
   @Action
   hideShortcutBar() {
     this.setShortcutBar({ shortcutBar: false })

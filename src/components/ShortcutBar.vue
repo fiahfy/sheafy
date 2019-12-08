@@ -12,14 +12,14 @@
     auto-select-first
     hide-details
     no-data-text="No results found"
-    :items="tabs"
+    :items="items"
     :filter="filter"
     :menu-props="menuProps"
     @change="onChange"
   >
     <template v-slot:item="{ item }">
       <v-list-item-icon class="mr-3 align-self-center">
-        <favicon :url="item.favicon" :loading="item.loading" />
+        <favicon :url="item.favicon" />
       </v-list-item-icon>
       <v-list-item-content>
         <v-list-item-title
@@ -48,6 +48,14 @@ export default class ShortcutBar extends Vue {
 
   width = 0
 
+  get shortcutBar() {
+    return layoutStore.shortcutBar
+  }
+
+  get items() {
+    return tabStore.recentTabs
+  }
+
   get filter() {
     return (item: Tab, queryText: string, itemText: string) => {
       return (
@@ -56,6 +64,7 @@ export default class ShortcutBar extends Vue {
       )
     }
   }
+
   get menuProps() {
     return {
       closeOnClick: false,
@@ -68,12 +77,6 @@ export default class ShortcutBar extends Vue {
       maxWidth: this.width
     }
   }
-  get shortcutBar() {
-    return layoutStore.shortcutBar
-  }
-  get tabs() {
-    return tabStore.recentTabs
-  }
 
   @Watch('shortcutBar')
   onShortcutBarChanged(value: boolean) {
@@ -84,13 +87,13 @@ export default class ShortcutBar extends Vue {
             layoutStore.hideShortcutBar()
           }
         })
-        this.width = (<HTMLElement>this.$el).offsetWidth
+        this.width = (this.$el as HTMLElement).offsetWidth
       })
     }
   }
 
   mounted() {
-    this.width = (<HTMLElement>this.$el).offsetWidth
+    this.width = (this.$el as HTMLElement).offsetWidth
     this.$eventBus.$on('focusShortcut', this.focus)
   }
 
@@ -105,9 +108,10 @@ export default class ShortcutBar extends Vue {
         el.focus()
         el.select()
       }
-      ;(<any>this.autocomplete).isMenuActive = true
+      ;(this.autocomplete as any).isMenuActive = true
     })
   }
+
   onChange(value: string) {
     tabStore.activateTab({ id: value, viewId: tabStore.activeViewId })
     layoutStore.hideShortcutBar()
@@ -122,6 +126,7 @@ export default class ShortcutBar extends Vue {
 ::v-deep .v-list-item {
   min-height: 36px;
   .v-list-item__icon {
+    height: unset;
     min-width: unset;
   }
 }

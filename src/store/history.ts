@@ -12,7 +12,7 @@ export default class HistoryModule extends VuexModule {
 
   get sortedHistoryItems() {
     return this.historyItems.slice().sort((a, b) => {
-      return a.updatedAt > b.updatedAt ? 1 : -1
+      return a.updatedAt < b.updatedAt ? 1 : -1
     })
   }
 
@@ -52,11 +52,13 @@ export default class HistoryModule extends VuexModule {
     }
     this.setHistoryItems({ historyItems })
   }
+
   @Action
   deleteHistoryItem({ id }: { id: string }) {
     const historyItems = this.historyItems.filter((item) => item.id !== id)
     this.setHistoryItems({ historyItems })
   }
+
   @Action
   clearHistoryItems() {
     this.setHistoryItems({ historyItems: [] })

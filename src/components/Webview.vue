@@ -16,7 +16,6 @@ const urlWithoutHash = (url: string) => {
 @Component
 export default class Webview extends Vue {
   @Prop({ type: Object, required: true }) readonly tab!: Tab
-  @Prop({ type: String, required: true }) readonly viewId!: string
 
   src = ''
   needFocus = false
@@ -25,20 +24,26 @@ export default class Webview extends Vue {
   get preload() {
     return `file://${remote.app.getAppPath()}/preload.js`
   }
+
   get active() {
-    return tabStore.isActiveTab({ id: this.tab.id, viewId: this.viewId })
-  }
-  get display() {
-    return this.active ? 'flex' : 'none'
+    return tabStore.isActiveTab({ id: this.tab.id })
   }
 
-  @Watch('active')
-  onActiveChanged(value: boolean) {
+  get viewId() {
+    return tabStore.getViewId({ tabId: this.tab.id })
+  }
+
+  get id() {
+    return this.viewId ? `${this.viewId}-webview` : ''
+  }
+
+  @Watch('viewId')
+  onViewIdChanged(value: boolean) {
     if (value) {
       this.init()
     }
     this.$nextTick(() => {
-      this.webview.style.display = this.display
+      this.webview.id = this.id
       // TODO: the accelerator is not worked if the active tab is changed
       this.webview.blur()
       if (value) {
@@ -50,10 +55,7 @@ export default class Webview extends Vue {
   }
 
   mounted() {
-    if (
-      this.active ||
-      (!this.tab.loaded && tabStore.isActiveView({ id: this.viewId }))
-    ) {
+    if (this.active || !this.tab.loaded) {
       this.init()
     }
   }
@@ -85,11 +87,11 @@ export default class Webview extends Vue {
 
     this.webview = document.createElement('webview')
     this.webview.classList.add('fill-height')
+    this.webview.id = this.id
     this.webview.src = this.tab.url
     this.webview.preload = this.preload
     this.webview.allowpopups = true
     this.webview.webpreferences = 'nativeWindowOpen, scrollBounce'
-    this.webview.style.display = this.display
     this.$el.parentElement!.append(this.webview)
 
     this.needFocus = true
@@ -253,12 +255,14 @@ export default class Webview extends Vue {
             })
             break
           }
-          case 'activateView':
-            tabStore.activateView({ id: this.viewId })
+          case 'focus': {
+            const viewId = tabStore.activeViewId
+            tabStore.activateTab({ id: this.tab.id, viewId })
             break
-          case 'activateTab':
+          }
+          case 'onclick':
             tabStore.activateView({ id: this.viewId })
-            tabStore.activateTab({ id: this.tab.id, viewId: this.viewId })
+            this.$eventBus.$emit('hideQueryHistory')
             break
           case 'onkeydown': {
             const [e] = args
@@ -285,43 +289,51 @@ export default class Webview extends Vue {
       })
     })
   }
+
   undo({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.undo()
     }
   }
+
   redo({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.redo()
     }
   }
+
   goBack({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.goBack()
     }
   }
+
   goForward({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.goForward()
     }
   }
+
   goToOffset({ viewId, offset }: { viewId: string; offset: number }) {
     if (this.active && this.viewId === viewId) {
       this.webview.goToOffset(offset)
     }
   }
+
   reload({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.needFocus = true
       this.webview.reload()
     }
   }
+
   forceReload({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.needFocus = true
       this.webview.reloadIgnoringCache()
     }
   }
+
   load({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       const query = this.tab.query
@@ -331,11 +343,13 @@ export default class Webview extends Vue {
       }
     }
   }
+
   download({ viewId, url }: { viewId: string; url: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.downloadURL(url)
     }
   }
+
   findInPage({
     viewId,
     text,
@@ -351,16 +365,19 @@ export default class Webview extends Vue {
       this.webview.findInPage(text, { forward, findNext })
     }
   }
+
   stopFindInPage({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.stopFindInPage('clearSelection')
     }
   }
+
   resetZoom({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       this.webview.setZoomLevel(0)
     }
   }
+
   zoomIn({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       const level = this.webview.getZoomLevel()
@@ -369,6 +386,7 @@ export default class Webview extends Vue {
       }
     }
   }
+
   zoomOut({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
       const level = this.webview.getZoomLevel()
@@ -377,18 +395,20 @@ export default class Webview extends Vue {
       }
     }
   }
+
   requestBackHistory({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
-      const contents = <any>this.webview.getWebContents()
+      const contents = this.webview.getWebContents() as any
       const history = contents.history
         .slice(0, contents.getActiveIndex())
         .reverse()
       this.$eventBus.$emit('showBackHistory', { viewId: this.viewId, history })
     }
   }
+
   requestForwardHistory({ viewId }: { viewId: string }) {
     if (this.active && this.viewId === viewId) {
-      const contents = <any>this.webview.getWebContents()
+      const contents = this.webview.getWebContents() as any
       const history = contents.history.slice(contents.getActiveIndex() + 1)
       this.$eventBus.$emit('showForwardHistory', {
         viewId: this.viewId,

@@ -129,9 +129,6 @@ const onContextMenu = (e, target) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('contextmenu', onContextMenu)
-  document.addEventListener('keydown', (e) => {
-    ipcRenderer.sendToHost('onkeydown', { key: e.key })
-  })
   document.addEventListener('dragover', (e) => {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'link'
@@ -143,13 +140,16 @@ document.addEventListener('DOMContentLoaded', () => {
       location.href = url
     }
   })
+  document.addEventListener('keydown', (e) => {
+    ipcRenderer.sendToHost('onkeydown', { key: e.key })
+  })
   document.addEventListener('click', () => {
-    ipcRenderer.sendToHost('activateView')
+    ipcRenderer.sendToHost('onclick')
   })
   document.querySelectorAll('iframe').forEach((el) => {
     try {
       el.contentWindow.addEventListener('click', () => {
-        ipcRenderer.sendToHost('activateView')
+        ipcRenderer.sendToHost('onclick')
       })
     } catch (e) {}
   })
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.focus = ((func) => {
   return function(...args) {
-    ipcRenderer.sendToHost('activateTab')
+    ipcRenderer.sendToHost('focus')
     return func.apply(this, args)
   }
 })(window.focus)

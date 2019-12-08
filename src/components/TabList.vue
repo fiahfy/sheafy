@@ -25,6 +25,7 @@ export default class TabPane extends Vue {
   get model() {
     return this.tabs
   }
+
   set model(value) {
     const ids = value.map((tab) => tab.id)
     tabStore.sortTabs({ ids })
@@ -33,7 +34,7 @@ export default class TabPane extends Vue {
   onEnd() {
     // Remove ripples if stop sorting
     this.$el.querySelectorAll('.v-ripple__container').forEach((el) => {
-      ;(<HTMLSpanElement>el).style.display = 'none'
+      ;(el as HTMLSpanElement).style.display = 'none'
     })
   }
 }

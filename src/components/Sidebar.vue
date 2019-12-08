@@ -30,15 +30,19 @@ export default class Sidebar extends Vue {
     { id: 'downloads', component: DownloadPanel },
     { id: 'settings', component: SettingsPanel }
   ]
+
   get width() {
     return settingsStore.sidebarWidth
   }
+
   set width(value) {
     settingsStore.setSidebarWidth({ sidebarWidth: value })
   }
+
   get classes() {
     return settingsStore.sidebarLocation === 'right' ? 'resizer--right' : ''
   }
+
   get panelId() {
     return layoutStore.panelId
   }
@@ -52,7 +56,7 @@ export default class Sidebar extends Vue {
       if (width < 256 || width > window.innerWidth - 256) {
         return
       }
-      ;(<HTMLElement>this.$el).style.width = width + 'px'
+      ;(this.$el as HTMLElement).style.width = width + 'px'
     }
 
     this.resizer.addEventListener('mousedown', () => {
@@ -68,7 +72,7 @@ export default class Sidebar extends Vue {
       }
       this.resizing = false
       layoutStore.setResizing({ resizing: false })
-      this.width = (<HTMLElement>this.$el).offsetWidth
+      this.width = (this.$el as HTMLElement).offsetWidth
       document.body.style.cursor = ''
       document.removeEventListener('mousemove', resize)
     })

@@ -16,9 +16,9 @@
         <span class="secondary--text" v-text="startedAt" />
       </v-list-item-title>
       <v-list-item-subtitle>
-        <span class="text--primary">{{ sizeText }}</span>
+        <span class="text--primary" v-text="sizeText" />
         <span v-if="statusText" class="text-capitalize">
-          &mdash; {{ statusText }}
+          — {{ statusText }}
         </span>
       </v-list-item-subtitle>
     </v-list-item-content>
@@ -118,9 +118,11 @@ export default class DownloadListItem extends Vue {
         return 'mdi-file-outline'
     }
   }
+
   get startedAt() {
     return new Date(this.item.startTime).toLocaleDateString()
   }
+
   get sizeText() {
     if (['progressing', 'paused', 'interrupted'].includes(this.item.status)) {
       return (
@@ -131,6 +133,7 @@ export default class DownloadListItem extends Vue {
     }
     return prettyBytes(this.item.receivedBytes || 0)
   }
+
   get statusText() {
     return ['paused', 'interrupted', 'cancelled', 'failed'].includes(
       this.item.status
@@ -138,21 +141,27 @@ export default class DownloadListItem extends Vue {
       ? this.item.status
       : ''
   }
+
   get canPause() {
     return downloadStore.canPause({ id: this.item.id })
   }
+
   get canResume() {
     return downloadStore.canResume({ id: this.item.id })
   }
+
   get canCancel() {
     return downloadStore.canCancel({ id: this.item.id })
   }
+
   get canShowInFolder() {
     return downloadStore.canShowInFolder({ id: this.item.id })
   }
+
   get canRetry() {
     return downloadStore.canRetry({ id: this.item.id })
   }
+
   get canDelete() {
     return downloadStore.canDelete({ id: this.item.id })
   }
@@ -162,27 +171,34 @@ export default class DownloadListItem extends Vue {
       shell.openItem(this.item.filepath)
     }
   }
+
   onClickPause() {
     ipcRenderer.send('pauseDownload', this.item.id)
   }
+
   onClickResume() {
     ipcRenderer.send('resumeDownload', this.item.id)
   }
+
   onClickCancel() {
     ipcRenderer.send('cancelDownload', this.item.id)
   }
+
   onClickShowInFolder() {
     shell.showItemInFolder(this.item.filepath)
   }
+
   onClickRetry() {
     this.$eventBus.$emit('download', {
       viewId: tabStore.activeViewId,
       url: this.item.url
     })
   }
+
   onClickDelete() {
     downloadStore.deleteDownloadItem({ id: this.item.id })
   }
+
   onContextMenu() {
     let template: MenuItemConstructorOptions[] = []
 
@@ -259,3 +275,14 @@ export default class DownloadListItem extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.download-list-item {
+  &:hover ::v-deep .v-list-item__title > .secondary--text {
+    display: none;
+  }
+  &:not(:hover) ::v-deep .v-list-item__action {
+    display: none;
+  }
+}
+</style>

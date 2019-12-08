@@ -5,7 +5,7 @@
     @click="onClickItem"
     @contextmenu.stop="onContextMenu"
   >
-    <v-list-item-icon class="mr-3 align-self-center">
+    <v-list-item-icon class="mr-3 align-center">
       <favicon :url="item.favicon" />
     </v-list-item-icon>
 
@@ -14,7 +14,7 @@
         <span class="text-truncate mr-3" v-text="item.title" />
       </v-list-item-title>
       <v-list-item-subtitle class="d-flex">
-        <span>{{ item.host }}</span>
+        <span v-text="item.host" />
         <v-spacer />
         <span class="secondary--text" v-text="updatedAt" />
       </v-list-item-subtitle>

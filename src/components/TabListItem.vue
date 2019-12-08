@@ -7,7 +7,7 @@
     @click="onClick"
     @contextmenu.stop="onContextMenu"
   >
-    <v-list-item-icon class="mr-3 align-self-center">
+    <v-list-item-icon class="my-0 mr-3 align-self-center">
       <favicon :url="tab.favicon" :loading="tab.loading" />
     </v-list-item-icon>
     <v-list-item-content>
@@ -44,22 +44,30 @@ export default class TabListItem extends Vue {
   get active() {
     return tabStore.isActiveTab({ id: this.tab.id })
   }
+
   get title() {
     return this.app ? this.tab.host : this.tab.title
   }
+
   get badge() {
     return this.tab.badge > 99 ? '99+' : String(this.tab.badge)
   }
 
   onClick(e: MouseEvent) {
+    const activeViewId = tabStore.activeViewId
+    const inactiveViewId =
+      activeViewId === 'secondary' ? 'primary' : 'secondary'
     tabStore.activateTab({
       id: this.tab.id,
-      viewId: e.altKey ? 'secondary' : 'primary'
+      viewId: e.altKey ? inactiveViewId : activeViewId
     })
+    tabStore.activateView({ id: e.altKey ? inactiveViewId : activeViewId })
   }
+
   onClickClose() {
     tabStore.closeTab({ id: this.tab.id })
   }
+
   onContextMenu() {
     this.$contextMenu.show([
       {
@@ -102,6 +110,7 @@ export default class TabListItem extends Vue {
     opacity: 0;
   }
   .v-list-item__icon {
+    height: unset;
     min-width: unset;
   }
 }

@@ -52,25 +52,33 @@ export default class TabModule extends VuexModule {
   sortedHosts: string[] = []
   sortedIdsOnHost: { [host: string]: string[] } = {}
 
-  get secondaryView() {
+  get multiView() {
     return !!this.activeTabIds.secondary
   }
+
+  get duplicatedView() {
+    return this.activeTabIds.primary === this.activeTabIds.secondary
+  }
+
   get canCloseView() {
     return !!this.activeTabIds.primary && !!this.activeTabIds.secondary
   }
+
   get totalBadges() {
     return this.tabs.reduce((carry, tab) => carry + tab.badge, 0)
   }
+
   get sortedTabs() {
     return this.tabs.slice().sort(createTabSort(this.sortedIds))
   }
+
   get sortedApps() {
     return Object.values(
-      this.tabs.slice().reduce((carry: { [key: string]: App }, tab) => {
+      this.tabs.slice().reduce((carry: { [host: string]: App }, tab) => {
         if (carry[tab.host]) {
           return {
             ...carry,
-            [tab.host]: <App>{
+            [tab.host]: {
               ...carry[tab.host],
               tabs: [...carry[tab.host].tabs, tab]
             }
@@ -78,7 +86,7 @@ export default class TabModule extends VuexModule {
         }
         return {
           ...carry,
-          [tab.host]: <App>{
+          [tab.host]: {
             host: tab.host,
             favicon: tab.favicon,
             tabs: [tab]
@@ -96,6 +104,7 @@ export default class TabModule extends VuexModule {
         }
       })
   }
+
   get recentTabs() {
     const recentIds = Object.keys(this.tabHistories)
       .reduce((carry: TabHistoryItem[], viewId) => {
@@ -113,51 +122,72 @@ export default class TabModule extends VuexModule {
       }, [])
     return this.tabs.slice().sort(createTabSort(recentIds))
   }
+
   get getTab() {
     return ({ id }: { id: string }) => this.tabs.find((tab) => tab.id === id)
   }
+
   get getTabWithIndex() {
     return ({ index }: { index: number }): Tab | undefined =>
       this.sortedTabs[index]
   }
+
   get getTabIndex() {
     return ({ id }: { id: string }) =>
       this.sortedTabs.findIndex((tab) => tab.id === id)
   }
+
   get getActiveTab() {
     return ({ viewId }: { viewId: string }) => {
       const id = this.activeTabIds[viewId]
       return this.getTab({ id })
     }
   }
+
   get getActiveTabIndex() {
     return ({ viewId }: { viewId: string }) => {
       const id = this.activeTabIds[viewId]
       return this.getTabIndex({ id })
     }
   }
+
   get isActiveView() {
     return ({ id }: { id: string }) => id === this.activeViewId
   }
+
   get isActiveTab() {
-    return ({ id, viewId }: { id: string; viewId?: string }) => {
-      return viewId === undefined
-        ? Object.values(this.activeTabIds).includes(id)
-        : this.activeTabIds[viewId] === id
+    return ({ id }: { id: string }) => {
+      return Object.values(this.activeTabIds).includes(id)
     }
   }
+
+  get getViewId() {
+    return ({ tabId }: { tabId: string }) => {
+      return Object.entries(this.activeTabIds)
+        .reverse()
+        .reduce((carry: { [tabId: string]: string }, [key, value]) => {
+          return {
+            ...carry,
+            [value]: key
+          }
+        }, {})[tabId]
+    }
+  }
+
   get getTabHistory() {
     return ({ viewId }: { viewId: string }) => {
       const history = this.tabHistories[viewId]
       return history === undefined ? [] : history
     }
   }
+
   get getTabHistoryIndex() {
     return ({ viewId }: { viewId: string }) => {
       const index = this.tabHistoryIndexes[viewId]
       return index === undefined ? -1 : index
     }
   }
+
   get getBackTabHistory() {
     return ({ viewId }: { viewId: string }) => {
       const history = this.getTabHistory({ viewId })
@@ -168,6 +198,7 @@ export default class TabModule extends VuexModule {
         .reverse()
     }
   }
+
   get getForwardTabHistory() {
     return ({ viewId }: { viewId: string }) => {
       const history = this.getTabHistory({ viewId })
@@ -177,6 +208,7 @@ export default class TabModule extends VuexModule {
         .map((item) => this.getTab({ id: item.id }))
     }
   }
+
   get getCanGoBackTab() {
     return ({ viewId }: { viewId: string }) => {
       const history = this.getTabHistory({ viewId })
@@ -184,6 +216,7 @@ export default class TabModule extends VuexModule {
       return !!history[index]
     }
   }
+
   get getCanGoForwardTab() {
     return ({ viewId }: { viewId: string }) => {
       const history = this.getTabHistory({ viewId })
@@ -196,10 +229,12 @@ export default class TabModule extends VuexModule {
   setTabs({ tabs }: { tabs: Tab[] }) {
     this.tabs = tabs
   }
+
   @Mutation
   setActiveViewId({ activeViewId }: { activeViewId: string }) {
     this.activeViewId = activeViewId
   }
+
   @Mutation
   setActiveTabId({
     activeTabId,
@@ -213,6 +248,7 @@ export default class TabModule extends VuexModule {
       [viewId]: activeTabId
     }
   }
+
   @Mutation
   setTabHistory({
     tabHistory,
@@ -226,6 +262,7 @@ export default class TabModule extends VuexModule {
       [viewId]: tabHistory
     }
   }
+
   @Mutation
   setTabHistoryIndex({
     tabHistoryIndex,
@@ -239,14 +276,17 @@ export default class TabModule extends VuexModule {
       [viewId]: tabHistoryIndex
     }
   }
+
   @Mutation
   setSortedIds({ sortedIds }: { sortedIds: string[] }) {
     this.sortedIds = sortedIds
   }
+
   @Mutation
   setSortedHosts({ sortedHosts }: { sortedHosts: string[] }) {
     this.sortedHosts = sortedHosts
   }
+
   @Mutation
   setSortedIdsOnHost({
     sortedIdsOnHost
@@ -328,12 +368,14 @@ export default class TabModule extends VuexModule {
       this.activateTab({ id, viewId })
     }
   }
+
   @Action
   newTabIfEmpty() {
     if (!this.tabs.length) {
       this.newTab()
     }
   }
+
   @Action
   duplicateTab({ id }: { id: string }) {
     const tab = this.getTab({ id })
@@ -344,6 +386,7 @@ export default class TabModule extends VuexModule {
       })
     }
   }
+
   @Action
   updateTab({ id, ...params }: Partial<Tab>) {
     const tabs = this.tabs.map((tab) => {
@@ -354,6 +397,7 @@ export default class TabModule extends VuexModule {
     })
     this.setTabs({ tabs })
   }
+
   @Action
   activateTab({ id, viewId }: { id: string; viewId: string }) {
     if (id === this.activeTabIds[viewId]) {
@@ -376,6 +420,7 @@ export default class TabModule extends VuexModule {
       viewId
     })
   }
+
   @Action
   closeTabs({ ids }: { ids: string[] }) {
     // TODO: MV
@@ -391,7 +436,10 @@ export default class TabModule extends VuexModule {
       //   this.activateTabIndex({ index })
       // }
     ;['primary', 'secondary'].forEach((viewId) => {
-      if (!existIds.includes(this.activeTabIds[viewId])) {
+      if (
+        this.activeTabIds[viewId] &&
+        !existIds.includes(this.activeTabIds[viewId])
+      ) {
         const tab = this.getTabWithIndex({ index: 0 })
         if (tab) {
           this.activateTab({ id: tab.id, viewId })
@@ -415,6 +463,7 @@ export default class TabModule extends VuexModule {
       remote.getCurrentWindow().close()
     }
   }
+
   @Action
   closeTab({ id }: { id: string }) {
     // TODO: MV
@@ -432,6 +481,7 @@ export default class TabModule extends VuexModule {
     })
     this.closeTabs({ ids: [id] })
   }
+
   @Action
   closeApp({ host }: { host: string }) {
     const ids = this.tabs
@@ -439,10 +489,12 @@ export default class TabModule extends VuexModule {
       .map((tab) => tab.id)
     this.closeTabs({ ids })
   }
+
   @Action
   activateView({ id }: { id: string }) {
     this.setActiveViewId({ activeViewId: id })
   }
+
   @Action
   closeView({ id }: { id: string }) {
     if (id === 'primary') {
@@ -462,16 +514,20 @@ export default class TabModule extends VuexModule {
       this.setTabHistory({ tabHistory: [], viewId: 'secondary' })
       this.setTabHistoryIndex({ tabHistoryIndex: -1, viewId: 'secondary' })
     }
+    this.setActiveViewId({ activeViewId: 'primary' })
     this.setActiveTabId({ activeTabId: '', viewId: 'secondary' })
   }
+
   @Action
   sortTabs({ ids }: { ids: string[] }) {
     this.setSortedIds({ sortedIds: ids })
   }
+
   @Action
   sortApps({ hosts }: { hosts: string[] }) {
     this.setSortedHosts({ sortedHosts: hosts })
   }
+
   @Action
   sortTabsOnApp({ ids, host }: { ids: string[]; host: string }) {
     const sortedIdsOnHost = {
@@ -480,6 +536,7 @@ export default class TabModule extends VuexModule {
     }
     this.setSortedIdsOnHost({ sortedIdsOnHost })
   }
+
   @Action
   goToOffsetTab({ offset, viewId }: { offset: number; viewId: string }) {
     const index = this.getTabHistoryIndex({ viewId }) + offset
@@ -491,14 +548,17 @@ export default class TabModule extends VuexModule {
     this.setActiveTabId({ activeTabId: historyItem.id, viewId })
     this.setTabHistoryIndex({ tabHistoryIndex: index, viewId })
   }
+
   @Action
   goBackTab({ viewId }: { viewId: string }) {
     this.goToOffsetTab({ offset: -1, viewId })
   }
+
   @Action
   goForwardTab({ viewId }: { viewId: string }) {
     this.goToOffsetTab({ offset: 1, viewId })
   }
+
   @Action
   goNextTab({ viewId }: { viewId: string }) {
     let index = this.getActiveTabIndex({ viewId }) + 1
@@ -511,6 +571,7 @@ export default class TabModule extends VuexModule {
     }
     this.activateTab({ id: tab.id, viewId })
   }
+
   @Action
   goPreviousTab({ viewId }: { viewId: string }) {
     let index = this.getActiveTabIndex({ viewId }) - 1

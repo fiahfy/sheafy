@@ -1,16 +1,36 @@
 <template>
-  <v-text-field
+  <v-combobox
+    ref="combobox"
     v-model="query"
-    filled
-    rounded
-    hide-details
     class="toolbar-text-field body-2"
     name="query"
+    filled
+    dense
+    hide-details
+    append-icon=""
+    item-text="title"
+    item-value="url"
+    :rounded="rounded"
+    :return-object="false"
+    :items="items"
+    :filter="filter"
+    :menu-props="menuProps"
+    @change="onChange"
     @mousedown="onMouseDown"
     @mouseup="onMouseUp"
-    @keypress.enter="onKeyPressEnter"
     @contextmenu.stop="onContextMenu"
   >
+    <template v-slot:item="{ item }">
+      <v-list-item-icon class="mr-3 align-self-center">
+        <favicon :url="item.favicon" />
+      </v-list-item-icon>
+      <v-list-item-content>
+        <v-list-item-title class="font-weight-regular caption">
+          <span v-text="item.title" />
+          <span class="secondary--text">— {{ item.url }}</span>
+        </v-list-item-title>
+      </v-list-item-content>
+    </template>
     <v-icon slot="prepend-inner" small v-text="icon" />
     <v-btn
       v-if="activeTab && activeTab.finding"
@@ -36,32 +56,75 @@
     >
       <v-icon small>mdi-magnify-plus-outline</v-icon>
     </v-btn>
-  </v-text-field>
+  </v-combobox>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import { tabStore } from '~/store'
+import { VCombobox } from 'vuetify/lib'
+import { Vue, Component, Prop, Ref } from 'vue-property-decorator'
+import { tabStore, historyStore } from '~/store'
+import HistoryItem from '~/models/history-item'
+import Favicon from '~/components/Favicon.vue'
 
-@Component
+@Component({
+  components: {
+    Favicon
+  }
+})
 export default class ToolbarTextField extends Vue {
   @Prop({ type: String, required: true }) readonly viewId!: string
+  @Ref() readonly combobox!: typeof VCombobox
 
+  width = 0
   focusIn = false
 
   get activeTab() {
     return tabStore.getActiveTab({ viewId: this.viewId })
   }
+
   get query() {
     const tab = this.activeTab
     return tab ? tab.query : ''
   }
+
   set query(value) {
     const tab = this.activeTab
     if (tab) {
       tabStore.updateTab({ id: tab.id, query: value })
     }
   }
+
+  get rounded() {
+    // TODO: return false if menu is open
+    return true
+  }
+
+  get items() {
+    return historyStore.sortedHistoryItems
+  }
+
+  get filter() {
+    return (item: HistoryItem, queryText: string, itemText: string) => {
+      return (
+        itemText.toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) ||
+        item.url.toLocaleLowerCase().includes(queryText.toLocaleLowerCase())
+      )
+    }
+  }
+
+  get menuProps() {
+    return {
+      closeOnClick: false,
+      closeOnContentClick: false,
+      openOnClick: false,
+      maxHeight: 480,
+      offsetY: true,
+      offsetOverflow: true,
+      transition: false,
+      maxWidth: this.width
+    }
+  }
+
   get icon() {
     const tab = this.activeTab
     const url = tab ? tab.url : ''
@@ -74,10 +137,12 @@ export default class ToolbarTextField extends Vue {
 
   mounted() {
     this.$eventBus.$on('focusLocation', this.focus)
+    this.$eventBus.$on('hideQueryHistory', this.hideQueryHistory)
   }
 
   destroyed() {
     this.$eventBus.$off('focusLocation', this.focus)
+    this.$eventBus.$off('hideQueryHistory', this.hideQueryHistory)
   }
 
   focus({ viewId }: { viewId: string }) {
@@ -92,6 +157,11 @@ export default class ToolbarTextField extends Vue {
       }
     })
   }
+
+  hideQueryHistory() {
+    ;(this.combobox as any).isMenuActive = false
+  }
+
   onContextMenu() {
     this.$contextMenu.show([
       { role: 'cut' },
@@ -99,26 +169,36 @@ export default class ToolbarTextField extends Vue {
       { role: 'paste' }
     ])
   }
+
+  onChange() {
+    this.hideQueryHistory()
+    const input = this.$el.querySelector('input')!
+    input.blur()
+    this.$nextTick(() => {
+      this.$eventBus.$emit('load', { viewId: this.viewId })
+    })
+  }
+
   onMouseDown(e: MouseEvent) {
+    // adjust menu width
+    this.width = (this.$el as HTMLElement).offsetWidth
+
     const input = e.target
     if (input === document.activeElement) {
       return
     }
-    ;(<Window>window).getSelection()!.empty()
+    ;(window as Window).getSelection()!.empty()
     this.focusIn = true
   }
+
   onMouseUp(e: MouseEvent) {
-    const input = <HTMLInputElement>e.target
-    if (this.focusIn && !(<Window>window).getSelection()!.toString()) {
+    const input = e.target as HTMLInputElement
+    if (this.focusIn && !(window as Window).getSelection()!.toString()) {
       input.select()
     }
     this.focusIn = false
   }
-  onKeyPressEnter(e: KeyboardEvent) {
-    const input = <HTMLInputElement>e.target
-    input.blur()
-    this.$eventBus.$emit('load', { viewId: this.viewId })
-  }
+
   onClickFind() {
     const tab = this.activeTab
     if (tab) {
@@ -137,13 +217,22 @@ export default class ToolbarTextField extends Vue {
     padding-right: 8px;
     align-self: center;
   }
-  > .v-text-field__slot > input {
-    padding: 4px 0;
-    margin-top: 0;
+  > .v-select__slot {
+    > input {
+      padding: 4px 0;
+      margin-top: 0 !important;
+    }
+    > .v-input__append-inner {
+      margin-top: 0;
+      align-self: center;
+    }
   }
-  > .v-input__append-inner {
-    margin-top: 0;
-    align-self: center;
+}
+::v-deep .v-list-item {
+  min-height: 36px;
+  .v-list-item__icon {
+    height: unset;
+    min-width: unset;
   }
 }
 </style>

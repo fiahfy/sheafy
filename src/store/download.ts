@@ -14,11 +14,13 @@ export default class DownloadModule extends VuexModule {
       return this.downloadItems.find((item) => item.id === id)
     }
   }
+
   get canPause() {
     return ({ id }: { id: string }): boolean => {
       return ['progressing'].includes(this.getDownloadItem({ id })!.status)
     }
   }
+
   get canResume() {
     return ({ id }: { id: string }): boolean => {
       return ['paused', 'interrupted'].includes(
@@ -26,6 +28,7 @@ export default class DownloadModule extends VuexModule {
       )
     }
   }
+
   get canCancel() {
     return ({ id }: { id: string }): boolean => {
       return ['progressing', 'paused', 'interrupted'].includes(
@@ -33,11 +36,13 @@ export default class DownloadModule extends VuexModule {
       )
     }
   }
+
   get canShowInFolder() {
     return ({ id }: { id: string }): boolean => {
       return ['completed'].includes(this.getDownloadItem({ id })!.status)
     }
   }
+
   get canRetry() {
     return ({ id }: { id: string }): boolean => {
       return ['cancelled', 'failed'].includes(
@@ -45,6 +50,7 @@ export default class DownloadModule extends VuexModule {
       )
     }
   }
+
   get canDelete() {
     return ({ id }: { id: string }): boolean => {
       // also clear invalid object
@@ -77,6 +83,7 @@ export default class DownloadModule extends VuexModule {
     }
     this.setDownloadItems({ downloadItems })
   }
+
   @Action
   deleteDownloadItem({ id }: { id: string }) {
     const downloadItems = this.downloadItems.filter(
@@ -84,6 +91,7 @@ export default class DownloadModule extends VuexModule {
     )
     this.setDownloadItems({ downloadItems })
   }
+
   @Action
   clearDownloads() {
     const downloadItems = this.downloadItems.filter(

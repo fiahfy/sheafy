@@ -85,6 +85,11 @@ const createTemplate = () => {
           click: () => send('showApps')
         },
         {
+          label: 'History',
+          accelerator: 'CmdOrCtrl+Shift+H',
+          click: () => send('showHistory')
+        },
+        {
           label: 'Downloads',
           accelerator: 'CmdOrCtrl+Shift+D',
           click: () => send('showDownloads')
@@ -177,7 +182,7 @@ const createTemplate = () => {
 
   if (process.platform === 'darwin') {
     template.unshift({
-      label: app.getName(),
+      label: app.name,
       submenu: [
         { role: 'about' },
         { type: 'separator' },
@@ -333,7 +338,6 @@ const createWindow = async () => {
       startTime: Math.floor(downloadItem.getStartTime() * 1000)
     }
     send('upsertDownloadItem', item)
-    send('showDownloads')
 
     downloadItem.setSavePath(filepath)
     downloadItem.on('updated', (_e, state) => {
