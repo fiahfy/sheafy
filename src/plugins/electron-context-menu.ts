@@ -1,13 +1,18 @@
 import Vue from 'vue'
-import { MenuItemConstructorOptions } from 'electron'
-const show = require('@fiahfy/electron-context-menu').default
+import { open } from '@fiahfy/electron-context-menu'
 
 declare module 'vue/types/vue' {
   interface Vue {
     $contextMenu: {
-      show(template?: MenuItemConstructorOptions[]): void
+      open: typeof open
+      openEditMenu: () => void
     }
   }
 }
 
-Vue.prototype.$contextMenu = { show }
+Vue.prototype.$contextMenu = {
+  open,
+  openEditMenu: () => {
+    open([{ role: 'cut' }, { role: 'copy' }, { role: 'paste' }])
+  }
+}

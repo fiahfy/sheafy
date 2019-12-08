@@ -34,6 +34,7 @@
           outlined
           dense
           hide-details
+          @contextmenu.stop="onContextMenu"
         />
       </template>
     </v-toolbar>
@@ -103,6 +104,10 @@ export default class DownloadPanel extends Vue {
 
   onClickClearAll() {
     downloadStore.clearDownloads()
+  }
+
+  onContextMenu() {
+    this.$contextMenu.openEditMenu()
   }
 
   onScroll(e: Event) {

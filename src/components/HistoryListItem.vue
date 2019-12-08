@@ -65,7 +65,7 @@ export default class HistoryListItem extends Vue {
       }
     ]
 
-    this.$contextMenu.show(template)
+    this.$contextMenu.open(template)
   }
 }
 </script>

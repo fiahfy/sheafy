@@ -163,11 +163,7 @@ export default class ToolbarTextField extends Vue {
   }
 
   onContextMenu() {
-    this.$contextMenu.show([
-      { role: 'cut' },
-      { role: 'copy' },
-      { role: 'paste' }
-    ])
+    this.$contextMenu.openEditMenu()
   }
 
   onChange() {

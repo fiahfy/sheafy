@@ -49,7 +49,7 @@ export default class Layout extends Vue {
   }
 
   onContextMenu() {
-    this.$contextMenu.show()
+    this.$contextMenu.open()
   }
 }
 </script>

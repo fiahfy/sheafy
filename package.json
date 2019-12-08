@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@fiahfy/electron-accelerator-formatter": "^0.0.3",
-    "@fiahfy/electron-context-menu": "^0.0.3",
+    "@fiahfy/electron-context-menu": "^0.0.5",
     "@mdi/font": "^4.6.95",
     "@nuxtjs/vuetify": "^1.9.1",
     "@types/debounce": "^1.2.0",

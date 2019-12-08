@@ -34,6 +34,7 @@
           outlined
           dense
           hide-details
+          @contextmenu.stop="onContextMenu"
         />
       </template>
     </v-toolbar>
@@ -102,6 +103,10 @@ export default class HistoryPanel extends Vue {
 
   onClickClearAll() {
     historyStore.clearHistoryItems()
+  }
+
+  onContextMenu() {
+    this.$contextMenu.openEditMenu()
   }
 
   onScroll(e: Event) {

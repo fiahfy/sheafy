@@ -69,7 +69,7 @@ export default class TabListItem extends Vue {
   }
 
   onContextMenu() {
-    this.$contextMenu.show([
+    this.$contextMenu.open([
       {
         label: 'Open to the Secondary View',
         click: () =>

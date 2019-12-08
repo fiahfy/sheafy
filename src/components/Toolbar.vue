@@ -165,7 +165,7 @@ export default class Toolbar extends Vue {
     if (this.viewId !== viewId) {
       return
     }
-    this.$contextMenu.show(
+    this.$contextMenu.open(
       history.map((title, index) => {
         return {
           label: title,
@@ -189,7 +189,7 @@ export default class Toolbar extends Vue {
     if (this.viewId !== viewId) {
       return
     }
-    this.$contextMenu.show(
+    this.$contextMenu.open(
       history.map((history, index) => {
         return {
           label: history,
@@ -243,7 +243,7 @@ export default class Toolbar extends Vue {
     if (!tab) {
       return
     }
-    this.$contextMenu.show([
+    this.$contextMenu.open([
       {
         label: 'New Tab',
         click: () =>
@@ -275,7 +275,7 @@ export default class Toolbar extends Vue {
   }
 
   onContextMenuBackTab() {
-    this.$contextMenu.show(
+    this.$contextMenu.open(
       tabStore
         .getBackTabHistory({ viewId: this.viewId })
         .map((history, index) => {
@@ -292,7 +292,7 @@ export default class Toolbar extends Vue {
   }
 
   onContextMenuForwardTab() {
-    this.$contextMenu.show(
+    this.$contextMenu.open(
       tabStore
         .getForwardTabHistory({ viewId: this.viewId })
         .map((history, index) => {
