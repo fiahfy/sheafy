@@ -95,6 +95,7 @@ export default class ToolbarTextField extends Vue {
   }
 
   get rounded() {
+    // TODO: return false if menu is open
     return true
   }
 
