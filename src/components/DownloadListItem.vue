@@ -16,7 +16,7 @@
         <span class="secondary--text" v-text="startedAt" />
       </v-list-item-title>
       <v-list-item-subtitle>
-        <span class="text--primary">{{ sizeText }}</span>
+        <span class="text--primary" v-text="sizeText" />
         <span v-if="statusText" class="text-capitalize">
           — {{ statusText }}
         </span>
@@ -275,3 +275,14 @@ export default class DownloadListItem extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.download-list-item {
+  &:hover ::v-deep .v-list-item__title > .secondary--text {
+    display: none;
+  }
+  &:not(:hover) ::v-deep .v-list-item__action {
+    display: none;
+  }
+}
+</style>

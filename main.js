@@ -338,7 +338,6 @@ const createWindow = async () => {
       startTime: Math.floor(downloadItem.getStartTime() * 1000)
     }
     send('upsertDownloadItem', item)
-    send('showDownloads')
 
     downloadItem.setSavePath(filepath)
     downloadItem.on('updated', (_e, state) => {

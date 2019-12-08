@@ -12,14 +12,14 @@
     auto-select-first
     hide-details
     no-data-text="No results found"
-    :items="tabs"
+    :items="items"
     :filter="filter"
     :menu-props="menuProps"
     @change="onChange"
   >
     <template v-slot:item="{ item }">
       <v-list-item-icon class="mr-3 align-self-center">
-        <favicon :url="item.favicon" :loading="item.loading" />
+        <favicon :url="item.favicon" />
       </v-list-item-icon>
       <v-list-item-content>
         <v-list-item-title
@@ -48,6 +48,14 @@ export default class ShortcutBar extends Vue {
 
   width = 0
 
+  get shortcutBar() {
+    return layoutStore.shortcutBar
+  }
+
+  get items() {
+    return tabStore.recentTabs
+  }
+
   get filter() {
     return (item: Tab, queryText: string, itemText: string) => {
       return (
@@ -68,14 +76,6 @@ export default class ShortcutBar extends Vue {
       transition: false,
       maxWidth: this.width
     }
-  }
-
-  get shortcutBar() {
-    return layoutStore.shortcutBar
-  }
-
-  get tabs() {
-    return tabStore.recentTabs
   }
 
   @Watch('shortcutBar')

@@ -255,12 +255,14 @@ export default class Webview extends Vue {
             })
             break
           }
-          case 'activateView':
-            tabStore.activateView({ id: this.viewId })
+          case 'focus': {
+            const viewId = tabStore.activeViewId
+            tabStore.activateTab({ id: this.tab.id, viewId })
             break
-          case 'activateTab':
+          }
+          case 'onclick':
             tabStore.activateView({ id: this.viewId })
-            tabStore.activateTab({ id: this.tab.id, viewId: this.viewId })
+            this.$eventBus.$emit('hideQueryHistory')
             break
           case 'onkeydown': {
             const [e] = args

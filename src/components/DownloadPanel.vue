@@ -77,19 +77,19 @@ export default class DownloadPanel extends Vue {
   perPage = 100
 
   get items() {
-    const items = downloadStore.downloadItems
-    if (!this.lazySearchText) {
-      return items
-    }
-    const words = this.lazySearchText.replace(/\s+/, ' ').split(' ')
-    return items.filter((item) => {
-      return words.every((word) => {
-        return (
-          (item.url || '').includes(word) ||
-          (item.filename || '').includes(word)
-        )
+    let items = downloadStore.downloadItems
+    if (this.lazySearchText) {
+      const words = this.lazySearchText.replace(/\s+/, ' ').split(' ')
+      items = items.filter((item) => {
+        return words.every((word) => {
+          return (
+            (item.url || '').includes(word) ||
+            (item.filename || '').includes(word)
+          )
+        })
       })
-    })
+    }
+    return items.slice().reverse()
   }
 
   get pagingItems() {

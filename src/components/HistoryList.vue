@@ -1,10 +1,6 @@
 <template>
   <v-list two-line dense class="history-list py-0">
-    <history-list-item
-      v-for="item of items.slice().reverse()"
-      :key="item.key"
-      :item="item"
-    />
+    <history-list-item v-for="item of items" :key="item.key" :item="item" />
   </v-list>
 </template>
 
