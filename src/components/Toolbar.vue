@@ -55,7 +55,7 @@
       height="32"
       class="ml-1"
       title="Close View"
-      @click="onClickCloseView"
+      @click.stop="onClickCloseView"
     >
       <v-icon size="20">mdi-close</v-icon>
     </v-btn>
