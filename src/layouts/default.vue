@@ -28,13 +28,19 @@ export default class Layout extends Vue {
     }
   }
 
-  mounted() {
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        layoutStore.hideShortcutBar()
-      }
+  created() {
+    ;(window as any).onNuxtReady(() => {
+      tabStore.newTabIfEmpty()
     })
+  }
+
+  mounted() {
     this.$vuetify.theme.dark = this.darkTheme
+    document.addEventListener('keydown', this.onKeyDown)
+  }
+
+  destroyed() {
+    document.removeEventListener('keydown', this.onKeyDown)
   }
 
   @Watch('darkTheme')
@@ -42,10 +48,10 @@ export default class Layout extends Vue {
     this.$vuetify.theme.dark = value
   }
 
-  created() {
-    ;(window as any).onNuxtReady(() => {
-      tabStore.newTabIfEmpty()
-    })
+  onKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      layoutStore.hideShortcutBar()
+    }
   }
 
   onContextMenu() {

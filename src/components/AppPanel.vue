@@ -4,7 +4,7 @@
     @dragover.prevent="onDragOver"
     @drop.prevent="onDrop"
   >
-    <div ref="content" :style="{ height: `${height}px` }">
+    <div ref="content" :style="{ height: `${height * 100}%` }">
       <tab-pane class="fill-height" />
     </div>
     <div ref="resizer" class="resizer" />
@@ -28,44 +28,54 @@ import TabPane from '~/components/TabPane.vue'
   }
 })
 export default class AppPanel extends Vue {
-  @Ref() readonly resizer!: HTMLDivElement
   @Ref() readonly content!: HTMLDivElement
+  @Ref() readonly resizer!: HTMLDivElement
 
   resizing = false
+
   get height() {
-    return settingsStore.topContentHeight
+    return settingsStore.tabPaneHeightRatio
   }
 
   set height(value) {
-    settingsStore.setTopContentHeight({ topContentHeight: value })
+    settingsStore.setTabPaneHeightRatio({ tabPaneHeightRatio: value })
   }
 
   mounted() {
-    const resize = (e: MouseEvent) => {
-      const height = e.clientY - this.content.getBoundingClientRect().top
-      if (height < 256 || height > window.innerHeight - 256) {
-        return
-      }
-      this.content.style.height = height + 'px'
+    this.resizer.addEventListener('mousedown', this.onMouseDown)
+    document.addEventListener('mouseup', this.onMouseUp)
+  }
+
+  destroyed() {
+    this.resizer.removeEventListener('mousedown', this.onMouseDown)
+    document.removeEventListener('mouseup', this.onMouseUp)
+  }
+
+  onMouseDown() {
+    this.resizing = true
+    layoutStore.setResizing({ resizing: true })
+    document.body.style.cursor = 'ns-resize'
+    document.addEventListener('mousemove', this.onResize)
+  }
+
+  onMouseUp() {
+    if (!this.resizing) {
+      return
     }
+    this.resizing = false
+    layoutStore.setResizing({ resizing: false })
+    this.height =
+      this.content.offsetHeight / (this.$el as HTMLElement).offsetHeight
+    document.body.style.cursor = ''
+    document.removeEventListener('mousemove', this.onResize)
+  }
 
-    this.resizer.addEventListener('mousedown', () => {
-      this.resizing = true
-      layoutStore.setResizing({ resizing: true })
-      document.body.style.cursor = 'ns-resize'
-      document.addEventListener('mousemove', resize)
-    })
-
-    document.addEventListener('mouseup', () => {
-      if (!this.resizing) {
-        return
-      }
-      this.resizing = false
-      layoutStore.setResizing({ resizing: false })
-      this.height = this.content.offsetHeight
-      document.body.style.cursor = ''
-      document.removeEventListener('mousemove', resize)
-    })
+  onResize(e: MouseEvent) {
+    const height = e.clientY - this.content.getBoundingClientRect().top
+    if (height < 256 || height > (this.$el as HTMLElement).offsetHeight - 256) {
+      return
+    }
+    this.content.style.height = height + 'px'
   }
 
   onDragOver(e: DragEvent) {

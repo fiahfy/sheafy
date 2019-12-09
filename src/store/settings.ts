@@ -10,8 +10,8 @@ export default class SettingsModule extends VuexModule {
   swipeToNavigate = false
   sidebarLocation = 'left'
   sidebarWidth = 256
-  secondaryTabWidthRatio = 0.5
-  topContentHeight = 256
+  secondaryViewWidthRatio = 0.5
+  tabPaneHeightRatio = 0.3
 
   @Mutation
   setDarkTheme({ darkTheme }: { darkTheme: boolean }) {
@@ -34,16 +34,20 @@ export default class SettingsModule extends VuexModule {
   }
 
   @Mutation
-  setSecondaryTabWidthRatio({
-    secondaryTabWidthRatio
+  setSecondaryViewWidthRatio({
+    secondaryViewWidthRatio
   }: {
-    secondaryTabWidthRatio: number
+    secondaryViewWidthRatio: number
   }) {
-    this.secondaryTabWidthRatio = secondaryTabWidthRatio
+    this.secondaryViewWidthRatio = secondaryViewWidthRatio
   }
 
   @Mutation
-  setTopContentHeight({ topContentHeight }: { topContentHeight: number }) {
-    this.topContentHeight = topContentHeight
+  setTabPaneHeightRatio({
+    tabPaneHeightRatio
+  }: {
+    tabPaneHeightRatio: number
+  }) {
+    this.tabPaneHeightRatio = tabPaneHeightRatio
   }
 }

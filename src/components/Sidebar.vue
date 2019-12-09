@@ -48,34 +48,42 @@ export default class Sidebar extends Vue {
   }
 
   mounted() {
-    const resize = (e: MouseEvent) => {
-      const width =
-        settingsStore.sidebarLocation === 'right'
-          ? -e.clientX + this.$el.getBoundingClientRect().right
-          : e.clientX - this.$el.getBoundingClientRect().left
-      if (width < 256 || width > window.innerWidth - 256) {
-        return
-      }
-      ;(this.$el as HTMLElement).style.width = width + 'px'
+    this.resizer.addEventListener('mousedown', this.onMouseDown)
+    document.addEventListener('mouseup', this.onMouseUp)
+  }
+
+  destroyed() {
+    this.resizer.removeEventListener('mousedown', this.onMouseDown)
+    document.removeEventListener('mouseup', this.onMouseUp)
+  }
+
+  onMouseDown() {
+    this.resizing = true
+    layoutStore.setResizing({ resizing: true })
+    document.body.style.cursor = 'ew-resize'
+    document.addEventListener('mousemove', this.onResize)
+  }
+
+  onMouseUp() {
+    if (!this.resizing) {
+      return
     }
+    this.resizing = false
+    layoutStore.setResizing({ resizing: false })
+    this.width = (this.$el as HTMLElement).offsetWidth
+    document.body.style.cursor = ''
+    document.removeEventListener('mousemove', this.onResize)
+  }
 
-    this.resizer.addEventListener('mousedown', () => {
-      this.resizing = true
-      layoutStore.setResizing({ resizing: true })
-      document.body.style.cursor = 'ew-resize'
-      document.addEventListener('mousemove', resize)
-    })
-
-    document.addEventListener('mouseup', () => {
-      if (!this.resizing) {
-        return
-      }
-      this.resizing = false
-      layoutStore.setResizing({ resizing: false })
-      this.width = (this.$el as HTMLElement).offsetWidth
-      document.body.style.cursor = ''
-      document.removeEventListener('mousemove', resize)
-    })
+  onResize(e: MouseEvent) {
+    const width =
+      settingsStore.sidebarLocation === 'right'
+        ? -e.clientX + this.$el.getBoundingClientRect().right
+        : e.clientX - this.$el.getBoundingClientRect().left
+    if (width < 256 || width > window.innerWidth - 256) {
+      return
+    }
+    ;(this.$el as HTMLElement).style.width = width + 'px'
   }
 }
 </script>

@@ -135,11 +135,11 @@ export default class Index extends Vue {
   }
 
   get width() {
-    return settingsStore.secondaryTabWidthRatio
+    return settingsStore.secondaryViewWidthRatio
   }
 
   set width(value) {
-    settingsStore.setSecondaryTabWidthRatio({ secondaryTabWidthRatio: value })
+    settingsStore.setSecondaryViewWidthRatio({ secondaryViewWidthRatio: value })
   }
 
   @Watch('activeTabIds')

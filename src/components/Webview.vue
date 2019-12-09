@@ -78,6 +78,34 @@ export default class Webview extends Vue {
     this.$eventBus.$off('zoomOut', this.zoomOut)
     this.$eventBus.$off('requestBackHistory', this.requestBackHistory)
     this.$eventBus.$off('requestForwardHistory', this.requestForwardHistory)
+
+    this.webview.removeEventListener('load-commit', this.onLoadCommit)
+    this.webview.removeEventListener(
+      'did-navigate-in-page',
+      this.onDidNavigateInPage
+    )
+    this.webview.removeEventListener('did-fail-load', this.onDidFailLoad)
+    this.webview.removeEventListener(
+      'page-title-updated',
+      this.onPageTitleUpdated
+    )
+    this.webview.removeEventListener(
+      'page-favicon-updated',
+      this.onPageFaviconUpdated
+    )
+    this.webview.removeEventListener(
+      'did-start-loading',
+      this.onDidStartLoading
+    )
+    this.webview.removeEventListener('did-stop-loading', this.onDidStopLoading)
+    this.webview.removeEventListener('found-in-page', this.onFoundInPage)
+    this.webview.removeEventListener('new-window', this.onNewWindow)
+    this.webview.removeEventListener('ipc-message', this.onIpcMessage)
+    this.webview.removeEventListener(
+      'update-target-url',
+      this.onUpdateTargetUrl
+    )
+
     this.webview && this.webview.remove()
   }
 
@@ -115,178 +143,205 @@ export default class Webview extends Vue {
     this.$eventBus.$on('requestBackHistory', this.requestBackHistory)
     this.$eventBus.$on('requestForwardHistory', this.requestForwardHistory)
 
-    this.webview.addEventListener('load-commit', ({ url, isMainFrame }) => {
-      if (isMainFrame) {
-        const urlChanged = urlWithoutHash(url) !== urlWithoutHash(this.tab.url)
-        const home = url === homeUrl
-        tabStore.updateTab({
-          id: this.tab.id,
+    this.webview.addEventListener('load-commit', this.onLoadCommit)
+    this.webview.addEventListener(
+      'did-navigate-in-page',
+      this.onDidNavigateInPage
+    )
+    this.webview.addEventListener('did-fail-load', this.onDidFailLoad)
+    this.webview.addEventListener('page-title-updated', this.onPageTitleUpdated)
+    this.webview.addEventListener(
+      'page-favicon-updated',
+      this.onPageFaviconUpdated
+    )
+    this.webview.addEventListener('did-start-loading', this.onDidStartLoading)
+    this.webview.addEventListener('did-stop-loading', this.onDidStopLoading)
+    this.webview.addEventListener('found-in-page', this.onFoundInPage)
+    this.webview.addEventListener('new-window', this.onNewWindow)
+    this.webview.addEventListener('ipc-message', this.onIpcMessage)
+    this.webview.addEventListener('update-target-url', this.onUpdateTargetUrl)
+  }
+
+  onLoadCommit({ url, isMainFrame }: Electron.LoadCommitEvent) {
+    if (isMainFrame) {
+      const urlChanged = urlWithoutHash(url) !== urlWithoutHash(this.tab.url)
+      const home = url === homeUrl
+      tabStore.updateTab({
+        id: this.tab.id,
+        url,
+        canGoBack: this.webview.canGoBack(),
+        canGoForward: this.webview.canGoForward()
+      })
+      if (home) {
+        this.$eventBus.$emit('focusLocation', { viewId: this.viewId })
+      } else if (urlChanged || this.needFocus) {
+        tabStore.updateTab({ id: this.tab.id, query: url })
+        historyStore.upsertHistory({
+          url: this.tab.url,
+          host: this.tab.host
+        })
+        this.needFocus = false
+        // TODO: https://github.com/electron/electron/issues/14474
+        this.webview.blur()
+        this.webview.focus()
+      }
+    }
+  }
+
+  onDidNavigateInPage({ url, isMainFrame }: Electron.DidNavigateInPageEvent) {
+    const home = url === homeUrl
+    if (isMainFrame && !home) {
+      tabStore.updateTab({
+        id: this.tab.id,
+        url,
+        query: url,
+        canGoBack: this.webview.canGoBack(),
+        canGoForward: this.webview.canGoForward()
+      })
+    }
+  }
+
+  onDidFailLoad({
+    errorCode,
+    errorDescription,
+    validatedURL,
+    isMainFrame
+  }: Electron.DidFailLoadEvent) {
+    // TODO: Handle load failure
+    // eslint-disable-next-line no-console
+    console.log(errorCode, errorDescription, validatedURL, isMainFrame)
+  }
+
+  onPageTitleUpdated({ title }: Electron.PageTitleUpdatedEvent) {
+    tabStore.updateTab({ id: this.tab.id, title })
+    historyStore.upsertHistory({
+      url: this.tab.url,
+      title
+    })
+  }
+
+  onPageFaviconUpdated({ favicons }: Electron.PageFaviconUpdatedEvent) {
+    const favicon = favicons[favicons.length - 1]
+    tabStore.updateTab({ id: this.tab.id, favicon })
+    historyStore.upsertHistory({
+      url: this.tab.url,
+      favicon
+    })
+  }
+
+  onDidStartLoading() {
+    tabStore.updateTab({ id: this.tab.id, loading: true, finding: false })
+    this.webview.stopFindInPage('clearSelection')
+  }
+
+  onDidStopLoading() {
+    tabStore.updateTab({ id: this.tab.id, loading: false, loaded: true })
+  }
+
+  onFoundInPage({ result }: Electron.FoundInPageEvent) {
+    tabStore.updateTab({
+      id: this.tab.id,
+      foundActiveMatchOrdinal: result.activeMatchOrdinal,
+      foundMatches: result.matches
+    })
+  }
+
+  onNewWindow({ disposition, url }: Electron.NewWindowEvent) {
+    switch (disposition) {
+      case 'new-window':
+        // open new window from main process
+        break
+      case 'foreground-tab':
+        tabStore.newTab({
           url,
+          options: {
+            activate: true,
+            position: 'next',
+            openerId: this.tab.id
+          }
+        })
+        break
+      case 'background-tab':
+        tabStore.newTab({
+          url,
+          options: {
+            activate: false,
+            position: 'next',
+            openerId: this.tab.id
+          }
+        })
+        break
+    }
+  }
+
+  onIpcMessage({ channel, args }: Electron.IpcMessageEvent) {
+    switch (channel) {
+      case 'inspectElement': {
+        const rect = this.webview.getBoundingClientRect()
+        let [x, y] = args
+        x += rect.left
+        y += rect.top
+        this.webview.inspectElement(x, y)
+        break
+      }
+      case 'undo':
+        this.webview.undo()
+        break
+      case 'redo':
+        this.webview.redo()
+        break
+      case 'lookUp':
+        this.webview.showDefinitionForSelection()
+        break
+      case 'newTab': {
+        const [url] = args
+        tabStore.newTab({
+          url,
+          options: { position: 'next', openerId: this.tab.id }
+        })
+        break
+      }
+      case 'search': {
+        const [query] = args
+        const url = TabUtils.getUrlWithQuery(query)
+        tabStore.newTab({
+          url,
+          options: { position: 'next', openerId: this.tab.id }
+        })
+        break
+      }
+      case 'focus': {
+        const viewId = tabStore.activeViewId
+        tabStore.activateTab({ id: this.tab.id, viewId })
+        break
+      }
+      case 'onclick':
+        tabStore.activateView({ id: this.viewId })
+        this.$eventBus.$emit('hideQueryHistory')
+        break
+      case 'onkeydown': {
+        const [e] = args
+        if (e.key === 'Escape') {
+          layoutStore.hideShortcutBar()
+        }
+        break
+      }
+      case 'openDefaultBrowser': {
+        const [url] = args
+        remote.shell.openExternal(url)
+        break
+      }
+      case 'requestContextMenu':
+        this.webview.send('showContextMenu', {
           canGoBack: this.webview.canGoBack(),
           canGoForward: this.webview.canGoForward()
         })
-        if (home) {
-          this.$eventBus.$emit('focusLocation', { viewId: this.viewId })
-        } else if (urlChanged || this.needFocus) {
-          tabStore.updateTab({ id: this.tab.id, query: url })
-          historyStore.upsertHistory({
-            url: this.tab.url,
-            host: this.tab.host
-          })
-          this.needFocus = false
-          // TODO: https://github.com/electron/electron/issues/14474
-          this.webview.blur()
-          this.webview.focus()
-        }
-      }
-    })
-    this.webview.addEventListener(
-      'did-navigate-in-page',
-      ({ url, isMainFrame }) => {
-        const home = url === homeUrl
-        if (isMainFrame && !home) {
-          tabStore.updateTab({
-            id: this.tab.id,
-            url,
-            query: url,
-            canGoBack: this.webview.canGoBack(),
-            canGoForward: this.webview.canGoForward()
-          })
-        }
-      }
-    )
-    this.webview.addEventListener(
-      'did-fail-load',
-      ({ errorCode, errorDescription, validatedURL, isMainFrame }) => {
-        // TODO: Handle load failure
-        // eslint-disable-next-line no-console
-        console.log(errorCode, errorDescription, validatedURL, isMainFrame)
-      }
-    )
-    this.webview.addEventListener('page-title-updated', ({ title }) => {
-      tabStore.updateTab({ id: this.tab.id, title })
-      historyStore.upsertHistory({
-        url: this.tab.url,
-        title
-      })
-    })
-    this.webview.addEventListener('page-favicon-updated', ({ favicons }) => {
-      const favicon = favicons[favicons.length - 1]
-      tabStore.updateTab({ id: this.tab.id, favicon })
-      historyStore.upsertHistory({
-        url: this.tab.url,
-        favicon
-      })
-    })
-    this.webview.addEventListener('did-start-loading', () => {
-      tabStore.updateTab({ id: this.tab.id, loading: true, finding: false })
-      this.webview.stopFindInPage('clearSelection')
-    })
-    this.webview.addEventListener('did-stop-loading', () => {
-      tabStore.updateTab({ id: this.tab.id, loading: false, loaded: true })
-    })
-    this.webview.addEventListener('found-in-page', ({ result }) => {
-      tabStore.updateTab({
-        id: this.tab.id,
-        foundActiveMatchOrdinal: result.activeMatchOrdinal,
-        foundMatches: result.matches
-      })
-    })
-    this.webview.addEventListener('new-window', ({ disposition, url }) => {
-      switch (disposition) {
-        case 'new-window':
-          // open new window from main process
-          break
-        case 'foreground-tab':
-          tabStore.newTab({
-            url,
-            options: {
-              activate: true,
-              position: 'next',
-              openerId: this.tab.id
-            }
-          })
-          break
-        case 'background-tab':
-          tabStore.newTab({
-            url,
-            options: {
-              activate: false,
-              position: 'next',
-              openerId: this.tab.id
-            }
-          })
-          break
-      }
-    })
-    this.webview.addEventListener('ipc-message', ({ channel, args }) => {
-      switch (channel) {
-        case 'inspectElement': {
-          const rect = this.webview.getBoundingClientRect()
-          let [x, y] = args
-          x += rect.left
-          y += rect.top
-          this.webview.inspectElement(x, y)
-          break
-        }
-        case 'undo':
-          this.webview.undo()
-          break
-        case 'redo':
-          this.webview.redo()
-          break
-        case 'lookUp':
-          this.webview.showDefinitionForSelection()
-          break
-        case 'newTab': {
-          const [url] = args
-          tabStore.newTab({
-            url,
-            options: { position: 'next', openerId: this.tab.id }
-          })
-          break
-        }
-        case 'search': {
-          const [query] = args
-          const url = TabUtils.getUrlWithQuery(query)
-          tabStore.newTab({
-            url,
-            options: { position: 'next', openerId: this.tab.id }
-          })
-          break
-        }
-        case 'focus': {
-          const viewId = tabStore.activeViewId
-          tabStore.activateTab({ id: this.tab.id, viewId })
-          break
-        }
-        case 'onclick':
-          tabStore.activateView({ id: this.viewId })
-          this.$eventBus.$emit('hideQueryHistory')
-          break
-        case 'onkeydown': {
-          const [e] = args
-          if (e.key === 'Escape') {
-            layoutStore.hideShortcutBar()
-          }
-          break
-        }
-        case 'openDefaultBrowser': {
-          const [url] = args
-          remote.shell.openExternal(url)
-          break
-        }
-        case 'requestContextMenu':
-          this.webview.send('showContextMenu', {
-            canGoBack: this.webview.canGoBack(),
-            canGoForward: this.webview.canGoForward()
-          })
-          break
-      }
-    })
-    this.webview.addEventListener('update-target-url', ({ url }) => {
-      this.$eventBus.$emit('updateTargetUrl', { viewId: this.viewId, url })
-    })
+        break
+    }
+  }
+
+  onUpdateTargetUrl({ url }: Electron.UpdateTargetUrlEvent) {
+    this.$eventBus.$emit('updateTargetUrl', { viewId: this.viewId, url })
   }
 
   undo({ viewId }: { viewId: string }) {

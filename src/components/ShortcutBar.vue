@@ -82,13 +82,15 @@ export default class ShortcutBar extends Vue {
   onShortcutBarChanged(value: boolean) {
     if (value) {
       this.$nextTick(() => {
-        this.$el.querySelector('input')!.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') {
-            layoutStore.hideShortcutBar()
-          }
-        })
+        this.$el
+          .querySelector('input')!
+          .addEventListener('keydown', this.onKeyDown)
         this.width = (this.$el as HTMLElement).offsetWidth
       })
+    } else {
+      this.$el
+        .querySelector('input')!
+        .removeEventListener('keydown', this.onKeyDown)
     }
   }
 
@@ -110,6 +112,12 @@ export default class ShortcutBar extends Vue {
       }
       ;(this.autocomplete as any).isMenuActive = true
     })
+  }
+
+  onKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      layoutStore.hideShortcutBar()
+    }
   }
 
   onChange(value: string) {
