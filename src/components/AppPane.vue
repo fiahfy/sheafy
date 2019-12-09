@@ -6,25 +6,17 @@
       </span>
       <chip class="ml-3" :num="apps.length" />
       <v-spacer />
-      <v-btn
-        icon
-        width="32"
-        height="32"
-        title="Expand Apps"
-        class="ml-1"
-        @click="onClickExpand"
-      >
-        <v-icon size="20">mdi-expand-all</v-icon>
+      <v-btn icon small title="Expand Apps" class="ml-1" @click="onClickExpand">
+        <v-icon small>mdi-expand-all</v-icon>
       </v-btn>
       <v-btn
         icon
-        width="32"
-        height="32"
+        small
         title="Collapse Apps"
         class="ml-1"
         @click="onClickCollapse"
       >
-        <v-icon size="20">mdi-collapse-all</v-icon>
+        <v-icon small>mdi-collapse-all</v-icon>
       </v-btn>
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">

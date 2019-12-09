@@ -207,22 +207,27 @@ export default class ToolbarTextField extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.toolbar-text-field ::v-deep .v-input__control > .v-input__slot {
-  min-height: unset;
-  padding: 0 6px 0 12px !important;
-  > .v-input__prepend-inner {
-    margin-top: 0;
-    padding-right: 8px;
-    align-self: center;
+.toolbar-text-field {
+  ::selection {
+    color: unset;
   }
-  > .v-select__slot {
-    > input {
-      padding: 4px 0;
-      margin-top: 0 !important;
-    }
-    > .v-input__append-inner {
+  ::v-deep .v-input__control > .v-input__slot {
+    min-height: unset;
+    padding: 0 6px 0 12px !important;
+    > .v-input__prepend-inner {
       margin-top: 0;
+      padding-right: 8px;
       align-self: center;
+    }
+    > .v-select__slot {
+      > input {
+        padding: 4px 0;
+        margin-top: 0 !important;
+      }
+      > .v-input__append-inner {
+        margin-top: 0;
+        align-self: center;
+      }
     }
   }
 }

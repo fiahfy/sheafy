@@ -1,6 +1,6 @@
 <template>
   <v-toolbar
-    class="toolbar"
+    class="toolbar pr-0"
     :class="classes"
     flat
     dense
@@ -9,7 +9,7 @@
     extension-height="36"
   >
     <favicon
-      class="mr-3"
+      class="mx-3"
       :url="activeTab && activeTab.favicon"
       :loading="activeTab && activeTab.loading"
     />
@@ -18,51 +18,54 @@
       @contextmenu.stop="onContextMenu"
       v-text="activeTab && activeTab.title"
     />
-    <v-btn icon small class="ml-3" title="Close" @click="onClickClose">
+    <v-btn icon small class="mx-1" title="Close" @click="onClickClose">
       <v-icon small>mdi-close</v-icon>
     </v-btn>
-    <v-spacer />
-    <v-btn
-      v-long-press="onContextMenuBackTab"
-      icon
-      width="32"
-      height="32"
-      class="ml-1"
-      title="Go Back Tab"
-      :disabled="!canGoBackTab"
-      @click="onClickGoBackTab"
-      @contextmenu.stop="onContextMenuBackTab"
+    <div
+      class="d-flex flex-grow-1 fill-height align-center pl-1"
+      :class="backgroundClasses"
     >
-      <v-icon size="20">mdi-chevron-left</v-icon>
-    </v-btn>
-    <v-btn
-      v-long-press="onContextMenuForwardTab"
-      icon
-      width="32"
-      height="32"
-      class="ml-1"
-      title="Go Forward Tab"
-      :disabled="!canGoForwardTab"
-      @click="onClickGoForwardTab"
-      @contextmenu.stop="onContextMenuForwardTab"
-    >
-      <v-icon size="20">mdi-chevron-right</v-icon>
-    </v-btn>
-    <v-btn
-      v-if="canCloseView"
-      icon
-      width="32"
-      height="32"
-      class="ml-1"
-      title="Close View"
-      @click.stop="onClickCloseView"
-    >
-      <v-icon size="20">mdi-close</v-icon>
-    </v-btn>
+      <v-spacer />
+      <v-btn
+        v-long-press="onContextMenuBackTab"
+        icon
+        small
+        class="mr-1"
+        title="Go Back Tab"
+        :disabled="!canGoBackTab"
+        @click="onClickGoBackTab"
+        @contextmenu.stop="onContextMenuBackTab"
+      >
+        <v-icon small>mdi-chevron-left</v-icon>
+      </v-btn>
+      <v-btn
+        v-long-press="onContextMenuForwardTab"
+        icon
+        small
+        class="mr-1"
+        title="Go Forward Tab"
+        :disabled="!canGoForwardTab"
+        @click="onClickGoForwardTab"
+        @contextmenu.stop="onContextMenuForwardTab"
+      >
+        <v-icon small>mdi-chevron-right</v-icon>
+      </v-btn>
+      <v-btn
+        v-if="canCloseView"
+        icon
+        small
+        class="mr-1"
+        title="Close View"
+        @click.stop="onClickCloseView"
+      >
+        <v-icon small>mdi-close</v-icon>
+      </v-btn>
+    </div>
     <template slot="extension">
       <v-btn
         v-long-press="onContextMenuBack"
         icon
+        min-width="32"
         width="32"
         height="32"
         class="mr-1"
@@ -76,6 +79,7 @@
       <v-btn
         v-long-press="onContextMenuForward"
         icon
+        min-width="32"
         width="32"
         height="32"
         class="mr-1"
@@ -89,6 +93,7 @@
       <v-btn
         v-if="activeTab && activeTab.loading"
         icon
+        min-width="32"
         width="32"
         height="32"
         class="mr-1"
@@ -100,6 +105,7 @@
       <v-btn
         v-else
         icon
+        min-width="32"
         width="32"
         height="32"
         class="mr-1"
@@ -133,6 +139,10 @@ export default class Toolbar extends Vue {
     return {
       active: tabStore.isActiveView({ id: this.viewId })
     }
+  }
+
+  get backgroundClasses() {
+    return this.$vuetify.theme.dark ? 'grey darken-4' : 'grey lighten-3'
   }
 
   get activeTab() {
@@ -311,7 +321,13 @@ export default class Toolbar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.toolbar:not(.active) .caption {
-  opacity: 0.5;
+.toolbar {
+  &:not(.active) .caption {
+    opacity: 0.5;
+  }
+  ::v-deep .v-toolbar__content {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 </style>

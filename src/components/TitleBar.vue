@@ -1,13 +1,14 @@
 <template>
   <v-system-bar
     v-if="titleBar"
-    class="title-bar caption px-0 align-start user-select-none"
+    class="title-bar user-select-none"
     app
     height="22"
+    @dblclick="onDoubleClick"
   >
-    <v-sheet tile class="fill-height flex-grow-1" @dblclick="onDoubleClick">
-      <div class="text-truncate text-center" v-text="title" />
-    </v-sheet>
+    <v-spacer />
+    <span class="caption text-truncate" v-text="title" />
+    <v-spacer />
   </v-system-bar>
 </template>
 
@@ -50,15 +51,7 @@ export default class TitleBar extends Vue {
 
 <style lang="scss" scoped>
 .title-bar {
-  z-index: 9999;
-  .v-sheet {
-    position: relative;
-    padding: 0 72px;
-    min-width: 0;
-    -webkit-app-region: drag;
-    > div {
-      margin-top: 2px;
-    }
-  }
+  padding: 0 72px;
+  -webkit-app-region: drag;
 }
 </style>

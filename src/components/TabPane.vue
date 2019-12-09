@@ -6,15 +6,8 @@
       </span>
       <chip class="ml-3" :num="tabs.length" />
       <v-spacer />
-      <v-btn
-        icon
-        width="32"
-        height="32"
-        title="New Tab"
-        class="ml-1"
-        @click="onClickNewTab"
-      >
-        <v-icon size="20">mdi-tab-plus</v-icon>
+      <v-btn icon small title="New Tab" class="ml-1" @click="onClickNewTab">
+        <v-icon small>mdi-tab-plus</v-icon>
       </v-btn>
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">

@@ -14,14 +14,8 @@
       </span>
       <chip v-if="items.length" class="ml-3" :num="items.length" />
       <v-spacer />
-      <v-btn
-        icon
-        width="32"
-        height="32"
-        title="Clear All"
-        @click="onClickClearAll"
-      >
-        <v-icon size="20">mdi-notification-clear-all</v-icon>
+      <v-btn icon small title="Clear All" @click="onClickClearAll">
+        <v-icon small>mdi-notification-clear-all</v-icon>
       </v-btn>
       <template slot="extension">
         <v-text-field

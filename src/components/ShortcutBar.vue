@@ -32,7 +32,6 @@
 </template>
 
 <script lang="ts">
-import { VAutocomplete } from 'vuetify/lib'
 import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
 import { layoutStore, tabStore } from '~/store'
 import Tab from '~/models/tab'
@@ -44,7 +43,7 @@ import Favicon from '~/components/Favicon.vue'
   }
 })
 export default class ShortcutBar extends Vue {
-  @Ref() readonly autocomplete!: typeof VAutocomplete
+  @Ref() readonly autocomplete!: Vue
 
   width = 0
 

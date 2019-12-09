@@ -25,7 +25,7 @@
             <status-bar view-id="primary" />
           </div>
         </div>
-        <div v-show="multiView" ref="resizer" class="resizer" vertical />
+        <v-divider v-show="multiView" ref="resizer" class="resizer" vertical />
         <div
           v-if="multiView"
           ref="secondaryView"
@@ -94,7 +94,7 @@ const waitUntil = (callback: Function, timeout = 1000) => {
 })
 export default class Index extends Vue {
   @Ref() readonly wrapper!: HTMLDivElement
-  @Ref() readonly resizer!: HTMLDivElement
+  @Ref() readonly resizer!: Vue
   @Ref() readonly primaryView!: HTMLDivElement
   @Ref() readonly secondaryView!: HTMLDivElement
   @Ref() readonly primaryInner!: HTMLDivElement
@@ -148,7 +148,7 @@ export default class Index extends Vue {
   }
 
   mounted() {
-    this.resizer.addEventListener('mousedown', this.onMouseDown)
+    this.resizer.$el.addEventListener('mousedown', this.onMouseDown)
     document.addEventListener('mouseup', this.onMouseUp)
 
     this.$nextTick(() => {
@@ -158,7 +158,7 @@ export default class Index extends Vue {
   }
 
   destroyed() {
-    this.resizer.removeEventListener('mousedown', this.onMouseDown)
+    this.resizer.$el.removeEventListener('mousedown', this.onMouseDown)
     document.removeEventListener('mouseup', this.onMouseUp)
 
     const el = this.$el.querySelector('.inner')
