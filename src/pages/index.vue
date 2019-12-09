@@ -101,7 +101,7 @@ export default class Index extends Vue {
   @Ref() readonly secondaryInner!: HTMLDivElement
 
   resizing = false
-  debounced = debounce(this.resize, 100)
+  debounced = debounce(this.onResize, 100)
   observer = new ResizeObserver(() => this.debounced())
 
   get classes() {
@@ -148,34 +148,8 @@ export default class Index extends Vue {
   }
 
   mounted() {
-    const resize = (e: MouseEvent) => {
-      const width = this.secondaryView.getBoundingClientRect().right - e.clientX
-      if (
-        width < 256 ||
-        width > window.innerWidth - 256 - settingsStore.sidebarWidth
-      ) {
-        return
-      }
-      this.secondaryView.style.width = width + 'px'
-    }
-
-    this.resizer.addEventListener('mousedown', () => {
-      this.resizing = true
-      layoutStore.setResizing({ resizing: true })
-      document.body.style.cursor = 'ew-resize'
-      document.addEventListener('mousemove', resize)
-    })
-
-    document.addEventListener('mouseup', () => {
-      if (!this.resizing) {
-        return
-      }
-      this.resizing = false
-      layoutStore.setResizing({ resizing: false })
-      this.width = this.secondaryView.offsetWidth / this.wrapper.offsetWidth
-      document.body.style.cursor = ''
-      document.removeEventListener('mousemove', resize)
-    })
+    this.resizer.addEventListener('mousedown', this.onMouseDown)
+    document.addEventListener('mouseup', this.onMouseUp)
 
     this.$nextTick(() => {
       const el = this.$el.querySelector('.inner')
@@ -184,8 +158,40 @@ export default class Index extends Vue {
   }
 
   destroyed() {
+    this.resizer.removeEventListener('mousedown', this.onMouseDown)
+    document.removeEventListener('mouseup', this.onMouseUp)
+
     const el = this.$el.querySelector('.inner')
     el && this.observer.unobserve(el)
+  }
+
+  onMouseDown() {
+    this.resizing = true
+    layoutStore.setResizing({ resizing: true })
+    document.body.style.cursor = 'ew-resize'
+    document.addEventListener('mousemove', this.onMouseMove)
+  }
+
+  onMouseUp() {
+    if (!this.resizing) {
+      return
+    }
+    this.resizing = false
+    layoutStore.setResizing({ resizing: false })
+    this.width = this.secondaryView.offsetWidth / this.wrapper.offsetWidth
+    document.body.style.cursor = ''
+    document.removeEventListener('mousemove', this.onMouseMove)
+  }
+
+  onMouseMove(e: MouseEvent) {
+    const width = this.secondaryView.getBoundingClientRect().right - e.clientX
+    if (
+      width < 256 ||
+      width > window.innerWidth - 256 - settingsStore.sidebarWidth
+    ) {
+      return
+    }
+    this.secondaryView.style.width = width + 'px'
   }
 
   onClickPrimaryView() {
@@ -196,7 +202,7 @@ export default class Index extends Vue {
     tabStore.activateView({ id: 'secondary' })
   }
 
-  async resize() {
+  async onResize() {
     const primaryWebview = (await waitUntil(() =>
       this.$el.querySelector('#primary-webview')
     )) as HTMLDivElement

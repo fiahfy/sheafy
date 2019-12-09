@@ -55,7 +55,7 @@ export default class AppPanel extends Vue {
     this.resizing = true
     layoutStore.setResizing({ resizing: true })
     document.body.style.cursor = 'ns-resize'
-    document.addEventListener('mousemove', this.onResize)
+    document.addEventListener('mousemove', this.onMouseMove)
   }
 
   onMouseUp() {
@@ -67,10 +67,10 @@ export default class AppPanel extends Vue {
     this.height =
       this.content.offsetHeight / (this.$el as HTMLElement).offsetHeight
     document.body.style.cursor = ''
-    document.removeEventListener('mousemove', this.onResize)
+    document.removeEventListener('mousemove', this.onMouseMove)
   }
 
-  onResize(e: MouseEvent) {
+  onMouseMove(e: MouseEvent) {
     const height = e.clientY - this.content.getBoundingClientRect().top
     if (height < 256 || height > (this.$el as HTMLElement).offsetHeight - 256) {
       return

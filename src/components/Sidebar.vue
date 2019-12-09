@@ -61,7 +61,7 @@ export default class Sidebar extends Vue {
     this.resizing = true
     layoutStore.setResizing({ resizing: true })
     document.body.style.cursor = 'ew-resize'
-    document.addEventListener('mousemove', this.onResize)
+    document.addEventListener('mousemove', this.onMouseMove)
   }
 
   onMouseUp() {
@@ -72,10 +72,10 @@ export default class Sidebar extends Vue {
     layoutStore.setResizing({ resizing: false })
     this.width = (this.$el as HTMLElement).offsetWidth
     document.body.style.cursor = ''
-    document.removeEventListener('mousemove', this.onResize)
+    document.removeEventListener('mousemove', this.onMouseMove)
   }
 
-  onResize(e: MouseEvent) {
+  onMouseMove(e: MouseEvent) {
     const width =
       settingsStore.sidebarLocation === 'right'
         ? -e.clientX + this.$el.getBoundingClientRect().right
