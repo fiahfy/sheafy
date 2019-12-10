@@ -177,6 +177,10 @@ export default class ToolbarTextField extends Vue {
   }
 
   onFocus() {
+    this.$nextTick(() => {
+      // TODO: prevent selection all when focused
+      ;(window as Window).getSelection()!.empty()
+    })
     this.width = (this.$el as HTMLElement).offsetWidth
   }
 
@@ -185,7 +189,8 @@ export default class ToolbarTextField extends Vue {
     if (input === document.activeElement) {
       return
     }
-    ;(window as Window).getSelection()!.empty()
+    // remove selection on focus
+    // ;(window as Window).getSelection()!.empty()
     this.focusIn = true
   }
 
