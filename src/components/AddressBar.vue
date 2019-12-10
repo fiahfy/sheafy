@@ -2,7 +2,7 @@
   <v-combobox
     ref="combobox"
     v-model="query"
-    class="toolbar-text-field body-2"
+    class="address-bar body-2"
     name="query"
     filled
     dense
@@ -212,7 +212,7 @@ export default class ToolbarTextField extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.toolbar-text-field {
+.address-bar {
   ::selection {
     color: unset;
   }

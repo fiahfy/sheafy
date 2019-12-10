@@ -114,7 +114,7 @@
       >
         <v-icon size="20">mdi-refresh</v-icon>
       </v-btn>
-      <toolbar-text-field class="ml-1" :view-id="viewId" />
+      <address-bar class="ml-1" :view-id="viewId" />
     </template>
   </v-toolbar>
 </template>
@@ -123,13 +123,13 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { shell } from 'electron'
 import { tabStore } from '~/store'
+import AddressBar from '~/components/AddressBar.vue'
 import Favicon from '~/components/Favicon.vue'
-import ToolbarTextField from '~/components/ToolbarTextField.vue'
 
 @Component({
   components: {
-    Favicon,
-    ToolbarTextField
+    AddressBar,
+    Favicon
   }
 })
 export default class Toolbar extends Vue {
