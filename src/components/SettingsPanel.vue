@@ -1,6 +1,13 @@
 <template>
   <div class="settings-panel d-flex flex-column">
-    <v-toolbar tile dense flat class="flex-grow-0" height="36">
+    <v-toolbar
+      tile
+      dense
+      flat
+      color="transparent"
+      class="flex-grow-0"
+      height="36"
+    >
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         settings
       </span>

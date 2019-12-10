@@ -1,12 +1,25 @@
 <template>
   <div class="tab-pane d-flex flex-column">
-    <v-toolbar tile dense flat class="flex-grow-0 pr-2" height="36">
+    <v-toolbar
+      tile
+      dense
+      flat
+      color="transparent"
+      class="flex-grow-0"
+      height="36"
+    >
       <span class="subtitle-2 text-uppercase text-truncate user-select-none">
         tabs
       </span>
       <chip class="ml-3" :num="tabs.length" />
       <v-spacer />
-      <v-btn icon small title="New Tab" class="ml-1" @click="onClickNewTab">
+      <v-btn
+        icon
+        small
+        title="New Tab"
+        class="ml-1 mr-0"
+        @click="onClickNewTab"
+      >
         <v-icon small>mdi-tab-plus</v-icon>
       </v-btn>
     </v-toolbar>

@@ -1,5 +1,9 @@
 <template>
-  <div class="side-bar d-flex" :style="{ width: `${width}px` }">
+  <div
+    class="side-bar d-flex"
+    :style="{ width: `${width}px` }"
+    :class="classes"
+  >
     <div class="wrapper flex-grow-1">
       <template v-for="panel in panels">
         <div v-show="panel.id === panelId" :key="panel.id" class="fill-height">
@@ -7,7 +11,7 @@
         </div>
       </template>
     </div>
-    <div ref="resizer" class="resizer" :class="classes" />
+    <div ref="resizer" class="resizer" :class="resizerClasses" />
   </div>
 </template>
 
@@ -40,6 +44,10 @@ export default class Sidebar extends Vue {
   }
 
   get classes() {
+    return this.$vuetify.theme.dark ? 'grey darken-4' : 'grey lighten-3'
+  }
+
+  get resizerClasses() {
     return settingsStore.sidebarLocation === 'right' ? 'resizer--right' : ''
   }
 

@@ -27,12 +27,12 @@ html {
     width: 10px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: #eee;
+    background-color: #e0e0e0;
     &:hover {
-      background-color: #ddd;
+      background-color: #d2d2d2;
     }
     &:active {
-      background-color: #ccc;
+      background-color: #bdbdbd;
     }
   }
 }

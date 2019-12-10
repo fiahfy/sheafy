@@ -4,7 +4,8 @@
       tile
       dense
       flat
-      class="flex-grow-0 pr-2"
+      color="transparent"
+      class="flex-grow-0"
       height="36"
       extended
       extension-height="36"
@@ -14,18 +15,18 @@
       </span>
       <chip v-if="items.length" class="ml-3" :num="items.length" />
       <v-spacer />
-      <v-btn icon small title="Clear All" @click="onClickClearAll">
+      <v-btn icon small title="Clear All" class="mr-0" @click="onClickClearAll">
         <v-icon small>mdi-notification-clear-all</v-icon>
       </v-btn>
       <template slot="extension">
         <v-text-field
           v-model="searchText"
           class="body-2"
+          :background-color="backgroundColor"
           clearable
-          clear-icon="mdi-close-circle-outline"
+          clear-icon="mdi-close-circle"
           prepend-inner-icon="mdi-magnify"
           placeholder="Search"
-          outlined
           dense
           hide-details
           @contextmenu.stop="onContextMenu"
@@ -70,6 +71,10 @@ export default class HistoryPanel extends Vue {
   debounced = debounce(this.lazySearch, 500)
   page = 1
   perPage = 100
+
+  get backgroundColor() {
+    return this.$vuetify.theme.dark ? 'grey darken-3' : 'grey lighten-5'
+  }
 
   get items() {
     const items = historyStore.sortedHistoryItems
@@ -127,10 +132,17 @@ export default class HistoryPanel extends Vue {
   .v-text-field ::v-deep .v-input__control > .v-input__slot {
     min-height: unset;
     padding: 0 8px;
+    &::before,
+    &::after {
+      display: none;
+    }
     > .v-input__prepend-inner {
       margin-top: 0;
       padding-right: 8px;
       align-self: center;
+    }
+    > .v-text-field__slot > input {
+      padding: 4px 0;
     }
     > .v-input__append-inner {
       margin-top: 0;
