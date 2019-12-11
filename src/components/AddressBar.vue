@@ -213,6 +213,9 @@ export default class ToolbarTextField extends Vue {
 
 <style lang="scss" scoped>
 .address-bar {
+  &.primary--text {
+    caret-color: unset !important;
+  }
   ::selection {
     color: unset;
   }

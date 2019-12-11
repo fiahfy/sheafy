@@ -285,4 +285,10 @@ export default class DownloadListItem extends Vue {
     display: none;
   }
 }
+.theme--light .download-list-item {
+  background: #eeeeee;
+}
+.theme--dark .download-list-item {
+  background: #212121;
+}
 </style>

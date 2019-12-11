@@ -1,8 +1,7 @@
 <template>
   <v-card
     v-if="url"
-    class="status-bar px-2 py-1 caption grey--text text-truncate"
-    :class="classes"
+    class="status-bar px-2 py-1 caption text-truncate"
     tile
     v-text="url"
   />
@@ -16,10 +15,6 @@ export default class StatusBar extends Vue {
   @Prop({ type: String, required: true }) readonly viewId!: string
 
   url = ''
-
-  get classes() {
-    return this.$vuetify.theme.dark ? 'text--lighten-2' : 'text--darken-1'
-  }
 
   mounted() {
     this.$eventBus.$on('updateTargetUrl', this.updateTargetUrl)
@@ -36,3 +31,12 @@ export default class StatusBar extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.theme--light .status-bar {
+  color: #757575;
+}
+.theme--dark .status-bar {
+  color: #e0e0e0;
+}
+</style>

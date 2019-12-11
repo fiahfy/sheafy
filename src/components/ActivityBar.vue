@@ -7,7 +7,7 @@
     mini-variant-width="48"
     :right="right"
   >
-    <v-list dense class="py-0 primary--text">
+    <v-list dense class="py-0">
       <v-list-item
         v-for="item in items"
         :key="item.id"

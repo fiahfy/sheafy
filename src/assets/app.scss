@@ -22,22 +22,24 @@ html {
 .overflow-y-scroll {
   overflow-y: scroll;
 }
-.scrollbar {
-  &::-webkit-scrollbar {
-    width: 10px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: #e0e0e0;
-    &:hover {
-      background-color: #d2d2d2;
-    }
-    &:active {
-      background-color: #bdbdbd;
+.scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+// theme
+.theme--light {
+  .scrollbar {
+    &::-webkit-scrollbar-thumb {
+      background-color: #e0e0e0;
+      &:hover {
+        background-color: #d2d2d2;
+      }
+      &:active {
+        background-color: #bdbdbd;
+      }
     }
   }
 }
-// for dark theme
-.v-application.theme--dark {
+.theme--dark {
   .scrollbar {
     &::-webkit-scrollbar-thumb {
       background-color: #424242;

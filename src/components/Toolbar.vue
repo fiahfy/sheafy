@@ -21,10 +21,7 @@
     <v-btn icon small class="mx-1" title="Close" @click="onClickClose">
       <v-icon small>mdi-close</v-icon>
     </v-btn>
-    <div
-      class="d-flex flex-grow-1 fill-height align-center pl-1"
-      :class="backgroundClasses"
-    >
+    <div class="background d-flex flex-grow-1 fill-height align-center pl-1">
       <v-spacer />
       <v-btn
         v-long-press="onContextMenuBackTab"
@@ -139,10 +136,6 @@ export default class Toolbar extends Vue {
     return {
       active: tabStore.isActiveView({ id: this.viewId })
     }
-  }
-
-  get backgroundClasses() {
-    return this.$vuetify.theme.dark ? 'grey darken-4' : 'grey lighten-3'
   }
 
   get activeTab() {
@@ -329,5 +322,11 @@ export default class Toolbar extends Vue {
     padding-left: 0;
     padding-right: 0;
   }
+}
+.theme--light .toolbar .background {
+  background: #eeeeee;
+}
+.theme--dark .toolbar .background {
+  background: #212121;
 }
 </style>

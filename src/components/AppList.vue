@@ -1,9 +1,7 @@
 <template>
   <div class="app-list">
-    <draggable v-model="model" animation="150" @end="onEnd">
-      <v-sheet v-for="app in model" :key="app.host" tile>
-        <app-list-item :app="app" />
-      </v-sheet>
+    <draggable v-model="model" animation="150">
+      <app-list-item v-for="app in model" :key="app.host" :app="app" />
     </draggable>
   </div>
 </template>
@@ -30,20 +28,12 @@ export default class AppList extends Vue {
     const hosts = value.map((app) => app.host)
     tabStore.sortApps({ hosts })
   }
-
-  onEnd() {
-    // Remove ripples if stop sorting
-    this.$el.querySelectorAll('.v-ripple__container').forEach((el) => {
-      ;(el as HTMLSpanElement).style.display = 'none'
-    })
-  }
 }
 </script>
 
 <style lang="scss" scoped>
-.app-list .v-sheet {
-  color: inherit;
-  &.sortable-ghost {
+.app-list {
+  .app-list-item.sortable-ghost {
     opacity: 0;
   }
 }

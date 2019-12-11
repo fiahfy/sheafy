@@ -69,3 +69,12 @@ export default class HistoryListItem extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.theme--light .history-list-item {
+  background: #eeeeee;
+}
+.theme--dark .history-list-item {
+  background: #212121;
+}
+</style>

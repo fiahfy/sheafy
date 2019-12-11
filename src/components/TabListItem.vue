@@ -1,9 +1,10 @@
 <template>
   <v-list-item
     class="tab-list-item pr-2"
-    :class="{ inset }"
+    :class="classes"
     :title="title"
     :input-value="active"
+    :ripple="false"
     @click="onClick"
     @contextmenu.stop="onContextMenu"
   >
@@ -43,6 +44,10 @@ export default class TabListItem extends Vue {
 
   get active() {
     return tabStore.isActiveTab({ id: this.tab.id })
+  }
+
+  get classes() {
+    return { inset: this.inset }
   }
 
   get title() {
@@ -112,6 +117,24 @@ export default class TabListItem extends Vue {
   .v-list-item__icon {
     height: unset;
     min-width: unset;
+  }
+}
+.theme--light .tab-list-item {
+  background: #eeeeee;
+  &.v-list-item--active {
+    background: #ffffff;
+    &::before {
+      display: none;
+    }
+  }
+}
+.theme--dark .tab-list-item {
+  background: #212121;
+  &.v-list-item--active {
+    background: #424242;
+    &::before {
+      display: none;
+    }
   }
 }
 </style>
