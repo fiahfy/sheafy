@@ -1,14 +1,7 @@
 <template>
   <div class="app-pane d-flex flex-column">
-    <v-toolbar
-      tile
-      dense
-      flat
-      color="transparent"
-      class="flex-grow-0"
-      height="36"
-    >
-      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+    <v-toolbar tile dense flat class="flex-grow-0" height="36">
+      <span class="overline user-select-none">
         apps
       </span>
       <chip class="ml-3" :num="apps.length" />
@@ -62,7 +55,15 @@ export default class AppPane extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.app-pane > div {
-  position: relative;
+.app-pane {
+  & > div {
+    position: relative;
+  }
+  .theme--light & .v-toolbar {
+    background-color: #fafafa;
+  }
+  .theme--dark & .v-toolbar {
+    background-color: #303030;
+  }
 }
 </style>

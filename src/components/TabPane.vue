@@ -1,14 +1,7 @@
 <template>
   <div class="tab-pane d-flex flex-column">
-    <v-toolbar
-      tile
-      dense
-      flat
-      color="transparent"
-      class="flex-grow-0"
-      height="36"
-    >
-      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+    <v-toolbar tile dense flat class="flex-grow-0" height="36">
+      <span class="overline user-select-none">
         tabs
       </span>
       <chip class="ml-3" :num="tabs.length" />
@@ -55,7 +48,15 @@ export default class TabPane extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.tab-pane > div {
-  position: relative;
+.tab-pane {
+  & > div {
+    position: relative;
+  }
+  .theme--light & .v-toolbar {
+    background-color: #fafafa;
+  }
+  .theme--dark & .v-toolbar {
+    background-color: #303030;
+  }
 }
 </style>

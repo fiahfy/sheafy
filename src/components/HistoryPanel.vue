@@ -4,7 +4,6 @@
       tile
       dense
       flat
-      color="transparent"
       class="flex-grow-0"
       height="36"
       extended
@@ -25,6 +24,7 @@
           prepend-inner-icon="mdi-magnify"
           placeholder="Search"
           dense
+          filled
           hide-details
           @focus="onFocus"
           @contextmenu.stop="onContextMenu"
@@ -129,6 +129,7 @@ export default class HistoryPanel extends Vue {
 <style lang="scss" scoped>
 .history-panel {
   .v-text-field {
+    border-radius: 0;
     &.primary--text {
       color: unset !important;
       caret-color: unset !important;
@@ -147,17 +148,18 @@ export default class HistoryPanel extends Vue {
       }
       > .v-text-field__slot > input {
         padding: 4px 0;
+        margin-top: 0 !important;
       }
       .v-icon.primary--text {
         color: unset !important;
       }
     }
   }
-  .theme--light & .v-text-field ::v-deep .v-input__control > .v-input__slot {
-    background: #ffffff;
+  .theme--light & .v-toolbar {
+    background-color: #fafafa;
   }
-  .theme--dark & .v-text-field ::v-deep .v-input__control > .v-input__slot {
-    background: #424242;
+  .theme--dark & .v-toolbar {
+    background-color: #303030;
   }
 }
 </style>
