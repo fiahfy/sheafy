@@ -322,11 +322,11 @@ export default class Toolbar extends Vue {
     padding-left: 0;
     padding-right: 0;
   }
-}
-.theme--light .toolbar .background {
-  background: #eeeeee;
-}
-.theme--dark .toolbar .background {
-  background: #212121;
+  .theme--light & .background {
+    background: #eeeeee;
+  }
+  .theme--dark & .background {
+    background: #212121;
+  }
 }
 </style>

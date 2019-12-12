@@ -33,10 +33,12 @@ export default class StatusBar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.theme--light .status-bar {
-  color: #757575;
-}
-.theme--dark .status-bar {
-  color: #e0e0e0;
+.status-bar {
+  .theme--light & {
+    color: #757575;
+  }
+  .theme--dark & {
+    color: #e0e0e0;
+  }
 }
 </style>

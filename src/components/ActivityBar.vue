@@ -73,7 +73,7 @@ export default class ActivityBar extends Vue {
     background-color: unset !important;
   }
   .v-list-item {
-    opacity: 0.66;
+    opacity: 0.5;
     &:hover,
     &.v-list-item--active {
       opacity: 1;

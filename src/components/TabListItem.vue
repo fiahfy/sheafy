@@ -118,22 +118,22 @@ export default class TabListItem extends Vue {
     height: unset;
     min-width: unset;
   }
-}
-.theme--light .tab-list-item {
-  background: #eeeeee;
-  &.v-list-item--active {
-    background: #ffffff;
-    &::before {
-      display: none;
+  .theme--light & {
+    background: #eeeeee;
+    &.v-list-item--active {
+      background: #ffffff;
+      &::before {
+        display: none;
+      }
     }
   }
-}
-.theme--dark .tab-list-item {
-  background: #212121;
-  &.v-list-item--active {
-    background: #424242;
-    &::before {
-      display: none;
+  .theme--dark & {
+    background: #212121;
+    &.v-list-item--active {
+      background: #424242;
+      &::before {
+        display: none;
+      }
     }
   }
 }

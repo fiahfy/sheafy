@@ -11,10 +11,10 @@
 
     <v-list-item-content>
       <v-list-item-title>
-        <span class="text-truncate mr-3" v-text="item.title" />
+        <span class="mr-3" v-text="item.title" />
       </v-list-item-title>
       <v-list-item-subtitle class="d-flex">
-        <span v-text="item.host" />
+        <span class="text-truncate" v-text="item.host" />
         <v-spacer />
         <span class="secondary--text" v-text="updatedAt" />
       </v-list-item-subtitle>
@@ -71,10 +71,12 @@ export default class HistoryListItem extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.theme--light .history-list-item {
-  background: #eeeeee;
-}
-.theme--dark .history-list-item {
-  background: #212121;
+.history-list-item {
+  .theme--light & {
+    background: #eeeeee;
+  }
+  .theme--dark & {
+    background: #212121;
+  }
 }
 </style>

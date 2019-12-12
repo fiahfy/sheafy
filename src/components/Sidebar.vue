@@ -106,11 +106,11 @@ export default class Sidebar extends Vue {
       right: unset;
     }
   }
-}
-.theme--light .side-bar {
-  background: #eeeeee;
-}
-.theme--dark .side-bar {
-  background: #212121;
+  .theme--light & {
+    background: #eeeeee;
+  }
+  .theme--dark & {
+    background: #212121;
+  }
 }
 </style>

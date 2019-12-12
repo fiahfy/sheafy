@@ -10,7 +10,7 @@
       extended
       extension-height="36"
     >
-      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+      <span class="overline user-select-none">
         downloads
       </span>
       <chip v-if="items.length" class="ml-3" :num="items.length" />
@@ -22,13 +22,11 @@
         <v-text-field
           v-model="searchText"
           class="body-2"
-          :background-color="backgroundColor"
-          clearable
-          clear-icon="mdi-close-circle"
           prepend-inner-icon="mdi-magnify"
           placeholder="Search"
           dense
           hide-details
+          @focus="onFocus"
           @contextmenu.stop="onContextMenu"
         />
       </template>
@@ -72,10 +70,6 @@ export default class DownloadPanel extends Vue {
   page = 1
   perPage = 100
 
-  get backgroundColor() {
-    return this.$vuetify.theme.dark ? 'grey darken-3' : 'grey lighten-5'
-  }
-
   get items() {
     let items = downloadStore.downloadItems
     if (this.lazySearchText) {
@@ -105,6 +99,11 @@ export default class DownloadPanel extends Vue {
     downloadStore.clearDownloads()
   }
 
+  onFocus(e: FocusEvent) {
+    const input = e.target as HTMLInputElement
+    input.select()
+  }
+
   onContextMenu() {
     this.$contextMenu.openEditMenu()
   }
@@ -130,26 +129,36 @@ export default class DownloadPanel extends Vue {
 
 <style lang="scss" scoped>
 .download-panel {
-  .v-text-field ::v-deep .v-input__control > .v-input__slot {
-    min-height: unset;
-    padding: 0 8px;
-    &::before,
-    &::after {
-      display: none;
+  .v-text-field {
+    &.primary--text {
+      color: unset !important;
+      caret-color: unset !important;
     }
-    > .v-input__prepend-inner {
-      margin-top: 0;
-      padding-right: 8px;
-      align-self: center;
+    ::v-deep .v-input__control > .v-input__slot {
+      min-height: unset;
+      padding: 0 8px;
+      &::before,
+      &::after {
+        display: none;
+      }
+      > .v-input__prepend-inner {
+        margin-top: 0;
+        padding-right: 8px;
+        align-self: center;
+      }
+      > .v-text-field__slot > input {
+        padding: 4px 0;
+      }
+      .v-icon.primary--text {
+        color: unset !important;
+      }
     }
-    > .v-text-field__slot > input {
-      padding: 4px 0;
-    }
-    > .v-input__append-inner {
-      margin-top: 0;
-      padding-left: 8px;
-      align-self: center;
-    }
+  }
+  .theme--light & .v-text-field ::v-deep .v-input__control > .v-input__slot {
+    background: #ffffff;
+  }
+  .theme--dark & .v-text-field ::v-deep .v-input__control > .v-input__slot {
+    background: #424242;
   }
 }
 </style>

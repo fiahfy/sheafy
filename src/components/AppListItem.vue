@@ -115,11 +115,11 @@ export default class AppListItem extends Vue {
   .tab-list-item.sortable-ghost {
     opacity: 0;
   }
-}
-.theme--light .app-list-item {
-  background: #eeeeee;
-}
-.theme--dark .app-list-item {
-  background: #212121;
+  .theme--light & {
+    background: #eeeeee;
+  }
+  .theme--dark & {
+    background: #212121;
+  }
 }
 </style>

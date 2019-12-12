@@ -284,11 +284,11 @@ export default class DownloadListItem extends Vue {
   &:not(:hover) ::v-deep .v-list-item__action {
     display: none;
   }
-}
-.theme--light .download-list-item {
-  background: #eeeeee;
-}
-.theme--dark .download-list-item {
-  background: #212121;
+  .theme--light & {
+    background: #eeeeee;
+  }
+  .theme--dark & {
+    background: #212121;
+  }
 }
 </style>

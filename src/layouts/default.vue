@@ -29,13 +29,13 @@ export default class Layout extends Vue {
   }
 
   created() {
+    this.$vuetify.theme.dark = this.darkTheme
     ;(window as any).onNuxtReady(() => {
       tabStore.newTabIfEmpty()
     })
   }
 
   mounted() {
-    this.$vuetify.theme.dark = this.darkTheme
     document.addEventListener('keydown', this.onKeyDown)
   }
 

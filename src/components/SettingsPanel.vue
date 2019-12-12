@@ -8,7 +8,7 @@
       class="flex-grow-0"
       height="36"
     >
-      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+      <span class="overline user-select-none">
         settings
       </span>
       <v-spacer />
