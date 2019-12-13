@@ -114,7 +114,7 @@ export default class TabListItem extends Vue {
   &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
     opacity: 0;
   }
-  .v-list-item__icon {
+  > .v-list-item__icon {
     height: unset;
     min-width: unset;
   }

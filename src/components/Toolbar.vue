@@ -62,54 +62,46 @@
       <v-btn
         v-long-press="onContextMenuBack"
         icon
-        min-width="32"
-        width="32"
-        height="32"
-        class="mr-1"
+        small
+        class="mr-2"
         title="Go Back"
         :disabled="!activeTab || !activeTab.canGoBack"
         @click="onClickGoBack"
         @contextmenu.stop="onContextMenuBack"
       >
-        <v-icon size="20">mdi-arrow-left</v-icon>
+        <v-icon size="18">mdi-arrow-left</v-icon>
       </v-btn>
       <v-btn
         v-long-press="onContextMenuForward"
         icon
-        min-width="32"
-        width="32"
-        height="32"
-        class="mr-1"
+        small
+        class="mr-2"
         title="Go Forward"
         :disabled="!activeTab || !activeTab.canGoForward"
         @click="onClickGoForward"
         @contextmenu.stop="onContextMenuForward"
       >
-        <v-icon size="20">mdi-arrow-right</v-icon>
+        <v-icon size="18">mdi-arrow-right</v-icon>
       </v-btn>
       <v-btn
         v-if="activeTab && activeTab.loading"
         icon
-        min-width="32"
-        width="32"
-        height="32"
-        class="mr-1"
+        small
+        class="mr-2"
         title="Stop"
         @click="onClickStop"
       >
-        <v-icon size="20">mdi-close</v-icon>
+        <v-icon size="18">mdi-close</v-icon>
       </v-btn>
       <v-btn
         v-else
         icon
-        min-width="32"
-        width="32"
-        height="32"
-        class="mr-1"
+        small
+        class="mr-2"
         title="Reload"
         @click="onClickReload"
       >
-        <v-icon size="20">mdi-refresh</v-icon>
+        <v-icon size="18">mdi-refresh</v-icon>
       </v-btn>
       <address-bar class="ml-1" :view-id="viewId" />
     </template>

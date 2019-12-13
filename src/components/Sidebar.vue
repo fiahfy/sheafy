@@ -91,10 +91,10 @@ export default class Sidebar extends Vue {
 <style lang="scss" scoped>
 .side-bar {
   position: relative;
-  .wrapper {
+  > .wrapper {
     min-width: 0;
   }
-  .resizer {
+  > .resizer {
     position: absolute;
     right: -1px;
     height: 100%;

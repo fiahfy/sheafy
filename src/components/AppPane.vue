@@ -56,7 +56,7 @@ export default class AppPane extends Vue {
 
 <style lang="scss" scoped>
 .app-pane {
-  & > div {
+  > div {
     position: relative;
   }
   .theme--light & .v-toolbar {

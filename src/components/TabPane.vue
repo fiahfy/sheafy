@@ -49,7 +49,7 @@ export default class TabPane extends Vue {
 
 <style lang="scss" scoped>
 .tab-pane {
-  & > div {
+  > div {
     position: relative;
   }
   .theme--light & .v-toolbar {

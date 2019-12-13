@@ -92,21 +92,25 @@ export default class AppListItem extends Vue {
     ::v-deep .v-list-group__header {
       min-height: 36px;
       padding-right: 8px;
-      &:not(:hover) .v-list-item__action:not(:first-child) {
+      &:not(:hover) > .v-list-item__action:not(:first-child) {
         display: none;
       }
-      &:hover .v-list-group__header__append-icon {
+      &:hover > .v-list-group__header__append-icon {
         display: none;
       }
       &:hover::before {
         opacity: 0.04;
       }
-      .v-list-group__header__append-icon {
+      > .v-list-group__header__append-icon {
         margin-left: 16px;
         padding: 0 2px;
-        min-width: unset;
+        min-width: 28px !important;
+        justify-content: center;
+        i {
+          font-size: 16px;
+        }
       }
-      .v-list-item__icon {
+      > .v-list-item__icon {
         height: unset;
         min-width: unset;
       }
