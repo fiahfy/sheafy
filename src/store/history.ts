@@ -23,6 +23,9 @@ export default class HistoryModule extends VuexModule {
 
   @Action
   upsertHistory({ url, ...params }: Partial<HistoryItem>) {
+    if (!url) {
+      return
+    }
     let historyItems: HistoryItem[]
     if (this.historyItems.find((item) => item.url === url)) {
       historyItems = this.historyItems.map((item) => {
@@ -41,7 +44,10 @@ export default class HistoryModule extends VuexModule {
       const now = Date.now()
       historyItems = [
         ...this.historyItems,
-        <HistoryItem>{
+        {
+          host: '',
+          title: '',
+          favicon: '',
           ...params,
           url,
           id,
