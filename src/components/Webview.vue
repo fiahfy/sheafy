@@ -317,7 +317,6 @@ export default class Webview extends Vue {
       }
       case 'onclick':
         tabStore.activateView({ id: this.viewId })
-        this.$eventBus.$emit('hideQueryHistory')
         break
       case 'onkeydown': {
         const [e] = args

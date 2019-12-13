@@ -1,68 +1,90 @@
 <template>
-  <v-combobox
-    ref="combobox"
-    v-model="query"
-    class="address-bar body-2"
-    name="query"
-    filled
-    dense
-    hide-details
-    append-icon=""
-    item-text="title"
-    item-value="url"
-    :rounded="rounded"
-    :return-object="false"
-    :items="items"
-    :filter="filter"
-    :menu-props="menuProps"
-    @change="onChange"
-    @focus="onFocus"
-    @mousedown="onMouseDown"
-    @mouseup="onMouseUp"
-    @contextmenu.stop="onContextMenu"
-  >
-    <template v-slot:item="{ item }">
-      <v-list-item-icon class="mr-3 align-self-center">
-        <favicon :url="item.favicon" />
-      </v-list-item-icon>
-      <v-list-item-content>
-        <v-list-item-title class="font-weight-regular caption">
-          <span v-text="item.title" />
-          <span class="secondary--text">— {{ item.url }}</span>
-        </v-list-item-title>
-      </v-list-item-content>
-    </template>
-    <v-icon slot="prepend-inner" small v-text="icon" />
-    <v-btn
-      v-if="activeTab && activeTab.finding"
-      slot="append"
-      x-small
-      depressed
-      rounded
-      title="Find"
-      @click.stop="onClickFind"
-      @mouseup.stop
+  <div class="address-bar flex-grow-1">
+    <v-text-field
+      ref="combobox"
+      v-model="query"
+      class="body-2"
+      name="query"
+      filled
+      dense
+      hide-details
+      :rounded="rounded"
+      @focus="onFocus"
+      @blur="onBlur"
+      @mousedown="onMouseDown"
+      @mouseup="onMouseUp"
+      @keydown.escape="onKeyDownEscape"
+      @keydown.enter="onKeyDownEnter"
+      @keydown.up="onKeyDownUp"
+      @keydown.down="onKeyDownDown"
+      @contextmenu.stop="onContextMenu"
     >
-      <v-icon small>mdi-file-search-outline</v-icon>
-    </v-btn>
-    <v-btn
-      v-if="activeTab && activeTab.zooming"
-      slot="append"
-      x-small
-      depressed
-      rounded
-      title="Zoom"
-      @click.stop="onClickStopFind"
-      @mouseup.stop
+      <v-icon slot="prepend-inner" small v-text="icon" />
+      <v-btn
+        v-if="activeTab && activeTab.finding"
+        slot="append"
+        x-small
+        depressed
+        rounded
+        title="Find"
+        @click.stop="onClickFind"
+        @mouseup.stop
+      >
+        <v-icon small>mdi-file-search-outline</v-icon>
+      </v-btn>
+      <v-btn
+        v-if="activeTab && activeTab.zooming"
+        slot="append"
+        x-small
+        depressed
+        rounded
+        title="Zoom"
+        @click.stop="onClickStopFind"
+        @mouseup.stop
+      >
+        <v-icon small>mdi-magnify-plus-outline</v-icon>
+      </v-btn>
+    </v-text-field>
+    <v-menu
+      v-model="menu"
+      :position-x="x"
+      :position-y="y"
+      :max-width="width"
+      :min-width="width"
+      absolute
+      max-height="360"
+      :close-on-click="false"
+      :close-on-content-click="false"
+      :transition="false"
     >
-      <v-icon small>mdi-magnify-plus-outline</v-icon>
-    </v-btn>
-  </v-combobox>
+      <v-list dense class="py-0">
+        <v-list-item-group v-model="index" color="primary">
+          <v-list-item
+            v-for="(item, index) in items"
+            :key="index"
+            active
+            @mousedown.prevent
+            @click="() => onClickItem(item)"
+          >
+            <v-list-item-icon class="mr-3 align-self-center">
+              <favicon :url="item.favicon" />
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-regular caption">
+                <span v-text="item.title" />
+                <span class="secondary--text">— {{ item.url }}</span>
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </v-menu>
+  </div>
 </template>
 
 <script lang="ts">
 import { VCombobox } from 'vuetify/lib'
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator'
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator'
 import { tabStore, historyStore } from '~/store'
 import HistoryItem from '~/models/history-item'
 import Favicon from '~/components/Favicon.vue'
@@ -76,8 +98,13 @@ export default class ToolbarTextField extends Vue {
   @Prop({ type: String, required: true }) readonly viewId!: string
   @Ref() readonly combobox!: typeof VCombobox
 
-  width = 0
+  focused = false
   focusIn = false
+  menu = false
+  width = 0
+  x = 0
+  y = 0
+  index = 0
 
   get activeTab() {
     return tabStore.getActiveTab({ viewId: this.viewId })
@@ -96,54 +123,59 @@ export default class ToolbarTextField extends Vue {
   }
 
   get rounded() {
-    // TODO: return false if menu is open
-    return true
+    return !this.menu
   }
 
   get items() {
     return historyStore.sortedHistoryItems
-  }
-
-  get filter() {
-    return (item: HistoryItem, queryText: string, itemText: string) => {
-      return (
-        itemText.toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) ||
-        item.url.toLocaleLowerCase().includes(queryText.toLocaleLowerCase())
-      )
-    }
-  }
-
-  get menuProps() {
-    return {
-      closeOnClick: false,
-      closeOnContentClick: false,
-      openOnClick: false,
-      maxHeight: 480,
-      offsetY: true,
-      offsetOverflow: true,
-      transition: false,
-      maxWidth: this.width
-    }
+      .filter((item) => item.url !== this.query)
+      .filter((item) => {
+        return (
+          item.title
+            .toLocaleLowerCase()
+            .includes(this.query.toLocaleLowerCase()) ||
+          item.url.toLocaleLowerCase().includes(this.query.toLocaleLowerCase())
+        )
+      })
+      .slice(0, 10)
   }
 
   get icon() {
     const tab = this.activeTab
-    const url = tab ? tab.url : ''
-    const match = url.match(/^http(s)?:\/\//)
-    if (match) {
-      return match[1] ? 'mdi-lock' : 'mdi-alert-circle-outline'
+    const query = tab ? tab.query : ''
+    const match = query.match(/^(\w+):\/\//)
+    if (!match) {
+      return 'mdi-magnify'
     }
-    return 'mdi-help-circle-outline'
+    switch (match[1]) {
+      case 'https':
+        return 'mdi-lock'
+      case 'http':
+        return 'mdi-alert-circle-outline'
+      default:
+        return 'mdi-help-circle-outline'
+    }
+  }
+
+  @Watch('menu')
+  onMenuChanged() {
+    this.index = -1
+  }
+
+  @Watch('items')
+  onItemsChanged(value: HistoryItem[]) {
+    this.index = -1
+    if (this.focused) {
+      this.menu = !!value.length
+    }
   }
 
   mounted() {
     this.$eventBus.$on('focusLocation', this.focus)
-    this.$eventBus.$on('hideQueryHistory', this.hideQueryHistory)
   }
 
   destroyed() {
     this.$eventBus.$off('focusLocation', this.focus)
-    this.$eventBus.$off('hideQueryHistory', this.hideQueryHistory)
   }
 
   focus({ viewId }: { viewId: string }) {
@@ -159,29 +191,22 @@ export default class ToolbarTextField extends Vue {
     })
   }
 
-  hideQueryHistory() {
-    ;(this.combobox as any).isMenuActive = false
-  }
-
   onContextMenu() {
     this.$contextMenu.openEditMenu()
   }
 
-  onChange() {
-    this.hideQueryHistory()
-    const input = this.$el.querySelector('input')!
-    input.blur()
-    this.$nextTick(() => {
-      this.$eventBus.$emit('load', { viewId: this.viewId })
-    })
+  onFocus() {
+    this.focused = true
+    const rect = this.$el.getBoundingClientRect()
+    this.x = rect.left
+    this.y = rect.top + rect.height
+    this.width = rect.width
+    this.menu = this.menu = !!this.items.length
   }
 
-  onFocus() {
-    this.$nextTick(() => {
-      // TODO: prevent selection all when focused
-      ;(window as Window).getSelection()!.empty()
-    })
-    this.width = (this.$el as HTMLElement).offsetWidth
+  onBlur() {
+    this.focused = false
+    this.menu = false
   }
 
   onMouseDown(e: MouseEvent) {
@@ -189,8 +214,7 @@ export default class ToolbarTextField extends Vue {
     if (input === document.activeElement) {
       return
     }
-    // remove selection on focus
-    // ;(window as Window).getSelection()!.empty()
+    ;(window as Window).getSelection()!.empty()
     this.focusIn = true
   }
 
@@ -202,7 +226,43 @@ export default class ToolbarTextField extends Vue {
     this.focusIn = false
   }
 
-  onClickFind() {
+  onKeyDownUp() {
+    const index = this.index - 1
+    this.index = Math.max(0, Math.min(index, this.items.length - 1))
+  }
+
+  onKeyDownDown() {
+    const index = this.index + 1
+    this.index = Math.max(0, Math.min(index, this.items.length - 1))
+  }
+
+  onKeyDownEscape() {
+    this.menu = false
+  }
+
+  onKeyDownEnter(e: KeyboardEvent) {
+    const item = this.items[this.index]
+    if (item) {
+      this.query = item.url
+    }
+    if (!this.query) {
+      return
+    }
+    const input = e.target as HTMLInputElement
+    input.blur()
+    this.$nextTick(() => {
+      this.$eventBus.$emit('load', { viewId: this.viewId })
+    })
+  }
+
+  onClickItem(item: HistoryItem) {
+    this.query = item.url
+    this.$nextTick(() => {
+      this.$eventBus.$emit('load', { viewId: this.viewId })
+    })
+  }
+
+  onClickStopFind() {
     const tab = this.activeTab
     if (tab) {
       tabStore.updateTab({ id: tab.id, finding: false })
@@ -212,7 +272,7 @@ export default class ToolbarTextField extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.address-bar {
+.address-bar .v-text-field {
   &.primary--text {
     caret-color: unset !important;
   }
@@ -222,26 +282,28 @@ export default class ToolbarTextField extends Vue {
   ::v-deep .v-input__control > .v-input__slot {
     min-height: unset;
     padding: 0 6px 0 12px !important;
+    &::before,
+    &::after {
+      display: none;
+    }
     > .v-input__prepend-inner {
       margin-top: 0;
-      padding-right: 8px;
+      padding-right: 12px;
       align-self: center;
     }
-    > .v-select__slot {
-      > input {
-        padding: 4px 0;
-        margin-top: 0 !important;
-      }
-      > .v-input__append-inner {
-        margin-top: 0;
-        align-self: center;
-      }
+    > .v-text-field__slot > input {
+      padding: 4px 0;
+      margin-top: 0;
+    }
+    > .v-input__append-inner {
+      margin-top: 0;
+      align-self: center;
     }
   }
 }
 ::v-deep .v-list-item {
   min-height: 36px;
-  .v-list-item__icon {
+  > .v-list-item__icon {
     height: unset;
     min-width: unset;
   }
