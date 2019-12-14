@@ -22,6 +22,9 @@
       <v-icon small>mdi-close</v-icon>
     </v-btn>
     <div class="background d-flex flex-grow-1 fill-height align-center pl-1">
+      <v-btn icon small class="mr-1" title="New Tab" @click="onClickNewTab">
+        <v-icon small>mdi-plus</v-icon>
+      </v-btn>
       <v-spacer />
       <v-btn
         v-long-press="onContextMenuBackTab"
@@ -219,6 +222,10 @@ export default class Toolbar extends Vue {
     if (tab) {
       tabStore.closeTab({ id: tab.id })
     }
+  }
+
+  onClickNewTab() {
+    tabStore.newTab()
   }
 
   onClickCloseView() {

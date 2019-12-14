@@ -5,16 +5,6 @@
         tabs
       </span>
       <chip class="ml-3" :num="tabs.length" />
-      <v-spacer />
-      <v-btn
-        icon
-        small
-        title="New Tab"
-        class="ml-1 mr-0"
-        @click="onClickNewTab"
-      >
-        <v-icon small>mdi-tab-plus</v-icon>
-      </v-btn>
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">
       <tab-list :tabs="tabs" />
@@ -39,10 +29,6 @@ export default class TabPane extends Vue {
 
   get tabs() {
     return tabStore.sortedTabs
-  }
-
-  onClickNewTab() {
-    tabStore.newTab()
   }
 }
 </script>
