@@ -60,6 +60,16 @@
       >
         <v-icon small>mdi-close</v-icon>
       </v-btn>
+      <v-btn
+        v-else
+        icon
+        small
+        class="mr-1"
+        title="Open Secondary View"
+        @click.stop="onClickOpenView"
+      >
+        <v-icon small>mdi-view-split-vertical</v-icon>
+      </v-btn>
     </div>
     <template slot="extension">
       <v-btn
@@ -230,6 +240,16 @@ export default class Toolbar extends Vue {
 
   onClickCloseView() {
     tabStore.closeView({ id: this.viewId })
+  }
+
+  onClickOpenView() {
+    const tab = this.activeTab
+    if (tab) {
+      tabStore.activateTab({
+        id: tab.id,
+        viewId: 'secondary'
+      })
+    }
   }
 
   onClickGoBackTab() {
