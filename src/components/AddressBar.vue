@@ -62,7 +62,6 @@
           <v-list-item
             v-for="(item, index) in items"
             :key="index"
-            active
             @mousedown.prevent
             @click="() => onClickItem(item)"
           >
@@ -94,7 +93,7 @@ import Favicon from '~/components/Favicon.vue'
     Favicon
   }
 })
-export default class ToolbarTextField extends Vue {
+export default class AddressBar extends Vue {
   @Prop({ type: String, required: true }) readonly viewId!: string
   @Ref() readonly combobox!: typeof VCombobox
 
