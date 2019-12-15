@@ -119,7 +119,7 @@ export default class ContextMenu extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.v-list-item {
+::v-deep .v-list-item {
   min-height: unset;
   > .v-list-item__icon {
     height: unset;
