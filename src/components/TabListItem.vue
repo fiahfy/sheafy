@@ -6,7 +6,7 @@
     :input-value="active"
     :ripple="false"
     @click="onClick"
-    @contextmenu="onContextMenu"
+    @contextmenu.stop="onContextMenu"
   >
     <v-list-item-icon class="my-0 mr-3 align-self-center">
       <favicon :url="tab.favicon" :loading="tab.loading" />

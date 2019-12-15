@@ -3,7 +3,7 @@
     class="download-list-item"
     :title="item.filename"
     @click="onClickItem"
-    @contextmenu="onContextMenu"
+    @contextmenu.stop="onContextMenu"
   >
     <v-list-item-avatar class="my-0 mr-3">
       <v-icon v-text="icon" />

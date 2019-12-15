@@ -3,7 +3,7 @@
     class="history-list-item"
     :title="item.title"
     @click="onClickItem"
-    @contextmenu="onContextMenu"
+    @contextmenu.stop="onContextMenu"
   >
     <v-list-item-icon class="mr-3 align-center">
       <favicon :url="item.favicon" />

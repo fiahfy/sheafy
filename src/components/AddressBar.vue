@@ -17,7 +17,7 @@
       @keydown.enter="onKeyDownEnter"
       @keydown.up="onKeyDownUp"
       @keydown.down="onKeyDownDown"
-      @contextmenu="onContextMenu"
+      @contextmenu.stop="onContextMenu"
     >
       <v-icon slot="prepend-inner" small v-text="icon" />
       <v-btn

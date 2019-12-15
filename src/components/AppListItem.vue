@@ -6,7 +6,7 @@
         <v-list-item-icon class="mr-3 align-self-center">
           <favicon :url="app.favicon" />
         </v-list-item-icon>
-        <v-list-item-content @contextmenu="onContextMenuItem">
+        <v-list-item-content @contextmenu.stop="onContextMenuItem">
           <v-list-item-title v-text="app.host" />
         </v-list-item-content>
         <chip v-if="app.tabs.length" class="ml-3" :num="app.tabs.length" />
