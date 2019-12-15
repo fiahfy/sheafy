@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { remote, WebviewTag } from 'electron'
-import { layoutStore, tabStore, historyStore } from '~/store'
+import { tabStore, historyStore } from '~/store'
 import TabUtils from '~/utils/tab'
 import Tab, { homeUrl } from '~/models/tab'
 
@@ -61,6 +61,10 @@ export default class Webview extends Vue {
   }
 
   destroyed() {
+    if (!this.webview) {
+      return
+    }
+
     this.$eventBus.$off('undo', this.undo)
     this.$eventBus.$off('redo', this.redo)
     this.$eventBus.$off('goBack', this.goBack)
@@ -315,14 +319,16 @@ export default class Webview extends Vue {
         tabStore.activateTab({ id: this.tab.id, viewId })
         break
       }
-      case 'onclick':
-        tabStore.activateView({ id: this.viewId })
+      case 'onclick': {
+        const selector = `#${this.viewId}-view`
+        ;(document.querySelector(selector) as HTMLDivElement).click()
         break
+      }
       case 'onkeydown': {
-        const [e] = args
-        if (e.key === 'Escape') {
-          layoutStore.hideShortcutBar()
-        }
+        const [{ key }] = args
+        const e = new KeyboardEvent('keydown', { key, bubbles: true })
+        const selector = `#${this.viewId}-view`
+        ;(document.querySelector(selector) as HTMLDivElement).dispatchEvent(e)
         break
       }
       case 'openDefaultBrowser': {

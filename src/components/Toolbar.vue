@@ -15,7 +15,7 @@
     />
     <div
       class="caption text-truncate user-select-none"
-      @contextmenu.stop="onContextMenu"
+      @contextmenu="onContextMenu"
       v-text="activeTab && activeTab.title"
     />
     <v-btn icon small class="mx-1" title="Close" @click="onClickClose">
@@ -34,7 +34,7 @@
         title="Go Back Tab"
         :disabled="!canGoBackTab"
         @click="onClickGoBackTab"
-        @contextmenu.stop="onContextMenuBackTab"
+        @contextmenu="onContextMenuBackTab"
       >
         <v-icon small>mdi-chevron-left</v-icon>
       </v-btn>
@@ -46,7 +46,7 @@
         title="Go Forward Tab"
         :disabled="!canGoForwardTab"
         @click="onClickGoForwardTab"
-        @contextmenu.stop="onContextMenuForwardTab"
+        @contextmenu="onContextMenuForwardTab"
       >
         <v-icon small>mdi-chevron-right</v-icon>
       </v-btn>
@@ -80,7 +80,7 @@
         title="Go Back"
         :disabled="!activeTab || !activeTab.canGoBack"
         @click="onClickGoBack"
-        @contextmenu.stop="onContextMenuBack"
+        @contextmenu="onContextMenuBack"
       >
         <v-icon size="18">mdi-arrow-left</v-icon>
       </v-btn>
@@ -92,7 +92,7 @@
         title="Go Forward"
         :disabled="!activeTab || !activeTab.canGoForward"
         @click="onClickGoForward"
-        @contextmenu.stop="onContextMenuForward"
+        @contextmenu="onContextMenuForward"
       >
         <v-icon size="18">mdi-arrow-right</v-icon>
       </v-btn>
@@ -124,7 +124,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { shell } from 'electron'
-import { tabStore } from '~/store'
+import { tabStore, historyStore } from '~/store'
 import AddressBar from '~/components/AddressBar.vue'
 import Favicon from '~/components/Favicon.vue'
 
@@ -174,16 +174,19 @@ export default class Toolbar extends Vue {
       return
     }
     this.$contextMenu.open(
-      history.map((title, index) => {
+      history.map((url, index) => {
+        const item = historyStore.getHistoryItemWithUrl({ url })
         return {
-          label: title,
+          icon: item ? item.favicon : undefined,
+          label: item ? item.title : url,
           click: () =>
             this.$eventBus.$emit('goToOffset', {
               viewId: this.viewId,
               offset: -index - 1
             })
         }
-      })
+      }),
+      { vuetify: true }
     )
   }
 
@@ -198,16 +201,19 @@ export default class Toolbar extends Vue {
       return
     }
     this.$contextMenu.open(
-      history.map((history, index) => {
+      history.map((url, index) => {
+        const item = historyStore.getHistoryItemWithUrl({ url })
         return {
-          label: history,
+          icon: item ? item.favicon : undefined,
+          label: item ? item.title : url,
           click: () =>
             this.$eventBus.$emit('goToOffset', {
               viewId: this.viewId,
               offset: index + 1
             })
         }
-      })
+      }),
+      { vuetify: true }
     )
   }
 
@@ -265,27 +271,30 @@ export default class Toolbar extends Vue {
     if (!tab) {
       return
     }
-    this.$contextMenu.open([
-      {
-        label: 'New Tab',
-        click: () =>
-          tabStore.newTab({ options: { srcId: tab.id, position: 'next' } })
-      },
-      { type: 'separator' },
-      {
-        label: 'Duplicate Tab',
-        click: () => tabStore.duplicateTab({ id: tab.id })
-      },
-      {
-        label: 'Open Current Page in a Default Browser',
-        click: () => shell.openExternal(tab.url)
-      },
-      { type: 'separator' },
-      {
-        label: 'Close Tab',
-        click: () => tabStore.closeTab({ id: tab.id })
-      }
-    ])
+    this.$contextMenu.open(
+      [
+        {
+          label: 'New Tab',
+          click: () =>
+            tabStore.newTab({ options: { srcId: tab.id, position: 'next' } })
+        },
+        { type: 'separator' },
+        {
+          label: 'Duplicate Tab',
+          click: () => tabStore.duplicateTab({ id: tab.id })
+        },
+        {
+          label: 'Open Current Page in a Default Browser',
+          click: () => shell.openExternal(tab.url)
+        },
+        { type: 'separator' },
+        {
+          label: 'Close Tab',
+          click: () => tabStore.closeTab({ id: tab.id })
+        }
+      ],
+      { vuetify: true }
+    )
   }
 
   onContextMenuBack() {

@@ -6,7 +6,7 @@
     :input-value="active"
     :ripple="false"
     @click="onClick"
-    @contextmenu.stop="onContextMenu"
+    @contextmenu="onContextMenu"
   >
     <v-list-item-icon class="my-0 mr-3 align-self-center">
       <favicon :url="tab.favicon" :loading="tab.loading" />
@@ -74,33 +74,38 @@ export default class TabListItem extends Vue {
   }
 
   onContextMenu() {
-    this.$contextMenu.open([
-      {
-        label: 'Open to the Secondary View',
-        click: () =>
-          tabStore.activateTab({ id: this.tab.id, viewId: 'secondary' })
-      },
-      { type: 'separator' },
-      {
-        label: 'New Tab',
-        click: () =>
-          tabStore.newTab({ options: { srcId: this.tab.id, position: 'next' } })
-      },
-      { type: 'separator' },
-      {
-        label: 'Duplicate Tab',
-        click: () => tabStore.duplicateTab({ id: this.tab.id })
-      },
-      {
-        label: 'Open Current Page in a Default Browser',
-        click: () => shell.openExternal(this.tab.url)
-      },
-      { type: 'separator' },
-      {
-        label: 'Close Tab',
-        click: () => tabStore.closeTab({ id: this.tab.id })
-      }
-    ])
+    this.$contextMenu.open(
+      [
+        {
+          label: 'Open to the Secondary View',
+          click: () =>
+            tabStore.activateTab({ id: this.tab.id, viewId: 'secondary' })
+        },
+        { type: 'separator' },
+        {
+          label: 'New Tab',
+          click: () =>
+            tabStore.newTab({
+              options: { srcId: this.tab.id, position: 'next' }
+            })
+        },
+        { type: 'separator' },
+        {
+          label: 'Duplicate Tab',
+          click: () => tabStore.duplicateTab({ id: this.tab.id })
+        },
+        {
+          label: 'Open Current Page in a Default Browser',
+          click: () => shell.openExternal(this.tab.url)
+        },
+        { type: 'separator' },
+        {
+          label: 'Close Tab',
+          click: () => tabStore.closeTab({ id: this.tab.id })
+        }
+      ],
+      { vuetify: true }
+    )
   }
 }
 </script>

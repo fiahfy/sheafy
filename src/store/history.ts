@@ -16,6 +16,11 @@ export default class HistoryModule extends VuexModule {
     })
   }
 
+  get getHistoryItemWithUrl() {
+    return ({ url }: { url: string }) =>
+      this.historyItems.find((item) => item.url === url)
+  }
+
   @Mutation
   setHistoryItems({ historyItems }: { historyItems: HistoryItem[] }) {
     this.historyItems = historyItems

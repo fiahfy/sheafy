@@ -14,6 +14,7 @@
         class="d-flex flex-grow-1 overflow-hidden fill-height"
       >
         <div
+          id="primary-view"
           ref="primaryView"
           class="d-flex flex-column white flex-grow-1 overflow-hidden"
           style="min-height: 0; flex-basis: 0;"
@@ -30,6 +31,7 @@
         </div>
         <div
           v-if="multiView"
+          id="secondary-view"
           ref="secondaryView"
           class="d-flex flex-column white flex-grow-0 overflow-hidden"
           :style="{ width: `${width * 100}%` }"

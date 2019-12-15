@@ -9,7 +9,7 @@
       @focus="onFocus"
       @keydown.enter="onKeyDownEnter"
       @keydown.esc="onKeyDownEsc"
-      @contextmenu.stop="onContextMenu"
+      @contextmenu="onContextMenu"
     />
     <div v-if="activeTab && activeTab.findingText" class="ml-2 body-2">
       {{ activeTab.foundActiveMatchOrdinal }} / {{ activeTab.foundMatches }}

@@ -27,7 +27,7 @@
           filled
           hide-details
           @focus="onFocus"
-          @contextmenu.stop="onContextMenu"
+          @contextmenu="onContextMenu"
         />
       </template>
     </v-toolbar>

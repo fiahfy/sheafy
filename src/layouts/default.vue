@@ -4,16 +4,19 @@
     <v-content class="fill-height">
       <router-view class="fill-height" />
     </v-content>
+    <context-menu />
   </v-app>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import { layoutStore, settingsStore, tabStore } from '~/store'
+import ContextMenu from '~/components/ContextMenu.vue'
 import TitleBar from '~/components/TitleBar.vue'
 
 @Component({
   components: {
+    ContextMenu,
     TitleBar
   }
 })

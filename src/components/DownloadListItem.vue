@@ -3,7 +3,7 @@
     class="download-list-item"
     :title="item.filename"
     @click="onClickItem"
-    @contextmenu.stop="onContextMenu"
+    @contextmenu="onContextMenu"
   >
     <v-list-item-avatar class="my-0 mr-3">
       <v-icon v-text="icon" />
@@ -271,7 +271,7 @@ export default class DownloadListItem extends Vue {
       ]
     }
 
-    this.$contextMenu.open(template)
+    this.$contextMenu.open(template, { vuetify: true })
   }
 }
 </script>

@@ -3,7 +3,7 @@
     class="history-list-item"
     :title="item.title"
     @click="onClickItem"
-    @contextmenu.stop="onContextMenu"
+    @contextmenu="onContextMenu"
   >
     <v-list-item-icon class="mr-3 align-center">
       <favicon :url="item.favicon" />
@@ -65,7 +65,7 @@ export default class HistoryListItem extends Vue {
       }
     ]
 
-    this.$contextMenu.open(template)
+    this.$contextMenu.open(template, { vuetify: true })
   }
 }
 </script>
