@@ -58,7 +58,21 @@ module.exports = {
       '@nuxtjs/vuetify',
       {
         customVariables: ['~/assets/variables.scss'],
-        defaultAssets: false
+        defaultAssets: false,
+        theme: {
+          themes: {
+            light: {
+              primary: '#ff4081',
+              secondary: '#424242',
+              accent: '#ff4081'
+            },
+            dark: {
+              primary: '#ff4081',
+              secondary: '#E0E0E0',
+              accent: '#ff4081'
+            }
+          }
+        }
       }
     ]
   ],
