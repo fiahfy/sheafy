@@ -131,10 +131,10 @@ export default class ShortcutBar extends Vue {
   border-radius: 0;
 }
 ::v-deep .v-list-item {
-  min-height: 36px;
+  min-height: 36px !important;
   .v-list-item__icon {
-    height: unset;
-    min-width: unset;
+    height: unset !important;
+    min-width: unset !important;
   }
 }
 </style>
