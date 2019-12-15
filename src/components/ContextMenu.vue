@@ -120,10 +120,10 @@ export default class ContextMenu extends Vue {
 
 <style lang="scss" scoped>
 ::v-deep .v-list-item {
-  min-height: unset;
+  min-height: 32px !important;
   > .v-list-item__icon {
-    height: unset;
-    min-width: unset;
+    height: unset !important;
+    min-width: unset !important;
   }
 }
 </style>
