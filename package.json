@@ -1,7 +1,7 @@
 {
   "name": "sheafy",
   "description": "Browser Application that organizes Web Applications",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": {
     "name": "fiahfy",
     "email": "d.fiahfy@gmail.com",
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@fiahfy/electron-accelerator-formatter": "^0.0.3",
-    "@fiahfy/electron-context-menu": "^0.0.3",
+    "@fiahfy/electron-context-menu": "^0.0.5",
     "@mdi/font": "^4.6.95",
     "@nuxtjs/vuetify": "^1.9.1",
     "@types/debounce": "^1.2.0",

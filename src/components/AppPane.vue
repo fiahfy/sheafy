@@ -1,30 +1,22 @@
 <template>
   <div class="app-pane d-flex flex-column">
-    <v-toolbar tile dense flat class="flex-grow-0 pr-2" height="36">
-      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+    <v-toolbar tile dense flat class="flex-grow-0" height="36">
+      <span class="overline user-select-none">
         apps
       </span>
       <chip class="ml-3" :num="apps.length" />
       <v-spacer />
-      <v-btn
-        icon
-        width="32"
-        height="32"
-        title="Expand Apps"
-        class="ml-1"
-        @click="onClickExpand"
-      >
-        <v-icon size="20">mdi-expand-all</v-icon>
+      <v-btn icon small title="Expand Apps" class="ml-1" @click="onClickExpand">
+        <v-icon small>mdi-expand-all</v-icon>
       </v-btn>
       <v-btn
         icon
-        width="32"
-        height="32"
+        small
         title="Collapse Apps"
-        class="ml-1"
+        class="ml-1 mr-0"
         @click="onClickCollapse"
       >
-        <v-icon size="20">mdi-collapse-all</v-icon>
+        <v-icon small>mdi-collapse-all</v-icon>
       </v-btn>
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">
@@ -63,7 +55,15 @@ export default class AppPane extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.app-pane > div {
-  position: relative;
+.app-pane {
+  > div {
+    position: relative;
+  }
+  .theme--light & .v-toolbar {
+    background-color: #fafafa;
+  }
+  .theme--dark & .v-toolbar {
+    background-color: #303030;
+  }
 }
 </style>

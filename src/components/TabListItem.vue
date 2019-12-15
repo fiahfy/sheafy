@@ -1,9 +1,10 @@
 <template>
   <v-list-item
     class="tab-list-item pr-2"
-    :class="{ inset }"
+    :class="classes"
     :title="title"
     :input-value="active"
+    :ripple="false"
     @click="onClick"
     @contextmenu.stop="onContextMenu"
   >
@@ -45,6 +46,10 @@ export default class TabListItem extends Vue {
     return tabStore.isActiveTab({ id: this.tab.id })
   }
 
+  get classes() {
+    return { inset: this.inset }
+  }
+
   get title() {
     return this.app ? this.tab.host : this.tab.title
   }
@@ -69,33 +74,38 @@ export default class TabListItem extends Vue {
   }
 
   onContextMenu() {
-    this.$contextMenu.show([
-      {
-        label: 'Open to the Secondary View',
-        click: () =>
-          tabStore.activateTab({ id: this.tab.id, viewId: 'secondary' })
-      },
-      { type: 'separator' },
-      {
-        label: 'New Tab',
-        click: () =>
-          tabStore.newTab({ options: { srcId: this.tab.id, position: 'next' } })
-      },
-      { type: 'separator' },
-      {
-        label: 'Duplicate Tab',
-        click: () => tabStore.duplicateTab({ id: this.tab.id })
-      },
-      {
-        label: 'Open Current Page in a Default Browser',
-        click: () => shell.openExternal(this.tab.url)
-      },
-      { type: 'separator' },
-      {
-        label: 'Close Tab',
-        click: () => tabStore.closeTab({ id: this.tab.id })
-      }
-    ])
+    this.$contextMenu.open(
+      [
+        {
+          label: 'Open to the Secondary View',
+          click: () =>
+            tabStore.activateTab({ id: this.tab.id, viewId: 'secondary' })
+        },
+        { type: 'separator' },
+        {
+          label: 'New Tab',
+          click: () =>
+            tabStore.newTab({
+              options: { srcId: this.tab.id, position: 'next' }
+            })
+        },
+        { type: 'separator' },
+        {
+          label: 'Duplicate Tab',
+          click: () => tabStore.duplicateTab({ id: this.tab.id })
+        },
+        {
+          label: 'Open Current Page in a Default Browser',
+          click: () => shell.openExternal(this.tab.url)
+        },
+        { type: 'separator' },
+        {
+          label: 'Close Tab',
+          click: () => tabStore.closeTab({ id: this.tab.id })
+        }
+      ],
+      { vuetify: true }
+    )
   }
 }
 </script>
@@ -109,9 +119,27 @@ export default class TabListItem extends Vue {
   &:not(.v-list-item--active):not(:hover) ::v-deep .v-list-item__action {
     opacity: 0;
   }
-  .v-list-item__icon {
+  > .v-list-item__icon {
     height: unset;
     min-width: unset;
+  }
+  .theme--light & {
+    background: #eeeeee;
+    &.v-list-item--active {
+      background: #ffffff;
+      &::before {
+        display: none;
+      }
+    }
+  }
+  .theme--dark & {
+    background: #212121;
+    &.v-list-item--active {
+      background: #424242;
+      &::before {
+        display: none;
+      }
+    }
   }
 }
 </style>

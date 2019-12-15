@@ -14,6 +14,7 @@
         class="d-flex flex-grow-1 overflow-hidden fill-height"
       >
         <div
+          id="primary-view"
           ref="primaryView"
           class="d-flex flex-column white flex-grow-1 overflow-hidden"
           style="min-height: 0; flex-basis: 0;"
@@ -25,9 +26,12 @@
             <status-bar view-id="primary" />
           </div>
         </div>
-        <div v-show="multiView" ref="resizer" class="resizer" vertical />
+        <div v-show="multiView" ref="resizer" class="resizer">
+          <v-divider vertical />
+        </div>
         <div
           v-if="multiView"
+          id="secondary-view"
           ref="secondaryView"
           class="d-flex flex-column white flex-grow-0 overflow-hidden"
           :style="{ width: `${width * 100}%` }"
@@ -101,7 +105,7 @@ export default class Index extends Vue {
   @Ref() readonly secondaryInner!: HTMLDivElement
 
   resizing = false
-  debounced = debounce(this.resize, 100)
+  debounced = debounce(this.onResize, 100)
   observer = new ResizeObserver(() => this.debounced())
 
   get classes() {
@@ -135,11 +139,11 @@ export default class Index extends Vue {
   }
 
   get width() {
-    return settingsStore.secondaryTabWidthRatio
+    return settingsStore.secondaryViewWidthRatio
   }
 
   set width(value) {
-    settingsStore.setSecondaryTabWidthRatio({ secondaryTabWidthRatio: value })
+    settingsStore.setSecondaryViewWidthRatio({ secondaryViewWidthRatio: value })
   }
 
   @Watch('activeTabIds')
@@ -148,34 +152,8 @@ export default class Index extends Vue {
   }
 
   mounted() {
-    const resize = (e: MouseEvent) => {
-      const width = this.secondaryView.getBoundingClientRect().right - e.clientX
-      if (
-        width < 256 ||
-        width > window.innerWidth - 256 - settingsStore.sidebarWidth
-      ) {
-        return
-      }
-      this.secondaryView.style.width = width + 'px'
-    }
-
-    this.resizer.addEventListener('mousedown', () => {
-      this.resizing = true
-      layoutStore.setResizing({ resizing: true })
-      document.body.style.cursor = 'ew-resize'
-      document.addEventListener('mousemove', resize)
-    })
-
-    document.addEventListener('mouseup', () => {
-      if (!this.resizing) {
-        return
-      }
-      this.resizing = false
-      layoutStore.setResizing({ resizing: false })
-      this.width = this.secondaryView.offsetWidth / this.wrapper.offsetWidth
-      document.body.style.cursor = ''
-      document.removeEventListener('mousemove', resize)
-    })
+    this.resizer.addEventListener('mousedown', this.onMouseDown)
+    document.addEventListener('mouseup', this.onMouseUp)
 
     this.$nextTick(() => {
       const el = this.$el.querySelector('.inner')
@@ -184,8 +162,40 @@ export default class Index extends Vue {
   }
 
   destroyed() {
+    this.resizer.removeEventListener('mousedown', this.onMouseDown)
+    document.removeEventListener('mouseup', this.onMouseUp)
+
     const el = this.$el.querySelector('.inner')
     el && this.observer.unobserve(el)
+  }
+
+  onMouseDown() {
+    this.resizing = true
+    layoutStore.setResizing({ resizing: true })
+    document.body.style.cursor = 'ew-resize'
+    document.addEventListener('mousemove', this.onMouseMove)
+  }
+
+  onMouseUp() {
+    if (!this.resizing) {
+      return
+    }
+    this.resizing = false
+    layoutStore.setResizing({ resizing: false })
+    this.width = this.secondaryView.offsetWidth / this.wrapper.offsetWidth
+    document.body.style.cursor = ''
+    document.removeEventListener('mousemove', this.onMouseMove)
+  }
+
+  onMouseMove(e: MouseEvent) {
+    const width = this.secondaryView.getBoundingClientRect().right - e.clientX
+    if (
+      width < 256 ||
+      width > window.innerWidth - 256 - settingsStore.sidebarWidth
+    ) {
+      return
+    }
+    this.secondaryView.style.width = width + 'px'
   }
 
   onClickPrimaryView() {
@@ -196,7 +206,7 @@ export default class Index extends Vue {
     tabStore.activateView({ id: 'secondary' })
   }
 
-  async resize() {
+  async onResize() {
     const primaryWebview = (await waitUntil(() =>
       this.$el.querySelector('#primary-webview')
     )) as HTMLDivElement
@@ -257,7 +267,7 @@ export default class Index extends Vue {
       height: 100%;
       padding: 0 1px;
       margin: 0 -1px;
-      z-index: 5;
+      z-index: 1;
       cursor: ew-resize;
     }
   }

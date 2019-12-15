@@ -1,9 +1,7 @@
 <template>
-  <v-list class="tab-list primary--text py-0" dense>
-    <draggable v-model="model" animation="150" @end="onEnd">
-      <v-sheet v-for="tab in tabs" :key="tab.id" tile>
-        <tab-list-item :tab="tab" />
-      </v-sheet>
+  <v-list class="tab-list py-0 transparent" dense>
+    <draggable v-model="model" animation="150">
+      <tab-list-item v-for="tab in tabs" :key="tab.id" :tab="tab" />
     </draggable>
   </v-list>
 </template>
@@ -30,20 +28,12 @@ export default class TabPane extends Vue {
     const ids = value.map((tab) => tab.id)
     tabStore.sortTabs({ ids })
   }
-
-  onEnd() {
-    // Remove ripples if stop sorting
-    this.$el.querySelectorAll('.v-ripple__container').forEach((el) => {
-      ;(el as HTMLSpanElement).style.display = 'none'
-    })
-  }
 }
 </script>
 
 <style lang="scss" scoped>
-.tab-list .v-sheet {
-  color: inherit;
-  &.sortable-ghost {
+.tab-list {
+  .tab-list-item.sortable-ghost {
     opacity: 0;
   }
 }

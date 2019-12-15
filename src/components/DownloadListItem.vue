@@ -271,7 +271,7 @@ export default class DownloadListItem extends Vue {
       ]
     }
 
-    this.$contextMenu.show(template)
+    this.$contextMenu.open(template, { vuetify: true })
   }
 }
 </script>
@@ -283,6 +283,12 @@ export default class DownloadListItem extends Vue {
   }
   &:not(:hover) ::v-deep .v-list-item__action {
     display: none;
+  }
+  .theme--light & {
+    background: #eeeeee;
+  }
+  .theme--dark & {
+    background: #212121;
   }
 }
 </style>

@@ -4,36 +4,30 @@
       tile
       dense
       flat
-      class="flex-grow-0 pr-2"
+      class="flex-grow-0"
       height="36"
       extended
       extension-height="36"
     >
-      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+      <span class="overline user-select-none">
         downloads
       </span>
       <chip v-if="items.length" class="ml-3" :num="items.length" />
       <v-spacer />
-      <v-btn
-        icon
-        width="32"
-        height="32"
-        title="Clear All"
-        @click="onClickClearAll"
-      >
-        <v-icon size="20">mdi-notification-clear-all</v-icon>
+      <v-btn icon small title="Clear All" class="mr-0" @click="onClickClearAll">
+        <v-icon small>mdi-notification-clear-all</v-icon>
       </v-btn>
       <template slot="extension">
         <v-text-field
           v-model="searchText"
           class="body-2"
-          clearable
-          clear-icon="mdi-close-circle-outline"
           prepend-inner-icon="mdi-magnify"
           placeholder="Search"
-          outlined
           dense
+          filled
           hide-details
+          @focus="onFocus"
+          @contextmenu.stop="onContextMenu"
         />
       </template>
     </v-toolbar>
@@ -105,6 +99,15 @@ export default class DownloadPanel extends Vue {
     downloadStore.clearDownloads()
   }
 
+  onFocus(e: FocusEvent) {
+    const input = e.target as HTMLInputElement
+    input.select()
+  }
+
+  onContextMenu() {
+    this.$contextMenu.openEditMenu()
+  }
+
   onScroll(e: Event) {
     const top = (e.target as HTMLDivElement).scrollTop
     if (
@@ -126,19 +129,38 @@ export default class DownloadPanel extends Vue {
 
 <style lang="scss" scoped>
 .download-panel {
-  .v-text-field ::v-deep .v-input__control > .v-input__slot {
-    min-height: unset;
-    padding: 0 8px;
-    > .v-input__prepend-inner {
-      margin-top: 0;
-      padding-right: 8px;
-      align-self: center;
+  .v-text-field {
+    border-radius: 0;
+    &.primary--text {
+      color: unset !important;
+      caret-color: unset !important;
     }
-    > .v-input__append-inner {
-      margin-top: 0;
-      padding-left: 8px;
-      align-self: center;
+    ::v-deep .v-input__control > .v-input__slot {
+      min-height: unset;
+      padding: 0 8px;
+      &::before,
+      &::after {
+        display: none;
+      }
+      > .v-input__prepend-inner {
+        margin-top: 0;
+        padding-right: 8px;
+        align-self: center;
+      }
+      > .v-text-field__slot > input {
+        padding: 4px 0;
+        margin-top: 0 !important;
+      }
+      .v-icon.primary--text {
+        color: unset !important;
+      }
     }
+  }
+  .theme--light & .v-toolbar {
+    background-color: #fafafa;
+  }
+  .theme--dark & .v-toolbar {
+    background-color: #303030;
   }
 }
 </style>

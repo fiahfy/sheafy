@@ -143,11 +143,7 @@ export default class FindingBar extends Vue {
   }
 
   onContextMenu() {
-    this.$contextMenu.show([
-      { role: 'cut' },
-      { role: 'copy' },
-      { role: 'paste' }
-    ])
+    this.$contextMenu.openEditMenu()
   }
 
   onClickUp() {

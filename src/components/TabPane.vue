@@ -1,21 +1,10 @@
 <template>
   <div class="tab-pane d-flex flex-column">
-    <v-toolbar tile dense flat class="flex-grow-0 pr-2" height="36">
-      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+    <v-toolbar tile dense flat class="flex-grow-0" height="36">
+      <span class="overline user-select-none">
         tabs
       </span>
       <chip class="ml-3" :num="tabs.length" />
-      <v-spacer />
-      <v-btn
-        icon
-        width="32"
-        height="32"
-        title="New Tab"
-        class="ml-1"
-        @click="onClickNewTab"
-      >
-        <v-icon size="20">mdi-tab-plus</v-icon>
-      </v-btn>
     </v-toolbar>
     <div ref="container" class="flex-grow-1 overflow-y-scroll scrollbar">
       <tab-list :tabs="tabs" />
@@ -41,15 +30,19 @@ export default class TabPane extends Vue {
   get tabs() {
     return tabStore.sortedTabs
   }
-
-  onClickNewTab() {
-    tabStore.newTab()
-  }
 }
 </script>
 
 <style lang="scss" scoped>
-.tab-pane > div {
-  position: relative;
+.tab-pane {
+  > div {
+    position: relative;
+  }
+  .theme--light & .v-toolbar {
+    background-color: #fafafa;
+  }
+  .theme--dark & .v-toolbar {
+    background-color: #303030;
+  }
 }
 </style>

@@ -7,7 +7,7 @@
     mini-variant-width="48"
     :right="right"
   >
-    <v-list dense class="py-0 primary--text">
+    <v-list dense class="py-0">
       <v-list-item
         v-for="item in items"
         :key="item.id"
@@ -73,7 +73,7 @@ export default class ActivityBar extends Vue {
     background-color: unset !important;
   }
   .v-list-item {
-    opacity: 0.66;
+    opacity: 0.5;
     &:hover,
     &.v-list-item--active {
       opacity: 1;

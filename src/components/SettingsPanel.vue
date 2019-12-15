@@ -1,7 +1,7 @@
 <template>
   <div class="settings-panel d-flex flex-column">
     <v-toolbar tile dense flat class="flex-grow-0" height="36">
-      <span class="subtitle-2 text-uppercase text-truncate user-select-none">
+      <span class="overline user-select-none">
         settings
       </span>
       <v-spacer />
@@ -67,3 +67,14 @@ export default class SettingsPanel extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.settings-panel {
+  .theme--light & .v-toolbar {
+    background-color: #fafafa;
+  }
+  .theme--dark & .v-toolbar {
+    background-color: #303030;
+  }
+}
+</style>

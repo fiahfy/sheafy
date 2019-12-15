@@ -10,7 +10,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component
-export default class Badge extends Vue {
+export default class Chip extends Vue {
   @Prop({ type: String, default: '' }) readonly color!: string
   @Prop({ type: [String, Number], default: '' }) readonly num!: string | number
 }

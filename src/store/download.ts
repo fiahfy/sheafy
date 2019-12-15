@@ -67,6 +67,9 @@ export default class DownloadModule extends VuexModule {
 
   @Action
   upsertDownloadItem({ id, ...params }: Partial<DownloadItem>) {
+    if (!id) {
+      return
+    }
     let downloadItems: DownloadItem[]
     if (this.downloadItems.find((item) => item.id === id)) {
       downloadItems = this.downloadItems.map((item) => {
@@ -79,7 +82,20 @@ export default class DownloadModule extends VuexModule {
         }
       })
     } else {
-      downloadItems = [...this.downloadItems, <DownloadItem>{ ...params, id }]
+      downloadItems = [
+        ...this.downloadItems,
+        {
+          status: '',
+          filepath: '',
+          filename: '',
+          url: '',
+          receivedBytes: 0,
+          totalBytes: 0,
+          startTime: 0,
+          ...params,
+          id
+        }
+      ]
     }
     this.setDownloadItems({ downloadItems })
   }

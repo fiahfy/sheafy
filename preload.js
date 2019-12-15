@@ -146,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', () => {
     ipcRenderer.sendToHost('onclick')
   })
+  // TODO: cross origin frame
   document.querySelectorAll('iframe').forEach((el) => {
     try {
       el.contentWindow.addEventListener('click', () => {

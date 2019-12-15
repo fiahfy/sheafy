@@ -32,7 +32,6 @@
 </template>
 
 <script lang="ts">
-import { VAutocomplete } from 'vuetify/lib'
 import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
 import { layoutStore, tabStore } from '~/store'
 import Tab from '~/models/tab'
@@ -44,7 +43,7 @@ import Favicon from '~/components/Favicon.vue'
   }
 })
 export default class ShortcutBar extends Vue {
-  @Ref() readonly autocomplete!: typeof VAutocomplete
+  @Ref() readonly autocomplete!: Vue
 
   width = 0
 
@@ -82,13 +81,15 @@ export default class ShortcutBar extends Vue {
   onShortcutBarChanged(value: boolean) {
     if (value) {
       this.$nextTick(() => {
-        this.$el.querySelector('input')!.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') {
-            layoutStore.hideShortcutBar()
-          }
-        })
+        this.$el
+          .querySelector('input')!
+          .addEventListener('keydown', this.onKeyDown)
         this.width = (this.$el as HTMLElement).offsetWidth
       })
+    } else {
+      this.$el
+        .querySelector('input')!
+        .removeEventListener('keydown', this.onKeyDown)
     }
   }
 
@@ -110,6 +111,12 @@ export default class ShortcutBar extends Vue {
       }
       ;(this.autocomplete as any).isMenuActive = true
     })
+  }
+
+  onKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      layoutStore.hideShortcutBar()
+    }
   }
 
   onChange(value: string) {
