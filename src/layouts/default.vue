@@ -1,5 +1,5 @@
 <template>
-  <v-app :class="classes" @contextmenu.native="onContextMenu">
+  <v-app :class="classes">
     <title-bar />
     <v-content class="fill-height">
       <router-view class="fill-height" />
@@ -55,10 +55,6 @@ export default class Layout extends Vue {
     if (e.key === 'Escape') {
       layoutStore.hideShortcutBar()
     }
-  }
-
-  onContextMenu() {
-    this.$contextMenu.open()
   }
 }
 </script>

@@ -8,19 +8,23 @@
     extended
     extension-height="36"
   >
-    <favicon
-      class="mx-3"
-      :url="activeTab && activeTab.favicon"
-      :loading="activeTab && activeTab.loading"
-    />
     <div
-      class="caption text-truncate user-select-none"
-      @contextmenu="onContextMenu"
-      v-text="activeTab && activeTab.title"
-    />
-    <v-btn icon small class="mx-1" title="Close" @click="onClickClose">
-      <v-icon small>mdi-close</v-icon>
-    </v-btn>
+      class="d-flex fill-height align-center user-select-none"
+      @contextmenu.stop="onContextMenu"
+    >
+      <favicon
+        class="mx-3"
+        :url="activeTab && activeTab.favicon"
+        :loading="activeTab && activeTab.loading"
+      />
+      <div
+        class="caption text-truncate"
+        v-text="activeTab && activeTab.title"
+      />
+      <v-btn icon small class="mx-1" title="Close" @click="onClickClose">
+        <v-icon small>mdi-close</v-icon>
+      </v-btn>
+    </div>
     <div class="background d-flex flex-grow-1 fill-height align-center pl-1">
       <v-btn icon small class="mr-1" title="New Tab" @click="onClickNewTab">
         <v-icon small>mdi-plus</v-icon>
@@ -34,7 +38,7 @@
         title="Go Back Tab"
         :disabled="!canGoBackTab"
         @click="onClickGoBackTab"
-        @contextmenu="onContextMenuBackTab"
+        @contextmenu.stop="onContextMenuBackTab"
       >
         <v-icon small>mdi-chevron-left</v-icon>
       </v-btn>
@@ -46,7 +50,7 @@
         title="Go Forward Tab"
         :disabled="!canGoForwardTab"
         @click="onClickGoForwardTab"
-        @contextmenu="onContextMenuForwardTab"
+        @contextmenu.stop="onContextMenuForwardTab"
       >
         <v-icon small>mdi-chevron-right</v-icon>
       </v-btn>
@@ -80,7 +84,7 @@
         title="Go Back"
         :disabled="!activeTab || !activeTab.canGoBack"
         @click="onClickGoBack"
-        @contextmenu="onContextMenuBack"
+        @contextmenu.stop="onContextMenuBack"
       >
         <v-icon size="18">mdi-arrow-left</v-icon>
       </v-btn>
@@ -92,7 +96,7 @@
         title="Go Forward"
         :disabled="!activeTab || !activeTab.canGoForward"
         @click="onClickGoForward"
-        @contextmenu="onContextMenuForward"
+        @contextmenu.stop="onContextMenuForward"
       >
         <v-icon size="18">mdi-arrow-right</v-icon>
       </v-btn>
@@ -137,6 +141,8 @@ import Favicon from '~/components/Favicon.vue'
 export default class Toolbar extends Vue {
   @Prop({ type: String, required: true }) readonly viewId!: string
 
+  storedEvent: MouseEvent | undefined = undefined
+
   get classes() {
     return {
       active: tabStore.isActiveView({ id: this.viewId })
@@ -173,8 +179,12 @@ export default class Toolbar extends Vue {
     if (this.viewId !== viewId) {
       return
     }
+    const e = this.storedEvent
+    if (!e) {
+      return
+    }
     this.$contextMenu.open(
-      history.map((url, index) => {
+      history.slice(0, 10).map((url, index) => {
         const item = historyStore.getHistoryItemWithUrl({ url })
         return {
           icon: item ? item.favicon : undefined,
@@ -186,7 +196,7 @@ export default class Toolbar extends Vue {
             })
         }
       }),
-      { vuetify: true }
+      { vuetify: true, x: e.clientX, y: e.clientY }
     )
   }
 
@@ -200,8 +210,12 @@ export default class Toolbar extends Vue {
     if (this.viewId !== viewId) {
       return
     }
+    const e = this.storedEvent
+    if (!e) {
+      return
+    }
     this.$contextMenu.open(
-      history.map((url, index) => {
+      history.slice(0, 10).map((url, index) => {
         const item = historyStore.getHistoryItemWithUrl({ url })
         return {
           icon: item ? item.favicon : undefined,
@@ -213,7 +227,7 @@ export default class Toolbar extends Vue {
             })
         }
       }),
-      { vuetify: true }
+      { vuetify: true, x: e.clientX, y: e.clientY }
     )
   }
 
@@ -297,45 +311,53 @@ export default class Toolbar extends Vue {
     )
   }
 
-  onContextMenuBack() {
+  onContextMenuBack(e: MouseEvent) {
+    this.storedEvent = e
     this.$eventBus.$emit('requestBackHistory', { viewId: this.viewId })
   }
 
-  onContextMenuForward() {
+  onContextMenuForward(e: MouseEvent) {
+    this.storedEvent = e
     this.$eventBus.$emit('requestForwardHistory', { viewId: this.viewId })
   }
 
-  onContextMenuBackTab() {
+  onContextMenuBackTab(e: MouseEvent) {
     this.$contextMenu.open(
       tabStore
         .getBackTabHistory({ viewId: this.viewId })
-        .map((history, index) => {
+        .slice(0, 10)
+        .map((tab, index) => {
           return {
-            label: history && history.title,
+            icon: tab && tab.favicon,
+            label: tab && tab.title,
             click: () =>
               tabStore.goToOffsetTab({
                 viewId: this.viewId,
                 offset: -index - 1
               })
           }
-        })
+        }),
+      { vuetify: true, x: e.clientX, y: e.clientY }
     )
   }
 
-  onContextMenuForwardTab() {
+  onContextMenuForwardTab(e: MouseEvent) {
     this.$contextMenu.open(
       tabStore
         .getForwardTabHistory({ viewId: this.viewId })
-        .map((history, index) => {
+        .slice(0, 10)
+        .map((tab, index) => {
           return {
-            label: history && history.title,
+            icon: tab && tab.favicon,
+            label: tab && tab.title,
             click: () =>
               tabStore.goToOffsetTab({
                 viewId: this.viewId,
                 offset: index + 1
               })
           }
-        })
+        }),
+      { vuetify: true, x: e.clientX, y: e.clientY }
     )
   }
 }

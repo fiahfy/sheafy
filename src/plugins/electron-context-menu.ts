@@ -21,6 +21,7 @@ const createInspectElementMenuItem = () => {
 const contextMenuCreator = (app: NuxtAppOptions) => {
   return {
     open: (template: MenuItemConstructorOptions[] = [], options: any = {}) => {
+      app.$eventBus.$emit('closeContextMenu')
       if (!options.vuetify) {
         open(template, options)
         return
@@ -34,9 +35,10 @@ const contextMenuCreator = (app: NuxtAppOptions) => {
           template = [...template, menuItem]
         }
       }
-      app.$eventBus.$emit('openContextMenu', { template })
+      app.$eventBus.$emit('openContextMenu', { template, options })
     },
     openEditMenu: () => {
+      app.$eventBus.$emit('closeContextMenu')
       open([{ role: 'cut' }, { role: 'copy' }, { role: 'paste' }])
     }
   }
