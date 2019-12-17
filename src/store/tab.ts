@@ -346,11 +346,11 @@ export default class TabModule extends VuexModule {
     let index
     switch (position) {
       case 'next':
-        index = this.getTabIndex({ id: srcId }) + 1
+        index = this.sortedIds.indexOf(srcId) + 1
         break
       case 'last':
       default:
-        index = this.tabs.length
+        index = this.sortedIds.length
         break
     }
 
