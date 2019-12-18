@@ -9,7 +9,8 @@
     extension-height="36"
   >
     <div
-      class="d-flex fill-height align-center user-select-none"
+      class="d-flex flex-grow-0 fill-height align-center user-select-none"
+      style="min-width: 0;"
       @contextmenu.stop="onContextMenu"
     >
       <favicon
