@@ -157,7 +157,9 @@ export default class Index extends Vue {
 
     this.$nextTick(() => {
       const el = this.$el.querySelector('.inner')
-      el && this.observer.observe(el)
+      if (el) {
+        this.observer.observe(el)
+      }
     })
   }
 
@@ -166,7 +168,9 @@ export default class Index extends Vue {
     document.removeEventListener('mouseup', this.onMouseUp)
 
     const el = this.$el.querySelector('.inner')
-    el && this.observer.unobserve(el)
+    if (el) {
+      this.observer.unobserve(el)
+    }
   }
 
   onMouseDown() {

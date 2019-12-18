@@ -126,12 +126,12 @@ export default class DownloadListItem extends Vue {
   get sizeText() {
     if (['progressing', 'paused', 'interrupted'].includes(this.item.status)) {
       return (
-        prettyBytes(this.item.receivedBytes || 0) +
+        prettyBytes(this.item.receivedBytes ?? 0) +
         ' of ' +
-        prettyBytes(this.item.totalBytes || 0)
+        prettyBytes(this.item.totalBytes ?? 0)
       )
     }
-    return prettyBytes(this.item.receivedBytes || 0)
+    return prettyBytes(this.item.receivedBytes ?? 0)
   }
 
   get statusText() {

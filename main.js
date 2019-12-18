@@ -11,7 +11,9 @@ const port = process.env.PORT || 3000
 let mainWindow = null
 
 const send = (...args) => {
-  mainWindow && mainWindow.webContents.send(...args)
+  if (mainWindow) {
+    mainWindow.webContents.send(...args)
+  }
 }
 
 const createTemplate = () => {
@@ -379,7 +381,9 @@ app.on('window-all-closed', () => process.platform !== 'darwin' && app.quit())
 app.on('web-contents-created', (_e, contents) => {
   if (contents.getType() === 'webview') {
     contents.on('new-window', (e, _url, _windowName, disposition) => {
-      disposition !== 'new-window' && e.preventDefault()
+      if (disposition !== 'new-window') {
+        e.preventDefault()
+      }
     })
   }
 })

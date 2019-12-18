@@ -27,7 +27,7 @@
         depressed
         rounded
         title="Find"
-        @click.stop="onClickFind"
+        @click.stop="onClickStopFind"
         @mouseup.stop
       >
         <v-icon small>mdi-file-search-outline</v-icon>

@@ -110,7 +110,7 @@ export default class Webview extends Vue {
       this.onUpdateTargetUrl
     )
 
-    this.webview && this.webview.remove()
+    this.webview.remove()
   }
 
   init() {

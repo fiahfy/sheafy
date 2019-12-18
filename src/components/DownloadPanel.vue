@@ -77,8 +77,8 @@ export default class DownloadPanel extends Vue {
       items = items.filter((item) => {
         return words.every((word) => {
           return (
-            (item.url || '').includes(word) ||
-            (item.filename || '').includes(word)
+            (item.url ?? '').includes(word) ||
+            (item.filename ?? '').includes(word)
           )
         })
       })

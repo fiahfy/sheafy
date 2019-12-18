@@ -100,7 +100,7 @@ export default class ContextMenu extends Vue {
   }
 
   onClickItem(item: any) {
-    item.click && item.click()
+    item?.click()
     this.active = false
   }
 
@@ -110,7 +110,7 @@ export default class ContextMenu extends Vue {
 
   onMouseUpItem(item: any) {
     if (!this.clicking) {
-      item.click && item.click()
+      item?.click()
       this.active = false
     }
     this.clicking = false

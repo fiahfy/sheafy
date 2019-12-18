@@ -329,8 +329,8 @@ export default class Toolbar extends Vue {
         .slice(0, 10)
         .map((tab, index) => {
           return {
-            icon: tab && tab.favicon,
-            label: tab && tab.title,
+            icon: tab?.favicon,
+            label: tab?.title,
             click: () =>
               tabStore.goToOffsetTab({
                 viewId: this.viewId,
@@ -349,8 +349,8 @@ export default class Toolbar extends Vue {
         .slice(0, 10)
         .map((tab, index) => {
           return {
-            icon: tab && tab.favicon,
-            label: tab && tab.title,
+            icon: tab?.favicon,
+            label: tab?.title,
             click: () =>
               tabStore.goToOffsetTab({
                 viewId: this.viewId,

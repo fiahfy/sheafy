@@ -99,7 +99,7 @@ export default class TabModule extends VuexModule {
         return {
           ...app,
           tabs: app.tabs.sort(
-            createTabSort(this.sortedIdsOnHost[app.host] || [])
+            createTabSort(this.sortedIdsOnHost[app.host] ?? [])
           )
         }
       })
@@ -315,7 +315,7 @@ export default class TabModule extends VuexModule {
       srcId = this.activeTabIds[this.activeViewId],
       openerId = '',
       viewId = this.activeViewId
-    } = options || {}
+    } = options ?? {}
     const id = nanoid()
     const url = homeUrl
     const tab = convertTab({
@@ -470,7 +470,7 @@ export default class TabModule extends VuexModule {
     // back tab if prev tab is opener
     // if (id === this.activeId) {
     //   const tab = this.getTab({ id })
-    //   if (tab && tab.openerId === this.history[this.historyIndex - 1]) {
+    //   if (tab?.openerId === this.history[this.historyIndex - 1]) {
     //     this.goBackTab()
     //   }
     // }

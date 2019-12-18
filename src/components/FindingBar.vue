@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar v-if="activeTab && activeTab.finding" dense class="finding-bar">
+  <v-toolbar v-if="finding" dense class="finding-bar">
     <v-text-field
       v-model="findingText"
       name="finding-text"
@@ -11,7 +11,7 @@
       @keydown.esc="onKeyDownEsc"
       @contextmenu.stop="onContextMenu"
     />
-    <div v-if="activeTab && activeTab.findingText" class="ml-2 body-2">
+    <div v-if="findingText" class="ml-2 body-2">
       {{ activeTab.foundActiveMatchOrdinal }} / {{ activeTab.foundMatches }}
     </div>
     <v-btn
@@ -61,9 +61,12 @@ export default class FindingBar extends Vue {
     return tabStore.getActiveTab({ viewId: this.viewId })
   }
 
+  get finding() {
+    return this.activeTab?.finding ?? false
+  }
+
   get findingText() {
-    const tab = this.activeTab
-    return tab ? tab.findingText : ''
+    return this.activeTab?.findingText ?? ''
   }
 
   set findingText(value) {

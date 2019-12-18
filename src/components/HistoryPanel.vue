@@ -79,7 +79,7 @@ export default class HistoryPanel extends Vue {
     return items.filter((item) => {
       return words.every((word) => {
         return (
-          (item.url || '').includes(word) || (item.title || '').includes(word)
+          (item.url ?? '').includes(word) || (item.title ?? '').includes(word)
         )
       })
     })
