@@ -17,7 +17,7 @@
 <script lang="ts">
 import { Vue, Component, Ref } from 'vue-property-decorator'
 import { layoutStore, settingsStore, tabStore } from '~/store'
-import TabUtils from '~/utils/tab'
+import * as TabUtils from '~/utils/tab'
 import AppPane from '~/components/AppPane.vue'
 import TabPane from '~/components/TabPane.vue'
 

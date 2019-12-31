@@ -1,7 +1,7 @@
 import { remote } from 'electron'
 import nanoid from 'nanoid'
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
-import TabUtils from '~/utils/tab'
+import * as TabUtils from '~/utils/tab'
 import App from '~/models/app'
 import Tab, { homeUrl } from '~/models/tab'
 import TabHistoryItem from '~/models/tab-history-item'

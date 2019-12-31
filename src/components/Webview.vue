@@ -6,7 +6,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { remote, WebviewTag } from 'electron'
 import { tabStore, historyStore } from '~/store'
-import TabUtils from '~/utils/tab'
+import * as TabUtils from '~/utils/tab'
 import Tab, { homeUrl } from '~/models/tab'
 
 const urlWithoutHash = (url: string) => {
